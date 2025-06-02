@@ -1,0 +1,135 @@
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid transparent;
+  background-color: color-mix(in srgb, var(--dropdown-color, var(--color-primary)) 10%, transparent);
+  border-radius: 0.375rem;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+
+.button:hover {
+  border-color: var(--dropdown-color, var(--color-primary));
+  background-color: color-mix(in srgb, var(--dropdown-color, var(--color-primary)) 15%, transparent);
+}
+
+.icon {
+  color: var(--dropdown-color, var(--color-primary));
+  flex-shrink: 0;
+}
+
+.chevron {
+  margin-left: auto;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.5;
+}
+
+.button:hover .chevron {
+  opacity: 0.8;
+}
+
+.open .chevron {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  padding: 0.375rem;
+  border-radius: 0.375rem;
+  border: none;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  z-index: 50;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+  background-color: color-mix(in srgb, var(--dropdown-color, var(--color-primary)) 5%, white);
+}
+
+.open .menu {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 0.125rem;
+}
+
+.option:hover {
+  background-color: color-mix(in srgb, var(--dropdown-color, var(--color-primary)) 10%, transparent);
+}
+
+.option.selected {
+  color: var(--dropdown-color, var(--color-primary));
+  background-color: color-mix(in srgb, var(--dropdown-color, var(--color-primary)) 15%, transparent);
+  font-weight: 500;
+}
+
+/* Sizes */
+.sm {
+  font-size: 0.875rem;
+  min-width: 120px;
+}
+
+.sm .button {
+  padding: 0.375rem 0.625rem;
+  height: 32px;
+}
+
+.md {
+  font-size: 1rem;
+  min-width: 150px;
+}
+
+.md .button {
+  padding: 0.625rem 0.75rem;
+  height: 40px;
+}
+
+.lg {
+  font-size: 1.125rem;
+  min-width: 180px;
+}
+
+.lg .button {
+  padding: 0.75rem 1rem;
+  height: 48px;
+}
+
+.sm .option {
+  padding: 0.375rem 0.625rem;
+  min-height: 32px;
+}
+
+.md .option {
+  padding: 0.625rem 0.75rem;
+  min-height: 40px;
+}
+
+.lg .option {
+  padding: 0.75rem 1rem;
+  min-height: 48px;
+}
