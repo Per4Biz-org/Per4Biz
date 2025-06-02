@@ -1,0 +1,24 @@
+.section {
+  padding: 1.5rem;
+  position: relative;
+  overflow: visible;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 1rem 0;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 1rem 0;
+}
+
+.description {
+  color: var(--color-text-light);
+  margin: 0 0 1rem 0;
+}

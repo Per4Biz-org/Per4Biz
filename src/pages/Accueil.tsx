@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UtensilsCrossed } from 'lucide-react';
+import { useMenu } from '../context/MenuContext';
+import { menuItemsAccueil } from '../config/menuConfig';
 
 const Accueil: React.FC = () => {
+  const { setMenuItems } = useMenu();
+
+  useEffect(() => {
+    setMenuItems(menuItemsAccueil);
+  }, [setMenuItems]);
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto text-center">

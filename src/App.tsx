@@ -1,16 +1,80 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Accueil from './pages/Accueil'
+import TestUI from './pages/TestUI'
+import ParametreGlobal from './pages/ParametreGlobal/'
+import Entites from './pages/ParametreGlobal/Entites'
+import Finances from './pages/finances'
+import ParametresFinances from './pages/finances/parametresFinances'
+import Profil from './pages/Profil'
 import Layout from './components/Layout'
+import { MenuProvider } from './context/MenuContext'
+import { AuthProvider } from './context/AuthContext'
+import { ProfilProvider } from './context/ProfilContext'
+import { PrivateRoute } from './components/PrivateRoute'
+import Login from './pages/Login'
 
 function App() {
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Accueil />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <AuthProvider>
+      <ProfilProvider>
+        <MenuProvider>
+          <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={
+              <PrivateRoute>
+                <Layout>
+                  <Accueil />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/testui" element={
+              <PrivateRoute>
+                <Layout>
+                  <TestUI />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/parametres-global/entites" element={
+              <PrivateRoute>
+                <Layout>
+                  <Entites />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances" element={
+              <PrivateRoute>
+                <Layout>
+                  <Finances />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/parametres-finances" element={
+              <PrivateRoute>
+                <Layout>
+                  <ParametresFinances />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/parametres-global" element={
+              <PrivateRoute>
+                <Layout>
+                  <ParametreGlobal />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/profil" element={
+              <PrivateRoute>
+                <Layout>
+                  <Profil />
+                </Layout>
+              </PrivateRoute>
+            } />
+          </Routes>
+        </BrowserRouter>
+        </MenuProvider>
+      </ProfilProvider>
+    </AuthProvider>
   )
 }
 

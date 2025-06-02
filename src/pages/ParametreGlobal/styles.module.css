@@ -1,0 +1,16 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.form {
+  background-color: var(--color-white);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+}
