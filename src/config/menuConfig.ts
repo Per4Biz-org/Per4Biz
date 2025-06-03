@@ -36,6 +36,22 @@ export const menuItemsGestionFinanciere = [
 
 export const menuItemsParamGestionFinanciere = [
   { icon: Home, label: 'Paramètres GF', path: '/finances/parametres-finances' },
-  { icon: CreditCard, label: 'Paramètre Jours', path: '/finances/parametres-finances/param-jours' },
-  { icon: FileText, label: 'Type mouv Bancaire', path: '/finances/parametres-finances/type-mouv-bq' }
+  { icon: CreditCard, label: 'Paramètre Jours', path: '/finances/parametres-finances/param-jours' }
+];
+
+export const menuItemsGestionBancaire = [
+  { icon: Home, label: 'Gestion Bancaire', path: '/banques' },
+  { icon: CreditCard, label: 'Mouvements Bancaires', path: '/banques/mouv-bancaire' },
+  { icon: FileText, label: 'Import Relevés', path: '/banques/import-releves' },
+  { icon: Settings, label: 'Paramètres', path: '/banques/parametres-banque', separator: true }
+];
+
+export const menuItemsParamGestionBancaire = [
+  { icon: Home, label: 'Paramètres GB', path: '/banques/parametres-bancaire' },
+  { icon: CreditCard, label: 'Comptes Bancaires', path: '/banques/parametres-bancaire/comptes-bancaire',separator: true },
+   { icon: FileText, label: 'Cartes Bancaires', path: '/banques/parametres-bancaire/cartes-bancaires' },
+  { icon: FileText, label: 'Mode Paiement', path: '/banques/parametres-bancaire/mode-paiement' }, 
+  { icon: FileText, label: 'Type mouv Bancaire', path: '/banques/parametres-bancaire/type-mouv-bq' }, 
+  { icon: FileText, label: 'Import Relevés', path: '/banques/parametres-bancaire/import-releves',separator: true },
+  { icon: FileText, label: 'Format Import', path: '/banques/parametres-bancaire/format-import' }
 ];

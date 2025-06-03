@@ -5,6 +5,9 @@ import ParametreGlobal from './pages/ParametreGlobal/'
 import Entites from './pages/ParametreGlobal/Entites'
 import Finances from './pages/finances'
 import ParametresFinances from './pages/finances/parametresFinances'
+import Banques from './pages/banques'
+import ParametresBanque from './pages/banques/ParametresBanque'
+import ComptesBancaire from './pages/banques/ParametresBanque/ComptesBancaire'
 import Profil from './pages/Profil'
 import Layout from './components/Layout'
 import { MenuProvider } from './context/MenuContext'
@@ -60,6 +63,27 @@ function App() {
               <PrivateRoute>
                 <Layout>
                   <ParametreGlobal />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/banques" element={
+              <PrivateRoute>
+                <Layout>
+                  <Banques />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/banques/parametres-bancaire" element={
+              <PrivateRoute>
+                <Layout>
+                  <ParametresBanque />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/banques/parametres-bancaire/comptes-bancaire" element={
+              <PrivateRoute>
+                <Layout>
+                  <ComptesBancaire />
                 </Layout>
               </PrivateRoute>
             } />
