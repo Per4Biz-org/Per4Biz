@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useMenu } from '../../context/MenuContext';
+import { useProfil } from '../../context/ProfilContext';
 import { supabase } from '../../lib/supabase';
 import { menuItemsParametreGlobal } from '../../config/menuConfig';
 import { PageSection } from '../../components/ui/page-section';
@@ -19,6 +20,7 @@ interface Entite {
 
 const Entites: React.FC = () => {
   const { setMenuItems } = useMenu();
+  const { profil, loading: profilLoading } = useProfil();
   const [entites, setEntites] = React.useState<Entite[]>([]);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [selectedEntite, setSelectedEntite] = React.useState<Entite | null>(null);
@@ -29,20 +31,34 @@ const Entites: React.FC = () => {
   const handleSubmit = async (formData: { code: string; libelle: string; actif: boolean }) => {
     setIsSubmitting(true);
     try {
+      if (!profil?.com_contrat_client_id) {
+        throw new Error('Aucun contrat client associé au profil');
+      }
+
       let error;
       
       if (selectedEntite) {
         // Mode édition
+        const updateData = {
+          ...formData,
+          com_contrat_client_id: profil.com_contrat_client_id
+        };
+        
         const { error: updateError } = await supabase
           .from('com_entite')
-          .update(formData)
+          .update(updateData)
           .eq('id', selectedEntite.id);
         error = updateError;
       } else {
         // Mode création
+        const insertData = {
+          ...formData,
+          com_contrat_client_id: profil.com_contrat_client_id
+        };
+
         const { error: insertError } = await supabase
           .from('com_entite')
-          .insert([formData]);
+          .insert([insertData]);
         error = insertError;
       }
 
@@ -116,9 +132,15 @@ const Entites: React.FC = () => {
 
   const fetchEntites = async () => {
     try {
+      if (!profil?.com_contrat_client_id) {
+        setEntites([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('com_entite')
         .select('*')
+        .eq('com_contrat_client_id', profil.com_contrat_client_id)
         .order('code', { ascending: true });
 
       if (error) {
@@ -135,8 +157,10 @@ const Entites: React.FC = () => {
 
   useEffect(() => {
     setMenuItems(menuItemsParametreGlobal);
-    fetchEntites();
-  }, [setMenuItems]);
+    if (!profilLoading) {
+      fetchEntites();
+    }
+  }, [setMenuItems, profilLoading, profil?.com_contrat_client_id]);
 
   const columns: Column<Entite>[] = [
     { 
@@ -181,7 +205,7 @@ const Entites: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title="Gestion des Entités"
+        title={loading || profilLoading ? "Chargement..." : "Gestion des Entités"}
         description="Gérez les différentes entités de votre organisation"
         className={styles.header}
       >

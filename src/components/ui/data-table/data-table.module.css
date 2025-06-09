@@ -1,14 +1,14 @@
 .table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0;
+  border-spacing: 0 2px;
   background-color: var(--color-white);
   border-radius: 0.5rem;
   overflow: hidden;
 }
 
 .dataCount {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--color-text-light);
   margin-bottom: 0.5rem;
 }
@@ -18,13 +18,14 @@
 }
 
 .headerCell {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   font-weight: 500;
   text-align: left;
   color: var(--color-text);
   border-bottom: 2px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
   white-space: nowrap;
   cursor: pointer;
+  font-size: 0.75rem;
   transition: background-color 0.2s;
 }
 
@@ -61,13 +62,14 @@
 }
 
 .cell {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   color: var(--color-text);
+  font-size: 0.75rem;
   border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 5%, transparent);
 }
 
 .actionsCell {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   color: var(--color-text);
   border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 5%, transparent);
   width: 1%;
@@ -101,14 +103,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   background-color: color-mix(in srgb, var(--color-primary) 2%, transparent);
   border-top: 1px solid color-mix(in srgb, var(--color-primary) 5%, transparent);
 }
 
 .paginationInfo {
   color: var(--color-text);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 
 .paginationControls {
@@ -139,5 +141,5 @@
 
 .emptyMessage {
   color: var(--color-text-light);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }

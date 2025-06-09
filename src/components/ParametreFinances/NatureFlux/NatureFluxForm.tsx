@@ -1,52 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { useProfil } from '../../context/ProfilContext';
-import { Form, FormField, FormInput, FormActions } from '../ui/form';
-import { Toggle } from '../ui/toggle';
-import { Dropdown, DropdownOption } from '../ui/dropdown';
-import { Button } from '../ui/button';
+import { supabase } from '../../../lib/supabase';
+import { useProfil } from '../../../context/ProfilContext';
+import { Form, FormField, FormInput, FormActions } from '../../ui/form';
+import { Toggle } from '../../ui/toggle';
+import { Dropdown, DropdownOption } from '../../ui/dropdown';
+import { Button } from '../../ui/button';
 
 interface Entite {
   id: string;
+  code: string;
   libelle: string;
 }
 
-interface CompteBancaireFormData {
-  id_entite: string;
+interface NatureFluxFormData {
   code: string;
-  nom: string;
-  banque: string;
-  iban: string;
-  bic?: string;
+  libelle: string;
+  description?: string;
+  id_entite: string;
   actif: boolean;
-  commentaire?: string;
 }
 
-interface CompteBancaireFormProps {
-  initialData?: CompteBancaireFormData;
-  onSubmit: (data: CompteBancaireFormData) => Promise<void>;
+interface NatureFluxFormProps {
+  initialData?: NatureFluxFormData;
+  onSubmit: (data: NatureFluxFormData) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
 }
 
-export function CompteBancaireForm({
+export function NatureFluxForm({
   initialData = {
-    id_entite: '',
     code: '',
-    nom: '',
-    banque: '',
-    iban: '',
-    bic: '',
-    actif: true,
-    commentaire: ''
+    libelle: '',
+    description: '',
+    id_entite: '',
+    actif: true
   },
   onSubmit,
   onCancel,
   isSubmitting = false
-}: CompteBancaireFormProps) {
-  const [formData, setFormData] = useState<CompteBancaireFormData>(initialData);
+}: NatureFluxFormProps) {
+  const [formData, setFormData] = useState<NatureFluxFormData>(initialData);
   const [entites, setEntites] = useState<Entite[]>([]);
-  const [errors, setErrors] = useState<Partial<Record<keyof CompteBancaireFormData, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof NatureFluxFormData, string>>>({});
   const { profil } = useProfil();
 
   useEffect(() => {
@@ -75,7 +70,7 @@ export function CompteBancaireForm({
       [name]: value
     }));
     // Effacer l'erreur quand l'utilisateur commence à taper
-    if (errors[name as keyof CompteBancaireFormData]) {
+    if (errors[name as keyof NatureFluxFormData]) {
       setErrors(prev => ({
         ...prev,
         [name]: undefined
@@ -104,13 +99,11 @@ export function CompteBancaireForm({
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<Record<keyof CompteBancaireFormData, string>> = {};
+    const newErrors: Partial<Record<keyof NatureFluxFormData, string>> = {};
 
-    if (!formData.id_entite) newErrors.id_entite = 'L\'entité est requise';
     if (!formData.code) newErrors.code = 'Le code est requis';
-    if (!formData.nom) newErrors.nom = 'Le nom est requis';
-    if (!formData.banque) newErrors.banque = 'La banque est requise';
-    if (!formData.iban) newErrors.iban = 'L\'IBAN est requis';
+    if (!formData.libelle) newErrors.libelle = 'Le libellé est requis';
+    if (!formData.id_entite) newErrors.id_entite = 'L\'entité est requise';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -161,70 +154,23 @@ export function CompteBancaireForm({
       </FormField>
 
       <FormField
-        label="Nom"
+        label="Libellé"
         required
-        error={errors.nom}
+        error={errors.libelle}
         className="mb-3"
       >
         <FormInput
-          name="nom"
-          value={formData.nom}
+          name="libelle"
+          value={formData.libelle}
           onChange={handleInputChange}
-          maxLength={30}
-          placeholder="30 caractères max"
-          className="h-9"
-        />
-      </FormField>
-
-      <FormField
-        label="Banque"
-        required
-        error={errors.banque}
-        className="mb-3"
-      >
-        <FormInput
-          name="banque"
-          value={formData.banque}
-          onChange={handleInputChange}
-          maxLength={20}
-          placeholder="Ex: BNP Paribas"
-          className="h-9"
-        />
-      </FormField>
-
-      <FormField
-        label="IBAN"
-        required
-        error={errors.iban}
-        className="mb-3"
-      >
-        <FormInput
-          name="iban"
-          value={formData.iban}
-          onChange={handleInputChange}
-          maxLength={30}
-          placeholder="FRXX XXXX XXXX XXXX XXXX XXXX XXX"
-          className="h-9"
-        />
-      </FormField>
-
-      <FormField
-        label="BIC"
-        className="mb-3"
-      >
-        <FormInput
-          name="bic"
-          value={formData.bic}
-          onChange={handleInputChange}
-          maxLength={11}
-          placeholder="11 caractères max"
+          placeholder="Ex: Exploitation"
           className="h-9"
         />
       </FormField>
 
       <FormField
         label="Statut"
-        className="mb-3 col-span-1"
+        className="mb-3"
       >
         <Toggle
           checked={formData.actif}
@@ -235,16 +181,16 @@ export function CompteBancaireForm({
       </FormField>
 
       <FormField
-        label="Commentaire"
-        className="mb-3 col-span-1"
+        label="Description"
+        className="mb-3 col-span-2"
       >
         <textarea
-          name="commentaire"
-          value={formData.commentaire}
+          name="description"
+          value={formData.description}
           onChange={handleInputChange}
           className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
-          rows={1}
-          placeholder="Commentaires ou notes sur le compte..."
+          rows={2}
+          placeholder="Description optionnelle de la nature de flux..."
         />
       </FormField>
 

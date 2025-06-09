@@ -1,68 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useProfil } from '../../../context/ProfilContext';
 import { useMenu } from '../../../context/MenuContext';
+import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
-import { menuItemsParamGestionBancaire } from '../../../config/menuConfig';
+import { menuItemsParamGestionFinanciere } from '../../../config/menuConfig';
 import { PageSection } from '../../../components/ui/page-section';
 import { DataTable, Column } from '../../../components/ui/data-table';
 import { Button } from '../../../components/ui/button';
 import { ToastContainer, ToastData } from '../../../components/ui/toast';
-import { CompteBancaireForm } from '../../../components/ParametreBanque/CompteBancaireForm';
+import { SousCategorieFluxForm } from '../../../components/ParametreFinances/SousCategorieFlux/SousCategorieFluxForm';
 import styles from './styles.module.css';
 
-interface CompteBancaire {
+interface SousCategorieFlux {
   id: string;
   code: string;
-  id_entite: string;
-  nom: string;
-  banque: string;
-  iban: string;
-  bic: string | null;
+  libelle: string;
+  id_categorie: string;
+  description: string | null;
+  ordre_affichage: number;
   actif: boolean;
-  commentaire: string | null;
-  date_creation: string;
   created_at: string;
-  entite: {
+  categorie: {
     code: string;
+    libelle: string;
+    entite: {
+      code: string;
+      libelle: string;
+    };
   };
 }
 
-const ComptesBancaire: React.FC = () => {
+const SousCategorieFlux: React.FC = () => {
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
-  const [comptes, setComptes] = useState<CompteBancaire[]>([]);
+  const [sousCategoriesFlux, setSousCategoriesFlux] = useState<SousCategorieFlux[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCompte, setSelectedCompte] = useState<CompteBancaire | null>(null);
+  const [selectedSousCategorie, setSelectedSousCategorie] = useState<SousCategorieFlux | null>(null);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState<ToastData[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchComptes = async () => {
+  const fetchSousCategoriesFlux = async () => {
     try {
       if (!profil?.com_contrat_client_id) {
-        setComptes([]);
+        setSousCategoriesFlux([]);
         return;
       }
 
       const { data, error } = await supabase
-        .from('fin_compte_bancaire')
+        .from('fin_flux_sous_categorie')
         .select(`
           *,
-          entite:id_entite (
-            code
+          categorie:id_categorie (
+            code,
+            libelle,
+            id_entite,
+            entite:id_entite (
+              code,
+              libelle
+            )
           )
         `)
         .eq('com_contrat_client_id', profil.com_contrat_client_id)
+        .order('ordre_affichage')
         .order('code');
 
       if (error) throw error;
-      setComptes(data || []);
+      setSousCategoriesFlux(data || []);
     } catch (error) {
-      console.error('Erreur lors de la récupération des comptes:', error);
+      console.error('Erreur lors de la récupération des sous-catégories de flux:', error);
       addToast({
-        label: 'Erreur lors de la récupération des comptes bancaires',
+        label: 'Erreur lors de la récupération des sous-catégories de flux',
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -72,9 +81,9 @@ const ComptesBancaire: React.FC = () => {
   };
 
   useEffect(() => {
-    setMenuItems(menuItemsParamGestionBancaire);
+    setMenuItems(menuItemsParamGestionFinanciere);
     if (!profilLoading) {
-      fetchComptes();
+      fetchSousCategoriesFlux();
     }
   }, [setMenuItems, profilLoading, profil?.com_contrat_client_id]);
 
@@ -99,49 +108,55 @@ const ComptesBancaire: React.FC = () => {
 
       let error;
       
-      if (selectedCompte) {
-        // Préparer les données pour la mise à jour en excluant l'objet entite
+      if (selectedSousCategorie) {
+        // Mode édition
         const updateData = {
-          com_contrat_client_id: profil.com_contrat_client_id,
-          id_entite: formData.id_entite,
           code: formData.code,
-          nom: formData.nom,
-          banque: formData.banque,
-          iban: formData.iban,
-          bic: formData.bic || '',
+          libelle: formData.libelle,
+          id_categorie: formData.id_categorie,
+          description: formData.description || null,
+          ordre_affichage: formData.ordre_affichage,
           actif: formData.actif,
-          commentaire: formData.commentaire || ''
+          com_contrat_client_id: profil.com_contrat_client_id
         };
 
         const { error: updateError } = await supabase
-          .from('fin_compte_bancaire')
+          .from('fin_flux_sous_categorie')
           .update(updateData)
-          .eq('id', selectedCompte.id);
+          .eq('id', selectedSousCategorie.id);
         error = updateError;
       } else {
+        // Mode création
+        const insertData = {
+          code: formData.code,
+          libelle: formData.libelle,
+          id_categorie: formData.id_categorie,
+          description: formData.description || null,
+          ordre_affichage: formData.ordre_affichage,
+          actif: formData.actif,
+          com_contrat_client_id: profil.com_contrat_client_id
+        };
+
         const { error: insertError } = await supabase
-          .from('fin_compte_bancaire')
-          .insert([{
-            ...formData,
-            com_contrat_client_id: profil.com_contrat_client_id
-          }]);
+          .from('fin_flux_sous_categorie')
+          .insert([insertData]);
         error = insertError;
       }
 
       if (error) throw error;
 
-      await fetchComptes();
+      await fetchSousCategoriesFlux();
       setIsModalOpen(false);
-      setSelectedCompte(null);
+      setSelectedSousCategorie(null);
       addToast({
-        label: `Compte bancaire ${selectedCompte ? 'modifié' : 'créé'} avec succès`,
+        label: `Sous-catégorie de flux ${selectedSousCategorie ? 'modifiée' : 'créée'} avec succès`,
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       addToast({
-        label: `Erreur lors de la ${selectedCompte ? 'modification' : 'création'} du compte bancaire`,
+        label: `Erreur lors de la ${selectedSousCategorie ? 'modification' : 'création'} de la sous-catégorie de flux`,
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -150,31 +165,31 @@ const ComptesBancaire: React.FC = () => {
     }
   };
 
-  const handleEdit = (compte: CompteBancaire) => {
-    setSelectedCompte(compte);
+  const handleEdit = (sousCategorie: SousCategorieFlux) => {
+    setSelectedSousCategorie(sousCategorie);
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (compte: CompteBancaire) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le compte "${compte.nom}" ?`)) {
+  const handleDelete = async (sousCategorie: SousCategorieFlux) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la sous-catégorie de flux "${sousCategorie.libelle}" ?`)) {
       try {
         const { error } = await supabase
-          .from('fin_compte_bancaire')
+          .from('fin_flux_sous_categorie')
           .delete()
-          .eq('id', compte.id);
+          .eq('id', sousCategorie.id);
 
         if (error) throw error;
 
-        await fetchComptes();
+        await fetchSousCategoriesFlux();
         addToast({
-          label: `Le compte "${compte.nom}" a été supprimé avec succès`,
+          label: `La sous-catégorie de flux "${sousCategorie.libelle}" a été supprimée avec succès`,
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression du compte bancaire',
+          label: 'Erreur lors de la suppression de la sous-catégorie de flux',
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -182,11 +197,16 @@ const ComptesBancaire: React.FC = () => {
     }
   };
 
-  const columns: Column<CompteBancaire>[] = [
+  const columns: Column<SousCategorieFlux>[] = [
     {
       label: 'Entité',
-      accessor: 'entite',
-      render: (value) => value.code
+      accessor: 'categorie',
+      render: (value) => `${value.entite.code} - ${value.entite.libelle}`
+    },
+    {
+      label: 'Catégorie de flux',
+      accessor: 'categorie',
+      render: (value) => `${value.code} - ${value.libelle}`
     },
     {
       label: 'Code',
@@ -194,18 +214,14 @@ const ComptesBancaire: React.FC = () => {
       sortable: true
     },
     {
-      label: 'Nom',
-      accessor: 'nom',
+      label: 'Libellé',
+      accessor: 'libelle',
       sortable: true
     },
     {
-      label: 'Banque',
-      accessor: 'banque',
-      sortable: true
-    },
-    {
-      label: 'IBAN',
-      accessor: 'iban'
+      label: 'Ordre',
+      accessor: 'ordre_affichage',
+      align: 'center'
     },
     {
       label: 'Actif',
@@ -244,13 +260,13 @@ const ComptesBancaire: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Comptes Bancaires"}
-        description="Gérez les comptes bancaires de votre organisation"
+        title={loading || profilLoading ? "Chargement..." : "Sous-Catégories de Flux"}
+        description="Gérez les sous-catégories de flux financiers de votre organisation"
         className={styles.header}
       >
         <div className="mb-6">
           <Button
-            label="Créer un compte bancaire"
+            label="Ajouter une sous-catégorie"
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
@@ -259,16 +275,16 @@ const ComptesBancaire: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des comptes bancaires...</p>
+            <p className="text-gray-500">Chargement des sous-catégories de flux...</p>
           </div>
         ) : (
           <DataTable
             columns={columns}
-            data={comptes}
+            data={sousCategoriesFlux}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucun compte bancaire"
-            emptyMessage="Aucun compte bancaire n'a été créé pour le moment."
+            emptyTitle="Aucune sous-catégorie de flux"
+            emptyMessage="Aucune sous-catégorie de flux n'a été créée pour le moment."
           />
         )}
 
@@ -279,12 +295,12 @@ const ComptesBancaire: React.FC = () => {
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">
-                  {selectedCompte ? 'Modifier un compte bancaire' : 'Créer un compte bancaire'}
+                  {selectedSousCategorie ? 'Modifier une sous-catégorie de flux' : 'Ajouter une sous-catégorie de flux'}
                 </h2>
                 <button
                   onClick={() => {
                     setIsModalOpen(false);
-                    setSelectedCompte(null);
+                    setSelectedSousCategorie(null);
                   }}
                   className="text-gray-500 hover:text-gray-700"
                 >
@@ -293,24 +309,20 @@ const ComptesBancaire: React.FC = () => {
                   </svg>
                 </button>
               </div>
-              <CompteBancaireForm
-                initialData={selectedCompte ? {
-                  id: selectedCompte.id,
-                  id_entite: selectedCompte.id_entite,
-                  code: selectedCompte.code,
-                  nom: selectedCompte.nom,
-                  banque: selectedCompte.banque,
-                  iban: selectedCompte.iban,
-                  bic: selectedCompte.bic || '',
-                  actif: selectedCompte.actif,
-                  commentaire: selectedCompte.commentaire || '',
-                  date_creation: selectedCompte.date_creation,
-                  created_at: selectedCompte.created_at
+              <SousCategorieFluxForm
+                initialData={selectedSousCategorie ? {
+                  code: selectedSousCategorie.code,
+                  libelle: selectedSousCategorie.libelle,
+                  id_categorie: selectedSousCategorie.id_categorie,
+                  id_entite: selectedSousCategorie.categorie?.id_entite || '',
+                  description: selectedSousCategorie.description || '',
+                  ordre_affichage: selectedSousCategorie.ordre_affichage,
+                  actif: selectedSousCategorie.actif
                 } : undefined}
                 onSubmit={handleSubmit}
                 onCancel={() => {
                   setIsModalOpen(false);
-                  setSelectedCompte(null);
+                  setSelectedSousCategorie(null);
                 }}
                 isSubmitting={isSubmitting}
               />
@@ -322,4 +334,4 @@ const ComptesBancaire: React.FC = () => {
   );
 };
 
-export default ComptesBancaire;
+export default SousCategorieFlux;

@@ -3,8 +3,14 @@ import Accueil from './pages/Accueil'
 import TestUI from './pages/TestUI'
 import ParametreGlobal from './pages/ParametreGlobal/'
 import Entites from './pages/ParametreGlobal/Entites'
+import TypeTiers from './pages/ParametreGlobal/TypeTiers'
+import Tiers from './pages/ParametreGlobal/Tiers'
+import Import from './pages/ParametreGlobal/Import'
 import Finances from './pages/finances'
 import ParametresFinances from './pages/finances/parametresFinances'
+import NatureFlux from './pages/finances/parametresFinances/NatureFlux'
+import CategorieFlux from './pages/finances/parametresFinances/CategorieFlux'
+import SousCategorieFlux from './pages/finances/parametresFinances/SousCategorieFlux'
 import Banques from './pages/banques'
 import ParametresBanque from './pages/banques/ParametresBanque'
 import ComptesBancaire from './pages/banques/ParametresBanque/ComptesBancaire'
@@ -45,6 +51,27 @@ function App() {
                 </Layout>
               </PrivateRoute>
             } />
+            <Route path="/parametres-global/type-tiers" element={
+              <PrivateRoute>
+                <Layout>
+                  <TypeTiers />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/parametres-global/tiers" element={
+              <PrivateRoute>
+                <Layout>
+                  <Tiers />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/parametres-global/import" element={
+              <PrivateRoute>
+                <Layout>
+                  <Import />
+                </Layout>
+              </PrivateRoute>
+            } />
             <Route path="/finances" element={
               <PrivateRoute>
                 <Layout>
@@ -56,6 +83,27 @@ function App() {
               <PrivateRoute>
                 <Layout>
                   <ParametresFinances />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/parametres-finances/nature-flux" element={
+              <PrivateRoute>
+                <Layout>
+                  <NatureFlux />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/parametres-finances/categorie-flux" element={
+              <PrivateRoute>
+                <Layout>
+                  <CategorieFlux />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/parametres-finances/sous-categorie-flux" element={
+              <PrivateRoute>
+                <Layout>
+                  <SousCategorieFlux />
                 </Layout>
               </PrivateRoute>
             } />

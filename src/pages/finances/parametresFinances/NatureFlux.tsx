@@ -1,68 +1,66 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useProfil } from '../../../context/ProfilContext';
 import { useMenu } from '../../../context/MenuContext';
+import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
-import { menuItemsParamGestionBancaire } from '../../../config/menuConfig';
+import { menuItemsParamGestionFinanciere } from '../../../config/menuConfig';
 import { PageSection } from '../../../components/ui/page-section';
 import { DataTable, Column } from '../../../components/ui/data-table';
 import { Button } from '../../../components/ui/button';
 import { ToastContainer, ToastData } from '../../../components/ui/toast';
-import { CompteBancaireForm } from '../../../components/ParametreBanque/CompteBancaireForm';
+import { NatureFluxForm } from '../../../components/ParametreFinances/NatureFlux/NatureFluxForm';
 import styles from './styles.module.css';
 
-interface CompteBancaire {
+interface NatureFlux {
   id: string;
   code: string;
+  libelle: string;
+  description: string | null;
   id_entite: string;
-  nom: string;
-  banque: string;
-  iban: string;
-  bic: string | null;
   actif: boolean;
-  commentaire: string | null;
-  date_creation: string;
   created_at: string;
   entite: {
     code: string;
+    libelle: string;
   };
 }
 
-const ComptesBancaire: React.FC = () => {
+const NatureFlux: React.FC = () => {
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
-  const [comptes, setComptes] = useState<CompteBancaire[]>([]);
+  const [naturesFlux, setNaturesFlux] = useState<NatureFlux[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCompte, setSelectedCompte] = useState<CompteBancaire | null>(null);
+  const [selectedNature, setSelectedNature] = useState<NatureFlux | null>(null);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState<ToastData[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchComptes = async () => {
+  const fetchNaturesFlux = async () => {
     try {
       if (!profil?.com_contrat_client_id) {
-        setComptes([]);
+        setNaturesFlux([]);
         return;
       }
 
       const { data, error } = await supabase
-        .from('fin_compte_bancaire')
+        .from('fin_flux_nature')
         .select(`
           *,
           entite:id_entite (
-            code
+            code,
+            libelle
           )
         `)
         .eq('com_contrat_client_id', profil.com_contrat_client_id)
         .order('code');
 
       if (error) throw error;
-      setComptes(data || []);
+      setNaturesFlux(data || []);
     } catch (error) {
-      console.error('Erreur lors de la récupération des comptes:', error);
+      console.error('Erreur lors de la récupération des natures de flux:', error);
       addToast({
-        label: 'Erreur lors de la récupération des comptes bancaires',
+        label: 'Erreur lors de la récupération des natures de flux',
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -72,9 +70,9 @@ const ComptesBancaire: React.FC = () => {
   };
 
   useEffect(() => {
-    setMenuItems(menuItemsParamGestionBancaire);
+    setMenuItems(menuItemsParamGestionFinanciere);
     if (!profilLoading) {
-      fetchComptes();
+      fetchNaturesFlux();
     }
   }, [setMenuItems, profilLoading, profil?.com_contrat_client_id]);
 
@@ -99,49 +97,53 @@ const ComptesBancaire: React.FC = () => {
 
       let error;
       
-      if (selectedCompte) {
-        // Préparer les données pour la mise à jour en excluant l'objet entite
+      if (selectedNature) {
+        // Mode édition
         const updateData = {
-          com_contrat_client_id: profil.com_contrat_client_id,
-          id_entite: formData.id_entite,
           code: formData.code,
-          nom: formData.nom,
-          banque: formData.banque,
-          iban: formData.iban,
-          bic: formData.bic || '',
+          libelle: formData.libelle,
+          description: formData.description || null,
+          id_entite: formData.id_entite,
           actif: formData.actif,
-          commentaire: formData.commentaire || ''
+          com_contrat_client_id: profil.com_contrat_client_id
         };
 
         const { error: updateError } = await supabase
-          .from('fin_compte_bancaire')
+          .from('fin_flux_nature')
           .update(updateData)
-          .eq('id', selectedCompte.id);
+          .eq('id', selectedNature.id);
         error = updateError;
       } else {
+        // Mode création
+        const insertData = {
+          code: formData.code,
+          libelle: formData.libelle,
+          description: formData.description || null,
+          id_entite: formData.id_entite,
+          actif: formData.actif,
+          com_contrat_client_id: profil.com_contrat_client_id
+        };
+
         const { error: insertError } = await supabase
-          .from('fin_compte_bancaire')
-          .insert([{
-            ...formData,
-            com_contrat_client_id: profil.com_contrat_client_id
-          }]);
+          .from('fin_flux_nature')
+          .insert([insertData]);
         error = insertError;
       }
 
       if (error) throw error;
 
-      await fetchComptes();
+      await fetchNaturesFlux();
       setIsModalOpen(false);
-      setSelectedCompte(null);
+      setSelectedNature(null);
       addToast({
-        label: `Compte bancaire ${selectedCompte ? 'modifié' : 'créé'} avec succès`,
+        label: `Nature de flux ${selectedNature ? 'modifiée' : 'créée'} avec succès`,
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       addToast({
-        label: `Erreur lors de la ${selectedCompte ? 'modification' : 'création'} du compte bancaire`,
+        label: `Erreur lors de la ${selectedNature ? 'modification' : 'création'} de la nature de flux`,
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -150,31 +152,31 @@ const ComptesBancaire: React.FC = () => {
     }
   };
 
-  const handleEdit = (compte: CompteBancaire) => {
-    setSelectedCompte(compte);
+  const handleEdit = (nature: NatureFlux) => {
+    setSelectedNature(nature);
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (compte: CompteBancaire) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le compte "${compte.nom}" ?`)) {
+  const handleDelete = async (nature: NatureFlux) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la nature de flux "${nature.libelle}" ?`)) {
       try {
         const { error } = await supabase
-          .from('fin_compte_bancaire')
+          .from('fin_flux_nature')
           .delete()
-          .eq('id', compte.id);
+          .eq('id', nature.id);
 
         if (error) throw error;
 
-        await fetchComptes();
+        await fetchNaturesFlux();
         addToast({
-          label: `Le compte "${compte.nom}" a été supprimé avec succès`,
+          label: `La nature de flux "${nature.libelle}" a été supprimée avec succès`,
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression du compte bancaire',
+          label: 'Erreur lors de la suppression de la nature de flux',
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -182,11 +184,11 @@ const ComptesBancaire: React.FC = () => {
     }
   };
 
-  const columns: Column<CompteBancaire>[] = [
+  const columns: Column<NatureFlux>[] = [
     {
       label: 'Entité',
       accessor: 'entite',
-      render: (value) => value.code
+      render: (value) => `${value.code} - ${value.libelle}`
     },
     {
       label: 'Code',
@@ -194,18 +196,14 @@ const ComptesBancaire: React.FC = () => {
       sortable: true
     },
     {
-      label: 'Nom',
-      accessor: 'nom',
+      label: 'Libellé',
+      accessor: 'libelle',
       sortable: true
     },
     {
-      label: 'Banque',
-      accessor: 'banque',
-      sortable: true
-    },
-    {
-      label: 'IBAN',
-      accessor: 'iban'
+      label: 'Description',
+      accessor: 'description',
+      render: (value) => value || '-'
     },
     {
       label: 'Actif',
@@ -244,13 +242,13 @@ const ComptesBancaire: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Comptes Bancaires"}
-        description="Gérez les comptes bancaires de votre organisation"
+        title={loading || profilLoading ? "Chargement..." : "Natures de Flux"}
+        description="Gérez les natures de flux financiers de votre organisation"
         className={styles.header}
       >
         <div className="mb-6">
           <Button
-            label="Créer un compte bancaire"
+            label="Créer une nature de flux"
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
@@ -259,16 +257,16 @@ const ComptesBancaire: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des comptes bancaires...</p>
+            <p className="text-gray-500">Chargement des natures de flux...</p>
           </div>
         ) : (
           <DataTable
             columns={columns}
-            data={comptes}
+            data={naturesFlux}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucun compte bancaire"
-            emptyMessage="Aucun compte bancaire n'a été créé pour le moment."
+            emptyTitle="Aucune nature de flux"
+            emptyMessage="Aucune nature de flux n'a été créée pour le moment."
           />
         )}
 
@@ -279,12 +277,12 @@ const ComptesBancaire: React.FC = () => {
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">
-                  {selectedCompte ? 'Modifier un compte bancaire' : 'Créer un compte bancaire'}
+                  {selectedNature ? 'Modifier une nature de flux' : 'Créer une nature de flux'}
                 </h2>
                 <button
                   onClick={() => {
                     setIsModalOpen(false);
-                    setSelectedCompte(null);
+                    setSelectedNature(null);
                   }}
                   className="text-gray-500 hover:text-gray-700"
                 >
@@ -293,24 +291,18 @@ const ComptesBancaire: React.FC = () => {
                   </svg>
                 </button>
               </div>
-              <CompteBancaireForm
-                initialData={selectedCompte ? {
-                  id: selectedCompte.id,
-                  id_entite: selectedCompte.id_entite,
-                  code: selectedCompte.code,
-                  nom: selectedCompte.nom,
-                  banque: selectedCompte.banque,
-                  iban: selectedCompte.iban,
-                  bic: selectedCompte.bic || '',
-                  actif: selectedCompte.actif,
-                  commentaire: selectedCompte.commentaire || '',
-                  date_creation: selectedCompte.date_creation,
-                  created_at: selectedCompte.created_at
+              <NatureFluxForm
+                initialData={selectedNature ? {
+                  code: selectedNature.code,
+                  libelle: selectedNature.libelle,
+                  description: selectedNature.description || '',
+                  id_entite: selectedNature.id_entite,
+                  actif: selectedNature.actif
                 } : undefined}
                 onSubmit={handleSubmit}
                 onCancel={() => {
                   setIsModalOpen(false);
-                  setSelectedCompte(null);
+                  setSelectedNature(null);
                 }}
                 isSubmitting={isSubmitting}
               />
@@ -322,4 +314,4 @@ const ComptesBancaire: React.FC = () => {
   );
 };
 
-export default ComptesBancaire;
+export default NatureFlux;

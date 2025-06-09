@@ -7,6 +7,7 @@ interface EntiteFormData {
   code: string;
   libelle: string;
   actif: boolean;
+  com_contrat_client_id: string;
 }
 
 interface EntiteFormProps {
@@ -22,7 +23,10 @@ export function EntiteForm({
   onCancel,
   isSubmitting = false
 }: EntiteFormProps) {
-  const [formData, setFormData] = React.useState<EntiteFormData>(initialData);
+  const [formData, setFormData] = React.useState<EntiteFormData>({
+    ...initialData,
+    com_contrat_client_id: initialData.com_contrat_client_id
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

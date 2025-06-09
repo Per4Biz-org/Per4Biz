@@ -8,6 +8,8 @@ interface Profil {
   nom: string;
   prenom: string;
   telephone: string | null;
+  code_user: string;
+  com_contrat_client_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -35,6 +37,7 @@ export const ProfilProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+
   useEffect(() => {
     if (!user) {
       setProfil(null);
@@ -46,7 +49,14 @@ export const ProfilProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       try {
         const { data, error } = await supabase
           .from('com_profil')
-          .select('*')
+          .select(`
+            *,
+            contrat:com_contrat_client_id (
+              code,
+              libelle,
+              numero_contrat
+            )
+          `)
           .eq('user_id', user.id)
           .single();
 
