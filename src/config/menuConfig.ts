@@ -37,8 +37,9 @@ export const menuItemsParametreGlobalImport = [
 
 export const menuItemsGestionFinanciere = [
   { icon: Home, label: 'Gestion Financière', path: '/finances' },
-  { icon: CreditCard, label: 'Saisie Factures', path: '/finances/saisie-factures' },
-  { icon: FileText, label: 'Suivi CA', path: '/finances/suivi-ca' },
+  { icon: CreditCard, label: 'Mes Factures', path: '/finances/mes-factures' },
+  { icon: FileText, label: 'Suivi CA Réel', path: '/finances/suivi-ca-reel', separator: true },
+  { icon: FileText, label: 'Suivi CA Budget', path: '/finances/suivi-ca-budget' },
   { icon: FileText, label: 'Gestion Budget Dépenses', path: '/finances/budget-depense',separator: true },
   { icon: Settings, label: 'Paramètres', path: '/finances/parametres-finances', separator: true }
 ];
@@ -48,7 +49,8 @@ export const menuItemsParamGestionFinanciere = [
   { icon: Home, label: 'Nature Flux', path: '/finances/parametres-finances/nature-flux', separator: true},
   { icon: Home, label: 'Catégorie Flux', path: '/finances/parametres-finances/categorie-flux' },
   { icon: Home, label: 'Sous Catégorie Flux', path: '/finances/parametres-finances/sous-categorie-flux' },
-  { icon: CreditCard, label: 'Paramètre Jours', path: '/finances/parametres-finances/param-jours', separator: true }
+  { icon: CreditCard, label: 'Type Services CA', path: '/finances/parametres-finances/ca-type-service', separator: true },
+  { icon: CreditCard, label: 'Paramètre Jours', path: '/finances/parametres-finances/param-jours' }
 ];
 
 export const menuItemsGestionBancaire = [

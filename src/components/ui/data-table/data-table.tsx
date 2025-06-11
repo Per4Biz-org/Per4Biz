@@ -28,6 +28,7 @@ interface DataTableProps<T> {
   className?: string;
   emptyTitle?: string;
   emptyMessage?: string;
+  customRowClassName?: (row: T, index: number) => string;
 }
 
 export function DataTable<T extends { id: string | number }>({
@@ -40,6 +41,7 @@ export function DataTable<T extends { id: string | number }>({
   className = '',
   emptyTitle = 'Aucune donnée',
   emptyMessage = 'Aucune donnée à afficher pour le moment',
+  customRowClassName,
 }: DataTableProps<T>) {
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T | null;
@@ -145,16 +147,19 @@ export function DataTable<T extends { id: string | number }>({
           </tr>
         </thead>
         <tbody>
-          {paginatedData.map(row => (
-            <tr key={row.id} className={styles.row}>
+          {paginatedData.map((row, index) => (
+            <tr 
+              key={row.id} 
+              className={`${styles.row} ${customRowClassName ? customRowClassName(row, index) : ''}`}
+            >
               {actions && (
                 <td className={styles.actionsCell}>
                   <div className="flex gap-2">
-                    {actions.map((action, index) => {
+                    {actions.map((action, actionIndex) => {
                       const IconComponent = action.icon === 'edit' ? Pencil : Trash2;
                       return (
                         <div
-                          key={index}
+                          key={actionIndex}
                           className={styles.actionIcon}
                           onClick={() => action.onClick(row)}
                           style={{ color: action.color }}

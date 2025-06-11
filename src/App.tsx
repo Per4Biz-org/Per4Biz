@@ -11,10 +11,17 @@ import ParametresFinances from './pages/finances/parametresFinances'
 import NatureFlux from './pages/finances/parametresFinances/NatureFlux'
 import CategorieFlux from './pages/finances/parametresFinances/CategorieFlux'
 import SousCategorieFlux from './pages/finances/parametresFinances/SousCategorieFlux'
+import ParamJours from './pages/finances/parametresFinances/ParamJours'
+import MesFactures from './pages/finances/MesFactures'
+import CATypeService from './pages/finances/parametresFinances/CATypeService'
 import Banques from './pages/banques'
 import ParametresBanque from './pages/banques/ParametresBanque'
 import ComptesBancaire from './pages/banques/ParametresBanque/ComptesBancaire'
+import ModePaiement from './pages/banques/ParametresBanque/ModePaiement'
+import ImportTiers from './pages/ParametreGlobal/Import/ImportTiers'
+import ImportFacture from './pages/ParametreGlobal/Import/ImportFacture'
 import Profil from './pages/Profil'
+import SuiviCABudget from './pages/finances/CA/SuiviCABudget'
 import Layout from './components/Layout'
 import { MenuProvider } from './context/MenuContext'
 import { AuthProvider } from './context/AuthContext'
@@ -72,10 +79,38 @@ function App() {
                 </Layout>
               </PrivateRoute>
             } />
+            <Route path="/parametres-global/import/tiers" element={
+              <PrivateRoute>
+                <Layout>
+                  <ImportTiers />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/parametres-global/import/factures" element={
+              <PrivateRoute>
+                <Layout>
+                  <ImportFacture />
+                </Layout>
+              </PrivateRoute>
+            } />
             <Route path="/finances" element={
               <PrivateRoute>
                 <Layout>
                   <Finances />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/mes-factures" element={
+              <PrivateRoute>
+                <Layout>
+                  <MesFactures />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/suivi-ca-budget" element={
+              <PrivateRoute>
+                <Layout>
+                  <SuiviCABudget />
                 </Layout>
               </PrivateRoute>
             } />
@@ -107,6 +142,20 @@ function App() {
                 </Layout>
               </PrivateRoute>
             } />
+            <Route path="/finances/parametres-finances/param-jours" element={
+              <PrivateRoute>
+                <Layout>
+                  <ParamJours />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/parametres-finances/ca-type-service" element={
+              <PrivateRoute>
+                <Layout>
+                  <CATypeService />
+                </Layout>
+              </PrivateRoute>
+            } />
             <Route path="/parametres-global" element={
               <PrivateRoute>
                 <Layout>
@@ -132,6 +181,13 @@ function App() {
               <PrivateRoute>
                 <Layout>
                   <ComptesBancaire />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/banques/parametres-bancaire/mode-paiement" element={
+              <PrivateRoute>
+                <Layout>
+                  <ModePaiement />
                 </Layout>
               </PrivateRoute>
             } />
