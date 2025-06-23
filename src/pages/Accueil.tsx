@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { useMenu } from '../context/MenuContext';
+import { useProfil } from '../context/ProfilContext';
 import { menuItemsAccueil } from '../config/menuConfig';
 import { BarChart as ChartBar, Wallet, Users, Calendar } from 'lucide-react';
 
 const Accueil: React.FC = () => {
   const { setMenuItems } = useMenu();
+  const { profil, loading } = useProfil();
 
   useEffect(() => {
     setMenuItems(menuItemsAccueil);
@@ -14,7 +16,7 @@ const Accueil: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center">
-          Bienvenue sur Per4Biz
+          {loading ? 'Bienvenue sur Per4Biz' : `Bienvenue ${profil?.prenom || ''} sur Per4Biz`}
         </h1>
         <p className="text-xl text-gray-600 leading-relaxed text-center mb-12">
           Votre solution complète pour la gestion financière et administrative de votre établissement
