@@ -81,7 +81,7 @@ export const menuItemsGestionRH = [
 
 export const menuItemsParamGestionRH = [
   { icon: Home, label: 'Paramètres RH', path: '/employes/parametres-employes' },
-  { icon: Home, label: 'Fonctions', path: '/employes/parametres-employes/fonction', separator: true},
+  { icon: Home, label: 'Type Fonctions', path: '/employes/parametres-employes/type-fonction', separator: true},
   { icon: Home, label: 'Type Contrat', path: '/employes/parametres-employes/type-contrat' },
   { icon: Home, label: 'Taux SS', path: '/employes/parametres-employes/taux-ss' }
 ];
