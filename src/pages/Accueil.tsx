@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useMenu } from '../context/MenuContext';
 import { menuItemsAccueil } from '../config/menuConfig';
-import { ChartBar, Wallet, Users, Calendar } from 'lucide-react';
+import { BarChart as ChartBar, Wallet, Users, Calendar } from 'lucide-react';
 
 const Accueil: React.FC = () => {
   const { setMenuItems } = useMenu();
