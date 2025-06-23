@@ -11,6 +11,7 @@ import { Button } from '../../../components/ui/button';
 import { ToastContainer, ToastData } from '../../../components/ui/toast';
 import { ModePaiementFormModal } from '../../../components/ParametreBanque/ModePaiementFormModal';
 import styles from './styles.module.css';
+import { Toggle } from '../../../components/ui/toggle';
 
 interface ModePaiement {
   id: string;
@@ -19,6 +20,7 @@ interface ModePaiement {
   actif: boolean;
   code_user: string;
   created_at: string;
+  paiement_caisse: boolean;
 }
 
 const ModePaiement: React.FC = () => {
@@ -91,7 +93,8 @@ const ModePaiement: React.FC = () => {
         const updateData = {
           code: formData.code,
           libelle: formData.libelle,
-          actif: formData.actif
+          actif: formData.actif,
+          paiement_caisse: formData.paiement_caisse
         };
 
         const { error: updateError } = await supabase
@@ -105,6 +108,7 @@ const ModePaiement: React.FC = () => {
           code: formData.code,
           libelle: formData.libelle,
           actif: formData.actif,
+          paiement_caisse: formData.paiement_caisse,
           com_contrat_client_id: profil.com_contrat_client_id,
           code_user: profil.code_user || ''
         };
@@ -179,6 +183,18 @@ const ModePaiement: React.FC = () => {
       label: 'Libellé',
       accessor: 'libelle',
       sortable: true
+    },
+    {
+      label: 'Paiement Caisse',
+      accessor: 'paiement_caisse',
+      align: 'center',
+      render: (value) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {value ? 'Oui' : 'Non'}
+        </span>
+      )
     },
     {
       label: 'Actif',

@@ -1,18 +1,20 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import React from 'react'
 import Accueil from './pages/Accueil'
 import TestUI from './pages/TestUI'
 import ParametreGlobal from './pages/ParametreGlobal/'
 import Entites from './pages/ParametreGlobal/Entites'
 import TypeTiers from './pages/ParametreGlobal/TypeTiers'
 import Tiers from './pages/ParametreGlobal/Tiers'
+import TypeFacture from './pages/ParametreGlobal/TypeFacture'
 import Import from './pages/ParametreGlobal/Import'
 import Finances from './pages/finances'
 import ParametresFinances from './pages/finances/parametresFinances'
 import NatureFlux from './pages/finances/parametresFinances/NatureFlux'
+import SaisieBudgetAnnuel from './pages/finances/Budget/SaisieBudgetAnnuel'
 import CategorieFlux from './pages/finances/parametresFinances/CategorieFlux'
 import SousCategorieFlux from './pages/finances/parametresFinances/SousCategorieFlux'
 import ParamJours from './pages/finances/parametresFinances/ParamJours'
-import MesFactures from './pages/finances/MesFactures'
 import CATypeService from './pages/finances/parametresFinances/CATypeService'
 import Banques from './pages/banques'
 import ParametresBanque from './pages/banques/ParametresBanque'
@@ -20,14 +22,24 @@ import ComptesBancaire from './pages/banques/ParametresBanque/ComptesBancaire'
 import ModePaiement from './pages/banques/ParametresBanque/ModePaiement'
 import ImportTiers from './pages/ParametreGlobal/Import/ImportTiers'
 import ImportFacture from './pages/ParametreGlobal/Import/ImportFacture'
+import ImportCADetail from './pages/ParametreGlobal/Import/ImportCADetail'
+import ImportFormat from './pages/banques/ParametresBanque/ImportFormat'
+import ImportRelevesBrut from './pages/banques/Releves/ImportRelevesBrut'
+import EcritureBancaire from './pages/banques/Releves/EcritureBancaire'
 import Profil from './pages/Profil'
 import SuiviCABudget from './pages/finances/CA/SuiviCABudget'
+import SuiviCAReel from './pages/finances/CA/SuiviCAReel'
+import FermetureCaisse from './pages/finances/caisse/FermetureCaisse'
 import Layout from './components/Layout'
 import { MenuProvider } from './context/MenuContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProfilProvider } from './context/ProfilContext'
 import { PrivateRoute } from './components/PrivateRoute'
 import Login from './pages/Login'
+import EditFactureAchat from './pages/finances/factures/EditFactureAchat'
+
+// Lazy loading du composant MesFactures
+const MesFacturesLazy = React.lazy(() => import('./pages/finances/factures/MesFactures'))
 
 function App() {
   return (
@@ -65,6 +77,13 @@ function App() {
                 </Layout>
               </PrivateRoute>
             } />
+            <Route path="/parametres-global/type-facture" element={
+              <PrivateRoute>
+                <Layout>
+                  <TypeFacture />
+                </Layout>
+              </PrivateRoute>
+            } />
             <Route path="/parametres-global/tiers" element={
               <PrivateRoute>
                 <Layout>
@@ -93,6 +112,13 @@ function App() {
                 </Layout>
               </PrivateRoute>
             } />
+            <Route path="/parametres-global/import/import-détail-ca" element={
+              <PrivateRoute>
+                <Layout>
+                  <ImportCADetail />
+                </Layout>
+              </PrivateRoute>
+            } />
             <Route path="/finances" element={
               <PrivateRoute>
                 <Layout>
@@ -103,7 +129,23 @@ function App() {
             <Route path="/finances/mes-factures" element={
               <PrivateRoute>
                 <Layout>
-                  <MesFactures />
+                  <React.Suspense fallback={<div>Chargement...</div>}>
+                    <MesFacturesLazy />
+                  </React.Suspense>
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/saisie-budget-annuel" element={
+              <PrivateRoute>
+                <Layout>
+                  <SaisieBudgetAnnuel />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/fermeture-caisse" element={
+              <PrivateRoute>
+                <Layout>
+                  <FermetureCaisse />
                 </Layout>
               </PrivateRoute>
             } />
@@ -111,6 +153,13 @@ function App() {
               <PrivateRoute>
                 <Layout>
                   <SuiviCABudget />
+                </Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/finances/suivi-ca-reel" element={
+              <PrivateRoute>
+                <Layout>
+                  <SuiviCAReel />
                 </Layout>
               </PrivateRoute>
             } />
@@ -191,6 +240,27 @@ function App() {
                 </Layout>
               </PrivateRoute>
             } />
+           <Route path="/banques/parametres-bancaire/format-import" element={
+             <PrivateRoute>
+               <Layout>
+                 <ImportFormat />
+               </Layout>
+             </PrivateRoute>
+           } />
+          <Route path="/banques/import-releves" element={
+            <PrivateRoute>
+              <Layout>
+                <ImportRelevesBrut />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/banques/mouv-bancaire" element={
+            <PrivateRoute>
+              <Layout>
+                <EcritureBancaire />
+              </Layout>
+            </PrivateRoute>
+          } />
             <Route path="/profil" element={
               <PrivateRoute>
                 <Layout>

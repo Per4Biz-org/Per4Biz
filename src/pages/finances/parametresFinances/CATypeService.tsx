@@ -28,6 +28,11 @@ interface CATypeService {
     code: string;
     libelle: string;
   };
+  id_flux_sous_categorie: string | null;
+  sous_categorie?: {
+    code: string;
+    libelle: string;
+  };
 }
 
 const CATypeService: React.FC = () => {
@@ -52,6 +57,10 @@ const CATypeService: React.FC = () => {
         .select(`
           *,
           entite:id_entite (
+            code,
+            libelle
+          ),
+          sous_categorie:id_flux_sous_categorie (
             code,
             libelle
           )
@@ -112,7 +121,8 @@ const CATypeService: React.FC = () => {
           actif: formData.actif,
           id_entite: formData.id_entite,
           heure_debut: formData.heure_debut || null,
-          heure_fin: formData.heure_fin || null
+          heure_fin: formData.heure_fin || null,
+          id_flux_sous_categorie: formData.id_flux_sous_categorie || null
         };
 
         const { error: updateError } = await supabase
@@ -129,7 +139,10 @@ const CATypeService: React.FC = () => {
           ordre_affichage: formData.ordre_affichage,
           actif: formData.actif,
           id_entite: formData.id_entite,
-          com_contrat_client_id: profil.com_contrat_client_id
+          com_contrat_client_id: profil.com_contrat_client_id,
+          heure_debut: formData.heure_debut || null,
+          heure_fin: formData.heure_fin || null,
+          id_flux_sous_categorie: formData.id_flux_sous_categorie || null
         };
 
         const { error: insertError } = await supabase
@@ -220,6 +233,11 @@ const CATypeService: React.FC = () => {
       label: 'Description',
       accessor: 'description',
       render: (value) => value || '-'
+    },
+    {
+      label: 'Sous-catégorie',
+      accessor: 'sous_categorie',
+      render: (value) => value ? `${value.code} - ${value.libelle}` : '-'
     },
     {
       label: 'Ordre',

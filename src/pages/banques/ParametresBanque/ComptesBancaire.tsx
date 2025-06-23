@@ -47,7 +47,7 @@ const ComptesBancaire: React.FC = () => {
       }
 
       const { data, error } = await supabase
-        .from('fin_compte_bancaire')
+        .from('bq_compte_bancaire')
         .select(`
           *,
           entite:id_entite (
@@ -114,13 +114,13 @@ const ComptesBancaire: React.FC = () => {
         };
 
         const { error: updateError } = await supabase
-          .from('fin_compte_bancaire')
+          .from('bq_compte_bancaire')
           .update(updateData)
           .eq('id', selectedCompte.id);
         error = updateError;
       } else {
         const { error: insertError } = await supabase
-          .from('fin_compte_bancaire')
+          .from('bq_compte_bancaire')
           .insert([{
             ...formData,
             com_contrat_client_id: profil.com_contrat_client_id
@@ -159,7 +159,7 @@ const ComptesBancaire: React.FC = () => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer le compte "${compte.nom}" ?`)) {
       try {
         const { error } = await supabase
-          .from('fin_compte_bancaire')
+          .from('bq_compte_bancaire')
           .delete()
           .eq('id', compte.id);
 

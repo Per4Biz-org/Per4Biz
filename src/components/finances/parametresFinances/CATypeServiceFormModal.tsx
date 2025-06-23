@@ -12,6 +12,20 @@ interface Entite {
   libelle: string;
 }
 
+interface CategorieFlux {
+  id: string;
+  code: string;
+  libelle: string;
+  id_entite: string;
+}
+
+interface SousCategorieFlux {
+  id: string;
+  code: string;
+  libelle: string;
+  id_categorie: string;
+}
+
 interface CATypeServiceFormData {
   code: string;
   libelle: string;
@@ -21,6 +35,7 @@ interface CATypeServiceFormData {
   id_entite: string;
   heure_debut?: string;
   heure_fin?: string;
+  id_flux_sous_categorie?: string;
 }
 
 interface CATypeServiceFormModalProps {
@@ -46,9 +61,15 @@ export function CATypeServiceFormModal({
     actif: true,
     id_entite: '',
     heure_debut: '',
-    heure_fin: ''
+    heure_fin: '',
+    id_flux_sous_categorie: ''
   });
   const [entites, setEntites] = useState<Entite[]>([]);
+  const [sousCategories, setSousCategories] = useState<SousCategorieFlux[]>([]);
+  const [filteredSousCategories, setFilteredSousCategories] = useState<SousCategorieFlux[]>([]);
+  const [categories, setCategories] = useState<CategorieFlux[]>([]);
+  const [filteredCategories, setFilteredCategories] = useState<CategorieFlux[]>([]);
+  const [selectedCategorie, setSelectedCategorie] = useState<string>('');
   const [errors, setErrors] = useState<Partial<Record<keyof CATypeServiceFormData, string>>>({});
   const { profil } = useProfil();
 
@@ -68,11 +89,107 @@ export function CATypeServiceFormModal({
         setEntites(data);
       }
     };
+    
+    const fetchCategories = async () => {
+      if (!profil?.com_contrat_client_id) return;
+
+      const { data } = await supabase
+        .from('fin_flux_categorie')
+        .select(`
+          id, 
+          code, 
+          libelle, 
+          id_entite
+        `)
+        .eq('actif', true)
+        .eq('com_contrat_client_id', profil.com_contrat_client_id)
+        .order('libelle');
+
+      if (data) {
+        setCategories(data);
+      }
+    };
+    
+    const fetchSousCategories = async () => {
+      if (!profil?.com_contrat_client_id) return;
+
+      const { data } = await supabase
+        .from('fin_flux_sous_categorie')
+        .select(`
+          id, 
+          code, 
+          libelle, 
+          id_categorie
+        `)
+        .eq('actif', true)
+        .eq('com_contrat_client_id', profil.com_contrat_client_id)
+        .order('libelle');
+
+      if (data) {
+        setSousCategories(data);
+      }
+    };
 
     if (isOpen) {
       fetchEntites();
+      fetchCategories();
+      fetchSousCategories();
     }
   }, [isOpen, profil?.com_contrat_client_id]);
+
+  // Filtrer les catégories en fonction de l'entité sélectionnée
+  useEffect(() => {
+    if (formData.id_entite) {
+      // Filtrer les catégories qui appartiennent à cette entité
+      const filtered = categories.filter(cat => cat.id_entite === formData.id_entite);
+      setFilteredCategories(filtered);
+
+      // Réinitialiser la catégorie sélectionnée si elle n'est pas valide pour cette entité
+      if (selectedCategorie && !filtered.some(cat => cat.id === selectedCategorie)) {
+        setSelectedCategorie('');
+      }
+
+      // Réinitialiser la sous-catégorie si l'entité change
+      if (formData.id_flux_sous_categorie) {
+        setFormData(prev => ({
+          ...prev,
+          id_flux_sous_categorie: ''
+        }));
+      }
+    } else {
+      setFilteredCategories([]);
+      setSelectedCategorie('');
+      setFilteredSousCategories([]);
+    }
+  }, [formData.id_entite, categories]);
+
+  // Filtrer les sous-catégories en fonction de la catégorie sélectionnée
+  useEffect(() => {
+    if (selectedCategorie) {
+      // Filtrer les sous-catégories qui appartiennent à cette catégorie
+      const filtered = sousCategories.filter(sc => sc.id_categorie === selectedCategorie);
+      setFilteredSousCategories(filtered);
+      
+      // Si la sous-catégorie sélectionnée n'est pas dans la liste filtrée, la réinitialiser
+      if (formData.id_flux_sous_categorie && 
+          !filtered.some(sc => sc.id === formData.id_flux_sous_categorie)) {
+        setFormData(prev => ({
+          ...prev,
+          id_flux_sous_categorie: ''
+        }));
+      }
+    } else {
+      setFilteredSousCategories([]);
+      
+      // Réinitialiser la sous-catégorie si aucune catégorie n'est sélectionnée
+      if (formData.id_flux_sous_categorie) {
+        setFormData(prev => ({
+          ...prev,
+          id_flux_sous_categorie: ''
+        }));
+      }
+    }
+  }, [selectedCategorie, sousCategories, formData.id_flux_sous_categorie]);
 
   // Réinitialiser le formulaire quand la modale s'ouvre/ferme ou que les données initiales changent
   useEffect(() => {
@@ -86,8 +203,17 @@ export function CATypeServiceFormModal({
           actif: initialData.actif,
           id_entite: initialData.id_entite,
           heure_debut: initialData.heure_debut || '',
-          heure_fin: initialData.heure_fin || ''
+          heure_fin: initialData.heure_fin || '',
+          id_flux_sous_categorie: initialData.id_flux_sous_categorie || '',
         });
+        
+        // Si une sous-catégorie est sélectionnée, trouver sa catégorie parente
+        if (initialData.id_flux_sous_categorie) {
+          const sousCategorie = sousCategories.find(sc => sc.id === initialData.id_flux_sous_categorie);
+          if (sousCategorie) {
+            setSelectedCategorie(sousCategorie.id_categorie);
+          }
+        }
       } else {
         setFormData({
           code: '',
@@ -97,7 +223,8 @@ export function CATypeServiceFormModal({
           actif: true,
           id_entite: '',
           heure_debut: '',
-          heure_fin: ''
+          heure_fin: '',
+          id_flux_sous_categorie: ''
         });
       }
       setErrors({});
@@ -149,12 +276,30 @@ export function CATypeServiceFormModal({
     }
   };
 
+  const handleCategorieChange = (value: string) => {
+    setSelectedCategorie(value);
+  };
+
+  const handleSousCategorieChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      id_flux_sous_categorie: value
+    }));
+    if (errors.id_flux_sous_categorie) {
+      setErrors(prev => ({
+        ...prev,
+        id_flux_sous_categorie: undefined
+      }));
+    }
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CATypeServiceFormData, string>> = {};
 
     if (!formData.code.trim()) newErrors.code = 'Le code est requis';
     if (!formData.libelle.trim()) newErrors.libelle = 'Le libellé est requis';
     if (!formData.id_entite) newErrors.id_entite = 'L\'entité est requise';
+    if (!formData.id_flux_sous_categorie) newErrors.id_flux_sous_categorie = 'La sous-catégorie est requise';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -172,7 +317,8 @@ export function CATypeServiceFormModal({
       actif: formData.actif,
       id_entite: formData.id_entite,
       heure_debut: formData.heure_debut?.trim() || undefined,
-      heure_fin: formData.heure_fin?.trim() || undefined
+      heure_fin: formData.heure_fin?.trim() || undefined,
+      id_flux_sous_categorie: formData.id_flux_sous_categorie || undefined
     });
   };
 
@@ -194,6 +340,16 @@ export function CATypeServiceFormModal({
   const entiteOptions: DropdownOption[] = entites.map(entite => ({
     value: entite.id,
     label: `${entite.code} - ${entite.libelle}`
+  }));
+
+  const categorieOptions: DropdownOption[] = filteredCategories.map(categorie => ({
+    value: categorie.id,
+    label: `${categorie.code} - ${categorie.libelle}`
+  }));
+
+  const sousCategorieOptions: DropdownOption[] = filteredSousCategories.map(sousCategorie => ({
+    value: sousCategorie.id,
+    label: `${sousCategorie.code} - ${sousCategorie.libelle}`
   }));
 
   if (!isOpen) return null;
@@ -311,6 +467,50 @@ export function CATypeServiceFormModal({
               onChange={handleInputChange}
               disabled={isSubmitting}
               className="h-9"
+            />
+          </FormField>
+
+          <FormField
+            label="Catégorie de flux"
+            description="Catégorie pour filtrer les sous-catégories"
+            className="mb-2"
+          >
+            <Dropdown
+              options={categorieOptions}
+              value={selectedCategorie}
+              onChange={handleCategorieChange}
+              label={
+                !formData.id_entite 
+                  ? "Sélectionner d'abord une entité" 
+                  : categorieOptions.length === 0 
+                    ? "Aucune catégorie disponible pour cette entité" 
+                    : "Sélectionner une catégorie"
+              }
+              size="sm"
+              disabled={!formData.id_entite || isSubmitting || categorieOptions.length === 0}
+            />
+          </FormField>
+
+          <FormField
+            label="Sous-catégorie de flux"
+            required
+            description="Sous-catégorie associée à ce type de service"
+            error={errors.id_flux_sous_categorie}
+            className="mb-2"
+          >
+            <Dropdown
+              options={sousCategorieOptions}
+              value={formData.id_flux_sous_categorie || ''}
+              onChange={handleSousCategorieChange}
+              label={
+                !selectedCategorie 
+                  ? "Sélectionner d'abord une catégorie" 
+                  : sousCategorieOptions.length === 0 
+                    ? "Aucune sous-catégorie disponible pour cette catégorie" 
+                    : "Sélectionner une sous-catégorie"
+              }
+              size="sm"
+              disabled={!selectedCategorie || isSubmitting || sousCategorieOptions.length === 0}
             />
           </FormField>
 

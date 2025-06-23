@@ -6,6 +6,7 @@ import styles from './data-table.module.css';
 export interface Column<T> {
   label: string;
   accessor: keyof T;
+  width?: string;
   align?: 'left' | 'center' | 'right';
   sortable?: boolean;
   render?: (value: any, row: T) => React.ReactNode;
@@ -130,6 +131,7 @@ export function DataTable<T extends { id: string | number }>({
                 className={`${styles.headerCell} ${
                   sortConfig.key === column.accessor ? styles.sortActive : ''
                 } ${column.align ? styles[column.align] : ''}`}
+                style={column.width ? { width: column.width } : undefined}
                 onClick={() => handleSort(column)}
               >
                 {column.label}

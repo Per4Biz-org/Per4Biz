@@ -7,6 +7,7 @@ interface ModePaiementFormData {
   code: string;
   libelle: string;
   actif: boolean;
+  paiement_caisse: boolean;
 }
 
 interface ModePaiementFormModalProps {
@@ -27,7 +28,8 @@ export function ModePaiementFormModal({
   const [formData, setFormData] = useState<ModePaiementFormData>({
     code: '',
     libelle: '',
-    actif: true
+    actif: true,
+    paiement_caisse: false
   });
   const [errors, setErrors] = useState<Partial<Record<keyof ModePaiementFormData, string>>>({});
 
@@ -38,13 +40,15 @@ export function ModePaiementFormModal({
         setFormData({
           code: initialData.code,
           libelle: initialData.libelle,
-          actif: initialData.actif
+          actif: initialData.actif,
+          paiement_caisse: initialData.paiement_caisse || false
         });
       } else {
         setFormData({
           code: '',
           libelle: '',
-          actif: true
+          actif: true,
+          paiement_caisse: false
         });
       }
       setErrors({});
@@ -73,6 +77,13 @@ export function ModePaiementFormModal({
     }));
   };
 
+  const handlePaiementCaisseToggleChange = (checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      paiement_caisse: checked
+    }));
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof ModePaiementFormData, string>> = {};
 
@@ -90,7 +101,8 @@ export function ModePaiementFormModal({
     await onSubmit({
       code: formData.code.trim(),
       libelle: formData.libelle.trim(),
-      actif: formData.actif
+      actif: formData.actif,
+      paiement_caisse: formData.paiement_caisse
     });
   };
 
@@ -98,7 +110,8 @@ export function ModePaiementFormModal({
     setFormData({
       code: '',
       libelle: '',
-      actif: true
+      actif: true,
+      paiement_caisse: false
     });
     setErrors({});
     onClose();
@@ -156,6 +169,21 @@ export function ModePaiementFormModal({
               placeholder="Ex: Carte bancaire, Espèces, Virement"
               disabled={isSubmitting}
               className="h-9"
+            />
+          </FormField>
+
+          <FormField
+            label="Paiement en caisse"
+            description="Ce mode de paiement peut-il être utilisé pour les paiements en caisse"
+            className="mb-4"
+          >
+            <Toggle
+              checked={formData.paiement_caisse}
+              onChange={handlePaiementCaisseToggleChange}
+              label={formData.paiement_caisse ? 'Oui' : 'Non'}
+              icon="CreditCard"
+              disabled={isSubmitting}
+              size="sm"
             />
           </FormField>
 
