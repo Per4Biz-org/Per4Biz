@@ -277,6 +277,13 @@ function App() {
               </Layout>
             </PrivateRoute>
           } />
+          <Route path="/employes/parametres-employes/type-fonction" element={
+            <PrivateRoute>
+              <Layout>
+                <TypeFonction />
+              </Layout>
+            </PrivateRoute>
+          } />
             <Route path="/profil" element={
               <PrivateRoute>
                 <Layout>
