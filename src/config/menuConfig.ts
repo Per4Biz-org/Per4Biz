@@ -75,7 +75,8 @@ export const menuItemsGestionRH = [
   { icon: Home, label: 'Gestion Employés', path: '/employes' },
   { icon: CreditCard, label: 'Mes Employés', path: '/employes/mes-employes' },
   { icon: FileText, label: 'Historique Contrat', path: '/employes/fermeture-caisse',separator: true },
-  { icon: FileText, label: 'Affectation Restaurant', path: '/employes/affectation-restaurant',separator: true }
+  { icon: FileText, label: 'Affectation Restaurant', path: '/employes/affectation-restaurant',separator: true },
+  { icon: Settings, label: 'Paramètres', path: '/employes/parametres-employes', separator: true }
 ];
 
 export const menuItemsParamGestionRH = [
