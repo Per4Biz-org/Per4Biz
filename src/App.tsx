@@ -40,6 +40,7 @@ import { PrivateRoute } from './components/PrivateRoute'
 import Login from './pages/Login'
 import EditFactureAchat from './pages/finances/factures/EditFactureAchat'
 import TypeFonction from './pages/employes/ParametresEmployes/TypeFonction'
+import TypeContrat from './pages/employes/ParametresEmployes/TypeContrat'
 
 // Lazy loading du composant MesFactures
 const MesFacturesLazy = React.lazy(() => import('./pages/finances/factures/MesFactures'))
@@ -282,6 +283,13 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <TypeFonction />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/employes/parametres-employes/type-contrat" element={
+            <PrivateRoute>
+              <Layout>
+                <TypeContrat />
               </Layout>
             </PrivateRoute>
           } />
