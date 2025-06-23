@@ -32,6 +32,7 @@ import SuiviCAReel from './pages/finances/CA/SuiviCAReel'
 import FermetureCaisse from './pages/finances/caisse/FermetureCaisse'
 import Layout from './components/Layout'
 import Employes from './pages/employes'
+import ParametresEmployes from './pages/employes/ParametresEmployes'
 import { MenuProvider } from './context/MenuContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProfilProvider } from './context/ProfilContext'
@@ -266,6 +267,13 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <Employes />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/employes/parametres-employes" element={
+            <PrivateRoute>
+              <Layout>
+                <ParametresEmployes />
               </Layout>
             </PrivateRoute>
           } />
