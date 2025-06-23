@@ -31,6 +31,7 @@ import SuiviCABudget from './pages/finances/CA/SuiviCABudget'
 import SuiviCAReel from './pages/finances/CA/SuiviCAReel'
 import FermetureCaisse from './pages/finances/caisse/FermetureCaisse'
 import Layout from './components/Layout'
+import Employes from './pages/employes'
 import { MenuProvider } from './context/MenuContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProfilProvider } from './context/ProfilContext'
@@ -258,6 +259,13 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <EcritureBancaire />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/employes" element={
+            <PrivateRoute>
+              <Layout>
+                <Employes />
               </Layout>
             </PrivateRoute>
           } />
