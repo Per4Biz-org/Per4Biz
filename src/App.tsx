@@ -39,6 +39,7 @@ import { ProfilProvider } from './context/ProfilContext'
 import { PrivateRoute } from './components/PrivateRoute'
 import Login from './pages/Login'
 import EditFactureAchat from './pages/finances/factures/EditFactureAchat'
+import TypeFonction from './pages/employes/ParametresEmployes/TypeFonction'
 
 // Lazy loading du composant MesFactures
 const MesFacturesLazy = React.lazy(() => import('./pages/finances/factures/MesFactures'))
