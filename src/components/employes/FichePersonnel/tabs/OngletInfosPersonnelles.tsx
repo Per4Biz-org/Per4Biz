@@ -316,16 +316,17 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         .eq('com_contrat_client_id', profil?.com_contrat_client_id)
         .eq('salarie', true)
         .eq('actif', true)
-        .limit(1)
-        .single();
+        .limit(1);
 
-      if (typeTiersError && typeTiersError.code !== 'PGRST116') { // PGRST116 = not found
+      if (typeTiersError) {
         throw typeTiersError;
       }
 
       // Si aucun type de tiers salarié n'est trouvé, utiliser le type fourni
       // Sinon, utiliser le type salarié
-      const id_type_tiers = typeTiersSalarie?.id || tiersData.id_type_tiers;
+      const id_type_tiers = (typeTiersSalarie && typeTiersSalarie.length > 0) 
+        ? typeTiersSalarie[0].id 
+        : tiersData.id_type_tiers;
 
       const { data, error } = await supabase
         .from('com_tiers') 
