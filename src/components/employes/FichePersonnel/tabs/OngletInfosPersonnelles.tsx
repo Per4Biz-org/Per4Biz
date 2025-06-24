@@ -445,7 +445,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               <User className="w-16 h-16 text-gray-400" />
             )}
           </div>
-          <div className="absolute bottom-0 right-0">
+          <div className="absolute bottom-0 right-0 flex">
             <input
               type="file"
               id="photo-upload"
@@ -456,14 +456,16 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             />
             <label
               htmlFor="photo-upload"
-              className="bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors"
+              className="bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors flex items-center justify-center"
+              title="Ajouter une photo"
             >
               <Upload size={16} />
             </label>
             {photoPreview && (
               <button
                 onClick={handleRemovePhoto}
-                className="bg-red-500 text-white p-2 rounded-full ml-2 hover:bg-red-600 transition-colors"
+                className="bg-red-500 text-white p-2 rounded-full ml-2 hover:bg-red-600 transition-colors flex items-center justify-center"
+                title="Supprimer la photo"
               >
                 <X size={16} />
               </button>
