@@ -10,7 +10,6 @@ import { ToastContainer, ToastData } from '../../components/ui/toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import styles from './styles.module.css';
-import FichePersonnel from './FichePersonnel';
 
 interface Personnel {
   id: string;
@@ -37,8 +36,6 @@ const MesEmployes: React.FC = () => {
   const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState<ToastData[]>([]);
-  const [selectedPersonnelId, setSelectedPersonnelId] = useState<string | undefined>(undefined);
-  const [showFichePersonnel, setShowFichePersonnel] = useState(false);
 
   useEffect(() => {
     setMenuItems(menuItemsGestionRH);
@@ -94,8 +91,7 @@ const MesEmployes: React.FC = () => {
 
   const handleEdit = (personne: Personnel) => {
     // Fonction à implémenter pour l'édition
-    setSelectedPersonnelId(personne.id);
-    setShowFichePersonnel(true);
+    console.log('Éditer:', personne);
   };
 
   const handleDelete = async (personne: Personnel) => {
@@ -123,17 +119,6 @@ const MesEmployes: React.FC = () => {
         });
       }
     }
-  };
-
-  const handleAddEmploye = () => {
-    setSelectedPersonnelId(undefined);
-    setShowFichePersonnel(true);
-  };
-
-  const handleCloseFichePersonnel = () => {
-    setShowFichePersonnel(false);
-    setSelectedPersonnelId(undefined);
-    fetchPersonnel(); // Rafraîchir la liste après modification
   };
 
   const columns: Column<Personnel>[] = [
@@ -202,18 +187,6 @@ const MesEmployes: React.FC = () => {
     }
   ];
 
-  // Si la fiche personnel est affichée, on la rend à la place de la liste
-  if (showFichePersonnel) {
-    return (
-      <div className={styles.container}>
-        <FichePersonnel 
-          personnelId={selectedPersonnelId} 
-          onClose={handleCloseFichePersonnel} 
-        />
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
       <PageSection
@@ -226,7 +199,10 @@ const MesEmployes: React.FC = () => {
             label="Ajouter un employé"
             icon="UserPlus"
             color="var(--color-primary)"
-            onClick={handleAddEmploye}
+            onClick={() => {
+              // Fonction à implémenter pour l'ajout
+              console.log('Ajouter un employé');
+            }}
           />
         </div>
 
@@ -238,7 +214,6 @@ const MesEmployes: React.FC = () => {
           <DataTable
             columns={columns}
             data={personnel}
-            onRowClick={handleEdit}
             actions={actions}
             defaultRowsPerPage={10}
             emptyTitle="Aucun employé"
