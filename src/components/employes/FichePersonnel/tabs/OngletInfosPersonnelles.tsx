@@ -309,6 +309,43 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   // Gérer la création d'un nouveau tiers
   const handleTiersSubmit = async (tiersData: any) => {
     try {
+      // Vérifier si un tiers avec ce code existe déjà
+      const { data: existingTiers, error: checkError } = await supabase
+        .from('com_tiers')
+        .select('id, code, nom')
+        .eq('code', tiersData.code)
+        .eq('com_contrat_client_id', profil?.com_contrat_client_id)
+        .maybeSingle();
+
+      if (checkError) {
+        throw checkError;
+      }
+
+      // Si un tiers avec ce code existe déjà, afficher un message et proposer de l'utiliser
+      if (existingTiers) {
+        if (window.confirm(`Un tiers avec le code "${tiersData.code}" existe déjà (${existingTiers.nom}). Voulez-vous l'utiliser ?`)) {
+          // Utiliser le tiers existant
+          setValue('id_tiers', existingTiers.id);
+          
+          addToast({
+            label: `Tiers existant "${existingTiers.nom}" sélectionné`,
+            icon: 'Check',
+            color: '#22c55e'
+          });
+          
+          setIsTiersModalOpen(false);
+          return;
+        } else {
+          // L'utilisateur ne veut pas utiliser le tiers existant
+          addToast({
+            label: 'Veuillez utiliser un code différent pour créer un nouveau tiers',
+            icon: 'AlertTriangle',
+            color: '#f59e0b'
+          });
+          return;
+        }
+      }
+
       // Vérifier si un type de tiers "salarié" existe
       const { data: typeTiersSalarie, error: typeTiersError } = await supabase
         .from('com_param_type_tiers')
@@ -353,8 +390,18 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       setIsTiersModalOpen(false);
     } catch (error) {
       console.error('Erreur lors de la création du tiers:', error);
+      
+      // Gestion spécifique des erreurs de contrainte d'unicité
+      let errorMessage = 'Erreur lors de la création du tiers';
+      
+      if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
+        if (error.message.includes('com_tiers_code_unique')) {
+          errorMessage = 'Un tiers avec ce code existe déjà. Veuillez utiliser un code différent.';
+        }
+      }
+      
       addToast({
-        label: 'Erreur lors de la création du tiers',
+        label: errorMessage,
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
