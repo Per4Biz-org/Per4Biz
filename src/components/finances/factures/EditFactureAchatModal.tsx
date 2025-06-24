@@ -409,7 +409,7 @@ const EditFactureAchatModal: React.FC<EditFactureAchatModalProps> = ({
     try {
       let factureId = facture.id;
       
-      // Préparation des données de la facture
+      // Préparation des données de la facture - code_user est toujours nécessaire dans fin_facture_achat
       const factureToSave = { 
         ...factureData,
         com_contrat_client_id: profil.com_contrat_client_id,
