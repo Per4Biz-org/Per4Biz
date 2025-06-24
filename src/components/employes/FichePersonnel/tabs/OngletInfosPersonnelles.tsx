@@ -229,6 +229,23 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
     setIsSubmitting(true);
     try {
+      // Nettoyer les données avant envoi - convertir les chaînes vides en null pour les champs optionnels
+      const cleanedData = {
+        ...data,
+        date_naissance: data.date_naissance === '' ? null : data.date_naissance,
+        civilite: data.civilite === '' ? null : data.civilite,
+        sexe: data.sexe === '' ? null : data.sexe,
+        adresse: data.adresse === '' ? null : data.adresse,
+        code_postal: data.code_postal === '' ? null : data.code_postal,
+        ville: data.ville === '' ? null : data.ville,
+        pays: data.pays === '' ? null : data.pays,
+        numero_securite_sociale: data.numero_securite_sociale === '' ? null : data.numero_securite_sociale,
+        nif: data.nif === '' ? null : data.nif,
+        email_perso: data.email_perso === '' ? null : data.email_perso,
+        telephone: data.telephone === '' ? null : data.telephone,
+        lien_photo: data.lien_photo === '' ? null : data.lien_photo
+      };
+
       let result;
       
       if (mode === 'edit' && personnelId) {
@@ -236,7 +253,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         const { data: updatedData, error } = await supabase
           .from('rh_personnel')
           .update({
-            ...data,
+            ...cleanedData,
             com_contrat_client_id: profil.com_contrat_client_id
           })
           .eq('id', personnelId)
@@ -250,7 +267,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         const { data: newData, error } = await supabase
           .from('rh_personnel')
           .insert({
-            ...data,
+            ...cleanedData,
             com_contrat_client_id: profil.com_contrat_client_id
           })
           .select()
