@@ -19,9 +19,9 @@ const affectationSchema = z.object({
   id_fonction: z.string().min(1, 'La fonction est requise'),
   id_contrat: z.string().min(1, 'Le contrat est requis'),
   date_debut: z.string().min(1, 'La date de début est requise'),
-  date_fin: z.string().optional(),
-  tx_presence: z.number().min(0, 'Le taux doit être positif').max(1, 'Le taux doit être inférieur ou égal à 1').default(1),
-  commentaire: z.string().optional()
+  date_fin: z.string().nullable().optional(),
+  tx_presence: z.number().nullable().default(1),
+  commentaire: z.string().nullable().optional()
 });
 
 type AffectationFormData = z.infer<typeof affectationSchema>;

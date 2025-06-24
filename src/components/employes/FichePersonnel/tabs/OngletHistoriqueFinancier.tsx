@@ -19,9 +19,9 @@ const historiqueFinancierSchema = z.object({
   id_categorie: z.string().min(1, 'La catégorie est requise'),
   id_sous_categorie: z.string().min(1, 'La sous-catégorie est requise'),
   date_debut: z.string().min(1, 'La date de début est requise'),
-  date_fin: z.string().optional(),
+  date_fin: z.string().nullable().optional(),
   montant: z.number().min(0, 'Le montant doit être positif'),
-  commentaire: z.string().optional()
+  commentaire: z.string().nullable().optional()
 });
 
 type HistoriqueFinancierFormData = z.infer<typeof historiqueFinancierSchema>;

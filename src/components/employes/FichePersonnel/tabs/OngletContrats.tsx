@@ -17,9 +17,9 @@ import { ToastData } from '../../../../components/ui/toast';
 const contratSchema = z.object({
   id_type_contrat: z.string().min(1, 'Le type de contrat est requis'),
   date_debut: z.string().min(1, 'La date de début est requise'),
-  date_fin: z.string().optional(),
-  commentaire: z.string().optional(),
-  id_entite_payeur: z.string().min(1, 'L\'entité payeuse est requise')
+  date_fin: z.string().nullable().optional(),
+  commentaire: z.string().nullable().optional(),
+  id_entite_payeur: z.string().nullable().optional()
 });
 
 type ContratFormData = z.infer<typeof contratSchema>;
