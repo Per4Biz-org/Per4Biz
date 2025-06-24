@@ -188,21 +188,18 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       });
     } finally {
       setIsUploadingPhoto(false);
-        console.error('Erreur lors de la création de l\'URL signée:', error);
     }
   };
 
-      console.log('URL signée générée:', data.signedUrl);
   // Supprimer la photo
   const handleRemovePhoto = async () => {
+    const photoPath = control._formValues.lien_photo;
     if (!photoPath) {
       console.log('Aucun chemin de photo fourni');
       return;
     }
     
     console.log('Chargement de l\'aperçu de la photo:', photoPath);
-    const photoPath = control._formValues.lien_photo;
-    if (!photoPath) return;
 
     console.log('Suppression de la photo:', photoPath);
     try {
@@ -211,7 +208,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         .remove([photoPath]);
 
       if (error) throw error;
-        console.error('Erreur lors de la suppression du fichier:', error);
 
       console.log('Photo supprimée avec succès');
       setValue('lien_photo', '');
