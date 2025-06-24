@@ -18,6 +18,7 @@ interface TypeTiers {
   libelle: string;
   actif: boolean;
   mp: boolean;
+  salarie: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -94,6 +95,7 @@ const TypeTiers: React.FC = () => {
           libelle: formData.libelle,
           actif: formData.actif,
           mp: formData.mp,
+          salarie: formData.salarie,
           com_contrat_client_id: profil.com_contrat_client_id
         };
 
@@ -109,6 +111,7 @@ const TypeTiers: React.FC = () => {
           libelle: formData.libelle,
           actif: formData.actif,
           mp: formData.mp,
+          salarie: formData.salarie,
           com_contrat_client_id: profil.com_contrat_client_id
         };
 
@@ -190,6 +193,18 @@ const TypeTiers: React.FC = () => {
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {value ? 'Oui' : 'Non'}
+        </span>
+      )
+    },
+    {
+      label: 'Salarié',
+      accessor: 'salarie',
+      align: 'center',
+      render: (value) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
         }`}>
           {value ? 'Oui' : 'Non'}
         </span>

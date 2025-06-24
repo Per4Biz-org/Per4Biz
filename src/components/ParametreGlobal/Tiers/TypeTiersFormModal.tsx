@@ -8,6 +8,7 @@ interface TypeTiersFormData {
   libelle: string;
   actif: boolean;
   mp: boolean;
+  salarie: boolean;
 }
 
 interface TypeTiersFormModalProps {
@@ -29,7 +30,8 @@ export function TypeTiersFormModal({
     code: '',
     libelle: '',
     actif: true,
-    mp: false
+    mp: false,
+    salarie: false
   });
   const [errors, setErrors] = useState<Partial<Record<keyof TypeTiersFormData, string>>>({});
 
@@ -41,14 +43,16 @@ export function TypeTiersFormModal({
           code: initialData.code,
           libelle: initialData.libelle,
           actif: initialData.actif,
-          mp: initialData.mp || false
+          mp: initialData.mp || false,
+          salarie: initialData.salarie || false
         });
       } else {
         setFormData({
           code: '',
           libelle: '',
           actif: true,
-          mp: false
+          mp: false,
+          salarie: false
         });
       }
       setErrors({});
@@ -84,6 +88,13 @@ export function TypeTiersFormModal({
     }));
   };
 
+  const handleSalarieToggleChange = (checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      salarie: checked
+    }));
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof TypeTiersFormData, string>> = {};
 
@@ -102,7 +113,8 @@ export function TypeTiersFormModal({
       code: formData.code.trim(),
       libelle: formData.libelle.trim(),
       actif: formData.actif,
-      mp: formData.mp
+      mp: formData.mp,
+      salarie: formData.salarie
     });
   };
 
@@ -111,7 +123,8 @@ export function TypeTiersFormModal({
       code: '',
       libelle: '',
       actif: true,
-      mp: false
+      mp: false,
+      salarie: false
     });
     setErrors({});
     onClose();
@@ -182,6 +195,21 @@ export function TypeTiersFormModal({
               onChange={handleMpToggleChange}
               label={formData.mp ? 'Matière première' : 'Pas une matière première'}
               icon="Package"
+              disabled={isSubmitting}
+              size="sm"
+            />
+          </FormField>
+
+          <FormField
+            label="Salarié"
+            description="Cocher si ce type de tiers correspond à un salarié"
+            className="mb-4"
+          >
+            <Toggle
+              checked={formData.salarie}
+              onChange={handleSalarieToggleChange}
+              label={formData.salarie ? 'Salarié' : 'Non salarié'}
+              icon="Users"
               disabled={isSubmitting}
               size="sm"
             />

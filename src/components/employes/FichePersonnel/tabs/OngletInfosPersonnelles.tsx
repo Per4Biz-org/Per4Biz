@@ -309,10 +309,29 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   // Gérer la création d'un nouveau tiers
   const handleTiersSubmit = async (tiersData: any) => {
     try {
+      // Vérifier si un type de tiers "salarié" existe
+      const { data: typeTiersSalarie, error: typeTiersError } = await supabase
+        .from('com_param_type_tiers')
+        .select('id')
+        .eq('com_contrat_client_id', profil?.com_contrat_client_id)
+        .eq('salarie', true)
+        .eq('actif', true)
+        .limit(1)
+        .single();
+
+      if (typeTiersError && typeTiersError.code !== 'PGRST116') { // PGRST116 = not found
+        throw typeTiersError;
+      }
+
+      // Si aucun type de tiers salarié n'est trouvé, utiliser le type fourni
+      // Sinon, utiliser le type salarié
+      const id_type_tiers = typeTiersSalarie?.id || tiersData.id_type_tiers;
+
       const { data, error } = await supabase
         .from('com_tiers') 
         .insert({
           ...tiersData,
+          id_type_tiers,
           com_contrat_client_id: profil?.com_contrat_client_id,
           // code_user n'est plus nécessaire, remplacé par created_by
         })
