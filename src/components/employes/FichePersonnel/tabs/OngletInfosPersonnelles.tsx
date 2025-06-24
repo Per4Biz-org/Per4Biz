@@ -310,10 +310,11 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const handleTiersSubmit = async (tiersData: any) => {
     try {
       const { data, error } = await supabase
-        .from('com_tiers')
+        .from('com_tiers') 
         .insert({
           ...tiersData,
-          com_contrat_client_id: profil?.com_contrat_client_id
+          com_contrat_client_id: profil?.com_contrat_client_id,
+          // code_user n'est plus nécessaire, remplacé par created_by
         })
         .select()
         .single();

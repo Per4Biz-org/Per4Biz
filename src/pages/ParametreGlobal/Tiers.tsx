@@ -106,7 +106,7 @@ const Tiers: React.FC = () => {
       if (selectedTiers) {
         // Mode édition
         const updateData = {
-          code: formData.code,
+          code: formData.code, 
           nom: formData.nom,
           nif: formData.nif || null,
           email: formData.email || null,
@@ -128,7 +128,7 @@ const Tiers: React.FC = () => {
         // Mode création
         const insertData = {
           code: formData.code,
-          nom: formData.nom,
+          nom: formData.nom, 
           nif: formData.nif || null,
           email: formData.email || null,
           telephone: formData.telephone || null,
@@ -137,7 +137,8 @@ const Tiers: React.FC = () => {
           ville: formData.ville || null,
           actif: formData.actif,
           id_type_tiers: formData.id_type_tiers,
-          com_contrat_client_id: profil.com_contrat_client_id
+          com_contrat_client_id: profil.com_contrat_client_id,
+          // code_user n'est plus nécessaire, remplacé par created_by
         };
 
         const { error: insertError } = await supabase

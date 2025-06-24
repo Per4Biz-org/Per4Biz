@@ -122,7 +122,7 @@ const ImportTiers: React.FC = () => {
 
   const validateRequiredData = async (): Promise<{ codeUser: string; contratClientId: string; typeId: string } | null> => {
     // Vérifier le profil
-    if (!profil?.code_user || !profil?.com_contrat_client_id) {
+    if (!profil?.com_contrat_client_id) {
       addToast({
         label: 'Profil utilisateur incomplet. Veuillez vérifier vos informations de profil.',
         icon: 'AlertTriangle',
@@ -150,7 +150,7 @@ const ImportTiers: React.FC = () => {
       }
 
       return {
-        codeUser: profil.code_user,
+        codeUser: profil.code_user || 'SYSTEM', // Gardé pour compatibilité mais n'est plus utilisé
         contratClientId: profil.com_contrat_client_id,
         typeId: typeTiers.id
       };
@@ -180,7 +180,7 @@ const ImportTiers: React.FC = () => {
       // Valider les données requises
       const requiredData = await validateRequiredData();
       if (!requiredData) {
-        setIsImporting(false);
+        setIsImporting(false); 
         return;
       }
 
@@ -221,15 +221,15 @@ const ImportTiers: React.FC = () => {
                 code: code,
                 nom: nom,
                 nif: row.nif?.trim() || null,
-                email: row.email?.trim() || null,
+                email: row.email?.trim() || null, 
                 telephone: row.telephone?.trim() || row.phone?.trim() || null,
                 adresse: row.adresse?.trim() || row.address?.trim() || null,
                 code_postal: row.code_postal?.trim() || row.postal_code?.trim() || null,
                 ville: row.ville?.trim() || row.city?.trim() || null,
                 actif: true,
                 id_type_tiers: requiredData.typeId,
-                com_contrat_client_id: requiredData.contratClientId,
-                code_user: requiredData.codeUser
+                com_contrat_client_id: requiredData.contratClientId
+                // code_user n'est plus nécessaire, remplacé par created_by
               };
             }).filter(Boolean); // Supprimer les lignes null
 

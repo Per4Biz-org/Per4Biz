@@ -47,7 +47,7 @@ export function TiersSelector({
       try {
         const { data, error } = await supabase
           .from('com_tiers')
-          .select(`
+          .select(` 
             id, 
             code, 
             nom,

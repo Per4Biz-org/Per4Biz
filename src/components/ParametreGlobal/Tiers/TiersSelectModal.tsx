@@ -43,7 +43,7 @@ export function TiersSelectModal({
       try {
         const { data, error } = await supabase
           .from('com_tiers')
-          .select(`
+          .select(` 
             id, 
             code, 
             nom,
