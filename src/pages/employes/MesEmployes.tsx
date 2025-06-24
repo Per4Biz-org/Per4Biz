@@ -10,6 +10,7 @@ import { ToastContainer, ToastData } from '../../components/ui/toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import styles from './styles.module.css';
+import FichePersonnel from './FichePersonnel';
 
 interface Personnel {
   id: string;
@@ -36,6 +37,11 @@ const MesEmployes: React.FC = () => {
   const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState<ToastData[]>([]);
+
+  // État pour la fiche personnel
+  const [showFichePersonnel, setShowFichePersonnel] = useState(false);
+  const [ficheMode, setFicheMode] = useState<'create' | 'edit'>('create');
+  const [selectedPersonnelId, setSelectedPersonnelId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     setMenuItems(menuItemsGestionRH);
@@ -89,9 +95,24 @@ const MesEmployes: React.FC = () => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   };
 
-  const handleEdit = (personne: Personnel) => {
-    // Fonction à implémenter pour l'édition
-    console.log('Éditer:', personne);
+  // Ouvrir la fiche personnel en mode édition
+  const handleEdit = (personnel: Personnel) => {
+    setSelectedPersonnelId(personnel.id);
+    setFicheMode('edit');
+    setShowFichePersonnel(true);
+  };
+
+  // Ouvrir la fiche personnel en mode création
+  const handleCreate = () => {
+    setSelectedPersonnelId(undefined);
+    setFicheMode('create');
+    setShowFichePersonnel(true);
+  };
+
+  // Fermer la fiche personnel et rafraîchir les données
+  const handleCloseFiche = () => {
+    setShowFichePersonnel(false);
+    fetchPersonnel();
   };
 
   const handleDelete = async (personne: Personnel) => {
@@ -120,6 +141,17 @@ const MesEmployes: React.FC = () => {
       }
     }
   };
+
+  // Si la fiche personnel est affichée, montrer uniquement celle-ci
+  if (showFichePersonnel) {
+    return (
+      <FichePersonnel 
+        mode={ficheMode} 
+        id={selectedPersonnelId} 
+        onClose={handleCloseFiche} 
+      />
+    );
+  }
 
   const columns: Column<Personnel>[] = [
     {
@@ -198,11 +230,8 @@ const MesEmployes: React.FC = () => {
           <Button
             label="Ajouter un employé"
             icon="UserPlus"
-            color="var(--color-primary)"
-            onClick={() => {
-              // Fonction à implémenter pour l'ajout
-              console.log('Ajouter un employé');
-            }}
+            color="var(--color-primary)" 
+            onClick={handleCreate}
           />
         </div>
 
@@ -214,6 +243,7 @@ const MesEmployes: React.FC = () => {
           <DataTable
             columns={columns}
             data={personnel}
+            onRowClick={handleEdit}
             actions={actions}
             defaultRowsPerPage={10}
             emptyTitle="Aucun employé"
@@ -226,5 +256,4 @@ const MesEmployes: React.FC = () => {
     </div>
   );
 };
-
 export default MesEmployes;
