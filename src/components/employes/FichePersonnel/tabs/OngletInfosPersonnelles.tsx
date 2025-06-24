@@ -6,7 +6,7 @@ import { supabase } from '../../../../lib/supabase';
 import { useProfil } from '../../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../../../components/ui/form';
 import { Button } from '../../../../components/ui/button';
-import { Dropdown, DropdownOption } from '../../../../components/ui/dropdown';
+import { Dropdown } from '../../../../components/ui/dropdown';
 import { TiersSelector } from '../../../../components/ParametreGlobal/Tiers/TiersSelector';
 import { TiersFormModal } from '../../../../components/ParametreGlobal/Tiers/TiersFormModal';
 import { ToastData } from '../../../../components/ui/toast';
@@ -60,7 +60,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const { 
     control, 
     handleSubmit, 
-    reset, 
+    reset,
+    getValues,
     setValue,
     formState: { errors } 
   } = useForm<PersonnelFormData>({
@@ -137,11 +138,17 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   // Charger l'aperçu de la photo
   const loadPhotoPreview = async (photoPath: string) => {
     try {
+      console.log('Chargement de l\'aperçu de la photo avec le chemin:', photoPath);
       const { data, error } = await supabase.storage
         .from('personnel-photos')
         .createSignedUrl(photoPath, 60);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur lors de la création de l\'URL signée:', error);
+        throw error;
+      }
+      
+      console.log('URL signée créée avec succès:', data.signedUrl);
       setPhotoPreview(data.signedUrl);
     } catch (error) {
       console.error('Erreur lors du chargement de la photo:', error);
@@ -157,7 +164,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     try {
       // Créer un nom de fichier unique
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       const filePath = `${profil.com_contrat_client_id}/${fileName}`;
 
       // Uploader le fichier
@@ -168,6 +175,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       if (uploadError) throw uploadError;
 
       // Mettre à jour le formulaire avec le chemin du fichier
+      console.log('Mise à jour du champ lien_photo avec le chemin:', filePath);
       setValue('lien_photo', filePath);
       console.log('Chemin de la photo mis à jour dans le formulaire:', filePath);
       
@@ -241,6 +249,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
     setIsSubmitting(true);
     try {
+      // Récupérer la valeur la plus récente du champ lien_photo
+      const currentPhotoPath = getValues('lien_photo');
+      console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath);
+      
       console.log('Données du formulaire avant nettoyage:', data);
       console.log('Valeur de lien_photo avant nettoyage:', data.lien_photo);
       // Nettoyer les données avant envoi - convertir les chaînes vides en null pour les champs optionnels
@@ -255,9 +267,9 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         pays: data.pays === '' ? null : data.pays,
         numero_securite_sociale: data.numero_securite_sociale === '' ? null : data.numero_securite_sociale,
         nif: data.nif === '' ? null : data.nif,
-        email_perso: data.email_perso === '' ? null : data.email_perso, 
+        email_perso: data.email_perso === '' ? null : data.email_perso,
         telephone: data.telephone === '' ? null : data.telephone,
-        lien_photo: data.lien_photo || null
+        lien_photo: currentPhotoPath || null
       };
       
       console.log('Données nettoyées avant envoi:', cleanedData);
