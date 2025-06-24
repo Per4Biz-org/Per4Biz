@@ -169,7 +169,7 @@ export function TiersFormModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
+
     await onSubmit({
       code: formData.code.trim(),
       nom: formData.nom.trim(),
