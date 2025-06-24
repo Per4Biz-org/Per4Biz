@@ -35,12 +35,14 @@ export const useFichePersonnel = (mode: 'create' | 'edit', id?: string) => {
       if (mode === 'edit' && id) {
         setLoading(true);
         try {
+          console.log('Chargement du personnel avec ID:', id);
           const { data, error } = await supabase
             .from('rh_personnel')
             .select(`
               *,
               tiers:id_tiers (
                 id,
+            console.log('Chargement de l\'aperçu de la photo:', data.lien_photo);
                 code,
                 nom
               )
@@ -49,6 +51,9 @@ export const useFichePersonnel = (mode: 'create' | 'edit', id?: string) => {
             .single();
 
           if (error) throw error;
+              console.log('URL signée créée:', urlData.signedUrl);
+          console.log('Personnel chargé:', data);
+          console.log('Lien photo:', data.lien_photo);
           setPersonnel(data);
         } catch (error: any) {
           console.error('Erreur lors de la récupération du personnel:', error);

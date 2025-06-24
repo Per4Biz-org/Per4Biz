@@ -45,6 +45,7 @@ export const OngletPiecesJointes: React.FC<OngletPiecesJointesProps> = ({
 
       setLoading(true);
       try {
+        console.log('Chargement des pièces jointes pour le personnel:', personnelId);
         const { data, error } = await supabase
           .from('rh_piece_jointe')
           .select('*')
@@ -53,17 +54,20 @@ export const OngletPiecesJointes: React.FC<OngletPiecesJointesProps> = ({
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        console.log('Pièces jointes chargées:', data);
         setPiecesJointes(data || []);
         
         // Générer des URL signées pour chaque pièce jointe
         if (data && data.length > 0) {
           const urls: Record<string, string> = {};
           for (const piece of data) {
+            console.log('Génération d\'URL signée pour:', piece.chemin_fichier);
             const { data: urlData } = await supabase.storage
               .from('personnel-documents')
               .createSignedUrl(piece.chemin_fichier, 60);
             
             if (urlData) {
+              console.log('URL signée générée:', urlData.signedUrl);
               urls[piece.id] = urlData.signedUrl;
             }
           }

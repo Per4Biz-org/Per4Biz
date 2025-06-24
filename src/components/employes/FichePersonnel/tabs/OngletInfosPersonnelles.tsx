@@ -93,6 +93,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       if (mode === 'edit' && personnelId) {
         setLoading(true);
         try {
+          console.log('Chargement du personnel avec ID:', personnelId);
           const { data, error } = await supabase
             .from('rh_personnel')
             .select('*')
@@ -100,6 +101,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             .single();
 
           if (error) throw error;
+          console.log('Personnel chargé:', data);
+          console.log('Lien photo:', data.lien_photo);
           
           // Formater la date de naissance pour l'input date
           let formattedData = { ...data };
@@ -112,6 +115,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           
           // Charger l'aperçu de la photo si disponible
           if (data.lien_photo) {
+            console.log('Chargement de l\'aperçu de la photo:', data.lien_photo);
             loadPhotoPreview(data.lien_photo);
           }
         } catch (error) {
@@ -165,6 +169,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
       // Mettre à jour le formulaire avec le chemin du fichier
       setValue('lien_photo', filePath);
+      console.log('Chemin de la photo mis à jour dans le formulaire:', filePath);
       
       // Charger l'aperçu
       loadPhotoPreview(filePath);
@@ -183,21 +188,32 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       });
     } finally {
       setIsUploadingPhoto(false);
+        console.error('Erreur lors de la création de l\'URL signée:', error);
     }
   };
 
+      console.log('URL signée générée:', data.signedUrl);
   // Supprimer la photo
   const handleRemovePhoto = async () => {
+    if (!photoPath) {
+      console.log('Aucun chemin de photo fourni');
+      return;
+    }
+    
+    console.log('Chargement de l\'aperçu de la photo:', photoPath);
     const photoPath = control._formValues.lien_photo;
     if (!photoPath) return;
 
+    console.log('Suppression de la photo:', photoPath);
     try {
       const { error } = await supabase.storage
         .from('personnel-photos')
         .remove([photoPath]);
 
       if (error) throw error;
+        console.error('Erreur lors de la suppression du fichier:', error);
 
+      console.log('Photo supprimée avec succès');
       setValue('lien_photo', '');
       setPhotoPreview(null);
       
@@ -229,6 +245,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
     setIsSubmitting(true);
     try {
+      console.log('Données du formulaire avant nettoyage:', data);
+      console.log('Valeur de lien_photo avant nettoyage:', data.lien_photo);
       // Nettoyer les données avant envoi - convertir les chaînes vides en null pour les champs optionnels
       const cleanedData = {
         ...data,
@@ -243,8 +261,11 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         nif: data.nif === '' ? null : data.nif,
         email_perso: data.email_perso === '' ? null : data.email_perso, 
         telephone: data.telephone === '' ? null : data.telephone,
-        lien_photo: data.lien_photo === '' ? null : data.lien_photo
+        lien_photo: data.lien_photo || null
       };
+      
+      console.log('Données nettoyées avant envoi:', cleanedData);
+      console.log('Valeur de lien_photo après nettoyage:', cleanedData.lien_photo);
 
       let result;
       
@@ -261,6 +282,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           .single();
 
         if (error) throw error;
+        console.log('Personnel mis à jour avec succès:', updatedData);
         result = updatedData;
       } else {
         // Mode création
@@ -274,6 +296,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           .single();
 
         if (error) throw error;
+        console.log('Personnel créé avec succès:', newData);
         result = newData;
       }
 
