@@ -25,7 +25,7 @@ const personnelSchema = z.object({
   pays: z.string().nullable().optional(),
   numero_securite_sociale: z.string().nullable().optional(),
   nif: z.string().nullable().optional(),
-  email_perso: z.string().email('Email invalide').optional().or(z.literal('')),
+  email_perso: z.string().email('Email invalide').nullable().optional(),
   telephone: z.string().nullable().optional(),
   lien_photo: z.string().nullable().optional(),
   id_tiers: z.string().min(1, 'Le tiers est requis'),
@@ -241,7 +241,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         pays: data.pays === '' ? null : data.pays,
         numero_securite_sociale: data.numero_securite_sociale === '' ? null : data.numero_securite_sociale,
         nif: data.nif === '' ? null : data.nif,
-        email_perso: data.email_perso === '' ? null : data.email_perso,
+        email_perso: data.email_perso === '' ? null : data.email_perso, 
         telephone: data.telephone === '' ? null : data.telephone,
         lien_photo: data.lien_photo === '' ? null : data.lien_photo
       };
