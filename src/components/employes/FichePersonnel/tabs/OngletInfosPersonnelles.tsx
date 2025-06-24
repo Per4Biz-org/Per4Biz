@@ -60,7 +60,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const { 
     control, 
     handleSubmit, 
-    reset, 
+    reset,
     getValues,
     setValue,
     formState: { errors } 
@@ -488,7 +488,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Section photo de profil */}
       <div className="flex flex-col items-center mb-8">
         <div className="relative">
@@ -535,230 +535,135 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         </p>
       </div>
 
-      <Form size={100} onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-4 gap-4 mb-4">
-          {/* Colonne de gauche pour la photo (vide car déjà affichée au-dessus) */}
-          <div className="col-span-1 w-[150px]"></div>
-          
-          {/* Première ligne - Informations obligatoires */}
-          <div className="col-span-3 grid grid-cols-3 gap-4">
-            <FormField
-              label="Civilité"
-              error={errors.civilite?.message}
-              className="w-[80px]"
-            >
-              <Controller
-                name="civilite"
-                control={control}
-                render={({ field }) => (
-                  <Dropdown
-                    options={civiliteOptions}
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    label="Sélectionner"
-                    size="sm"
-                  />
-                )}
-              />
-            </FormField>
-
-            <FormField
-              label="Nom"
-              required
-              error={errors.nom?.message}
-              className="w-[200px]"
-            >
-              <Controller
-                name="nom"
-                control={control}
-                render={({ field }) => (
-                  <FormInput
-                    {...field}
-                    placeholder="Nom"
-                    error={!!errors.nom}
-                  />
-                )}
-              />
-            </FormField>
-
-            <FormField
-              label="Prénom"
-              required
-              error={errors.prenom?.message}
-              className="w-[200px]"
-            >
-              <Controller
-                name="prenom"
-                control={control}
-                render={({ field }) => (
-                  <FormInput
-                    {...field}
-                    placeholder="Prénom"
-                    error={!!errors.prenom}
-                  />
-                )}
-              />
-            </FormField>
-          </div>
-        </div>
-
-        {/* Deuxième ligne - Identifiants */}
-        <div className="grid grid-cols-4 gap-4 mb-4">
-          <div className="col-span-1 w-[150px]"></div>
-          <div className="col-span-3 grid grid-cols-3 gap-4">
-            <FormField
-              label="Code court"
-              required
-              error={errors.code_court?.message}
-              className="w-[100px]"
-            >
-              <Controller
-                name="code_court"
-                control={control}
-                render={({ field }) => (
-                  <FormInput
-                    {...field}
-                    placeholder="Code court"
-                    maxLength={12}
-                    error={!!errors.code_court}
-                  />
-                )}
-              />
-            </FormField>
-
-            <FormField
-              label="Matricule"
-              required
-              error={errors.matricule?.message}
-              className="w-[120px]"
-            >
-              <Controller
-                name="matricule"
-                control={control}
-                render={({ field }) => (
-                  <FormInput
-                    {...field}
-                    placeholder="Matricule"
-                    maxLength={12}
-                    error={!!errors.matricule}
-                  />
-                )}
-              />
-            </FormField>
-
-            <div className="flex gap-2 items-end">
-              <div className="flex-1 w-[200px]">
-                <FormField
-                  label="Tiers associé"
-                  required
-                  error={errors.id_tiers?.message}
-                >
-                  <Controller
-                    name="id_tiers"
-                    control={control}
-                    render={({ field }) => (
-                      <TiersSelector
-                        value={field.value}
-                        onChange={field.onChange}
-                        disabled={isSubmitting}
-                      />
-                    )}
-                  />
-                </FormField>
-              </div>
-              <Button
-                label="+"
-                icon="Plus"
-                color="var(--color-primary)"
-                onClick={() => setIsTiersModalOpen(true)}
-                disabled={isSubmitting}
+      <Form size={100} columns={3} onSubmit={handleSubmit(onSubmit)}>
+        {/* Première ligne */}
+        <FormField
+          label="Civilité"
+          error={errors.civilite?.message}
+        >
+          <Controller
+            name="civilite"
+            control={control}
+            render={({ field }) => (
+              <Dropdown
+                options={civiliteOptions}
+                value={field.value || ''}
+                onChange={field.onChange}
+                label="Sélectionner une civilité"
                 size="sm"
-                className="mb-2"
               />
-            </div>
-          </div>
-        </div>
+            )}
+          />
+        </FormField>
 
-        {/* Troisième ligne - Informations de contact */}
-        <div className="grid grid-cols-4 gap-4 mb-4">
-          <div className="col-span-1 w-[150px]"></div>
-          <div className="col-span-3 grid grid-cols-3 gap-4">
-            <FormField
-              label="Téléphone"
-              error={errors.telephone?.message}
-              className="w-[150px]"
-            >
-              <Controller
-                name="telephone"
-                control={control}
-                render={({ field }) => (
-                  <FormInput
-                    {...field}
-                    placeholder="Téléphone"
-                    error={!!errors.telephone}
-                  />
-                )}
+        <FormField
+          label="Nom"
+          required
+          error={errors.nom?.message}
+        >
+          <Controller
+            name="nom"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Nom"
+                error={!!errors.nom}
               />
-            </FormField>
+            )}
+          />
+        </FormField>
 
-            <FormField
-              label="Date de naissance"
-              error={errors.date_naissance?.message}
-              className="w-[120px]"
-            >
-              <Controller
-                name="date_naissance"
-                control={control}
-                render={({ field }) => (
-                  <FormInput
-                    type="date"
-                    {...field}
-                    error={!!errors.date_naissance}
-                  />
-                )}
+        <FormField
+          label="Prénom"
+          required
+          error={errors.prenom?.message}
+        >
+          <Controller
+            name="prenom"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Prénom"
+                error={!!errors.prenom}
               />
-            </FormField>
+            )}
+          />
+        </FormField>
 
-            <FormField
-              label="NIF"
-              error={errors.nif?.message}
-              className="w-[150px]"
-            >
-              <Controller
-                name="nif"
-                control={control}
-                render={({ field }) => (
-                  <FormInput
-                    {...field}
-                    placeholder="NIF"
-                    error={!!errors.nif}
-                  />
-                )}
+        {/* Deuxième ligne */}
+        <FormField
+          label="Sexe"
+          error={errors.sexe?.message}
+        >
+          <Controller
+            name="sexe"
+            control={control}
+            render={({ field }) => (
+              <Dropdown
+                options={sexeOptions}
+                value={field.value || ''}
+                onChange={field.onChange}
+                label="Sélectionner un sexe"
+                size="sm"
               />
-            </FormField>
-          </div>
-        </div>
+            )}
+          />
+        </FormField>
 
-        {/* Quatrième ligne - Adresse */}
-        <div className="mb-4">
-          <FormField
-            label="Adresse"
-            error={errors.adresse?.message}
-            className="min-w-[500px]"
-          >
-            <Controller
-              name="adresse"
-              control={control}
-              render={({ field }) => (
-                <FormInput
-                  {...field}
-                  placeholder="Adresse"
-                  error={!!errors.adresse}
-                />
-              )}
-            />
-          </FormField>
-        </div>
+        <FormField
+          label="Date de naissance"
+          error={errors.date_naissance?.message}
+        >
+          <Controller
+            name="date_naissance"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                type="date"
+                {...field}
+                error={!!errors.date_naissance}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="Numéro de sécurité sociale"
+          error={errors.numero_securite_sociale?.message}
+        >
+          <Controller
+            name="numero_securite_sociale"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Numéro de sécurité sociale"
+                error={!!errors.numero_securite_sociale}
+              />
+            )}
+          />
+        </FormField>
+
+        {/* Troisième ligne */}
+        <FormField
+          label="Adresse"
+          error={errors.adresse?.message}
+          className="col-span-3"
+        >
+          <Controller
+            name="adresse"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Adresse"
+                error={!!errors.adresse}
+              />
+            )}
+          />
+        </FormField>
 
         {/* Quatrième ligne */}
         <FormField
@@ -813,121 +718,129 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         </FormField>
 
         {/* Cinquième ligne */}
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <FormField
-            label="Code postal"
-            error={errors.code_postal?.message}
-            className="w-[100px]"
-          >
-            <Controller
-              name="code_postal"
-              control={control}
-              render={({ field }) => (
-                <FormInput
-                  {...field}
-                  placeholder="Code postal"
-                  error={!!errors.code_postal}
-                />
-              )}
-            />
-          </FormField>
+        <FormField
+          label="Email personnel"
+          error={errors.email_perso?.message}
+        >
+          <Controller
+            name="email_perso"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                type="email"
+                {...field}
+                placeholder="Email personnel"
+                error={!!errors.email_perso}
+              />
+            )}
+          />
+        </FormField>
 
-          <FormField
-            label="Ville"
-            error={errors.ville?.message}
-            className="w-[200px]"
-          >
-            <Controller
-              name="ville"
-              control={control}
-              render={({ field }) => (
-                <FormInput
-                  {...field}
-                  placeholder="Ville"
-                  error={!!errors.ville}
-                />
-              )}
-            />
-          </FormField>
+        <FormField
+          label="Téléphone"
+          error={errors.telephone?.message}
+        >
+          <Controller
+            name="telephone"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Téléphone"
+                error={!!errors.telephone}
+              />
+            )}
+          />
+        </FormField>
 
-          <FormField
-            label="Pays"
-            error={errors.pays?.message}
-            className="w-[150px]"
-          >
-            <Controller
-              name="pays"
-              control={control}
-              render={({ field }) => (
-                <FormInput
-                  {...field}
-                  placeholder="Pays"
-                  error={!!errors.pays}
-                />
-              )}
-            />
-          </FormField>
-        </div>
+        <FormField
+          label="NIF"
+          error={errors.nif?.message}
+        >
+          <Controller
+            name="nif"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="NIF"
+                error={!!errors.nif}
+              />
+            )}
+          />
+        </FormField>
 
         {/* Sixième ligne */}
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <FormField
-            label="Email personnel"
-            error={errors.email_perso?.message}
-            className="w-[250px]"
-          >
-            <Controller
-              name="email_perso"
-              control={control}
-              render={({ field }) => (
-                <FormInput
-                  type="email"
-                  {...field}
-                  placeholder="Email personnel"
-                  error={!!errors.email_perso}
-                />
-              )}
-            />
-          </FormField>
+        <FormField
+          label="Code court"
+          required
+          error={errors.code_court?.message}
+          description="Code unique pour identifier le salarié (max 12 caractères)"
+        >
+          <Controller
+            name="code_court"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Code court"
+                maxLength={12}
+                error={!!errors.code_court}
+              />
+            )}
+          />
+        </FormField>
 
-          <FormField
-            label="Numéro de sécurité sociale"
-            error={errors.numero_securite_sociale?.message}
-            className="w-[200px]"
-          >
-            <Controller
-              name="numero_securite_sociale"
-              control={control}
-              render={({ field }) => (
-                <FormInput
-                  {...field}
-                  placeholder="Numéro de sécurité sociale"
-                  error={!!errors.numero_securite_sociale}
-                />
-              )}
-            />
-          </FormField>
+        <FormField
+          label="Matricule"
+          required
+          error={errors.matricule?.message}
+          description="Matricule unique pour identifier le salarié (max 12 caractères)"
+        >
+          <Controller
+            name="matricule"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Matricule"
+                maxLength={12}
+                error={!!errors.matricule}
+              />
+            )}
+          />
+        </FormField>
 
-          <FormField
-            label="Sexe"
-            error={errors.sexe?.message}
-            className="w-[80px]"
-          >
-            <Controller
-              name="sexe"
-              control={control}
-              render={({ field }) => (
-                <Dropdown
-                  options={sexeOptions}
-                  value={field.value || ''}
-                  onChange={field.onChange}
-                  label="Sélectionner"
-                  size="sm"
-                />
-              )}
+        <FormField
+          label="Tiers associé"
+          required
+          error={errors.id_tiers?.message}
+          description="Tiers associé au salarié"
+        >
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <Controller
+                name="id_tiers"
+                control={control}
+                render={({ field }) => (
+                  <TiersSelector
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={isSubmitting}
+                  />
+                )}
+              />
+            </div>
+            <Button
+              label="Nouveau tiers"
+              icon="Plus"
+              color="var(--color-primary)"
+              onClick={() => setIsTiersModalOpen(true)}
+              disabled={isSubmitting}
+              size="sm"
             />
-          </FormField>
-        </div>
+          </div>
+        </FormField>
 
         <FormActions>
           <Button
