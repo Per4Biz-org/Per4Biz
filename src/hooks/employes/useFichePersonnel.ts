@@ -42,7 +42,6 @@ export const useFichePersonnel = (mode: 'create' | 'edit', id?: string) => {
               *,
               tiers:id_tiers (
                 id,
-            console.log('Chargement de l\'aperçu de la photo:', data.lien_photo);
                 code,
                 nom
               )
@@ -51,7 +50,6 @@ export const useFichePersonnel = (mode: 'create' | 'edit', id?: string) => {
             .single();
 
           if (error) throw error;
-              console.log('URL signée créée:', urlData.signedUrl);
           console.log('Personnel chargé:', data);
           console.log('Lien photo:', data.lien_photo);
           setPersonnel(data);
