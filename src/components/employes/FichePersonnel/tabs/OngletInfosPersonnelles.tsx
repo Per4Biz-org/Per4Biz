@@ -6,7 +6,7 @@ import { supabase } from '../../../../lib/supabase';
 import { useProfil } from '../../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../../../components/ui/form';
 import { Button } from '../../../../components/ui/button';
-import { Dropdown } from '../../../../components/ui/dropdown';
+import { Dropdown, DropdownOption } from '../../../../components/ui/dropdown';
 import { TiersSelector } from '../../../../components/ParametreGlobal/Tiers/TiersSelector';
 import { TiersFormModal } from '../../../../components/ParametreGlobal/Tiers/TiersFormModal';
 import { ToastData } from '../../../../components/ui/toast';
@@ -138,7 +138,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   // Charger l'aperçu de la photo
   const loadPhotoPreview = async (photoPath: string) => {
     try {
-      console.log('Chargement de l\'aperçu de la photo avec le chemin:', photoPath);
+      console.log('Génération de l\'URL signée pour la photo:', photoPath);
       const { data, error } = await supabase.storage
         .from('personnel-photos')
         .createSignedUrl(photoPath, 60);
@@ -147,8 +147,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         console.error('Erreur lors de la création de l\'URL signée:', error);
         throw error;
       }
-      
-      console.log('URL signée créée avec succès:', data.signedUrl);
+
+      console.log('URL signée créée avec succès, longueur:', data.signedUrl.length);
       setPhotoPreview(data.signedUrl);
     } catch (error) {
       console.error('Erreur lors du chargement de la photo:', error);
@@ -159,25 +159,33 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !profil?.com_contrat_client_id) return;
+    
+    console.log('Début du téléversement de la photo:', file.name);
 
     setIsUploadingPhoto(true);
     try {
       // Créer un nom de fichier unique
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+      const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${profil.com_contrat_client_id}/${fileName}`;
+      
+      console.log('Chemin du fichier à téléverser:', filePath);
 
       // Uploader le fichier
       const { error: uploadError } = await supabase.storage
         .from('personnel-photos')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Erreur lors du téléversement:', uploadError);
+        throw uploadError;
+      }
+      
+      console.log('Photo téléversée avec succès. Chemin:', filePath);
 
       // Mettre à jour le formulaire avec le chemin du fichier
-      console.log('Mise à jour du champ lien_photo avec le chemin:', filePath);
       setValue('lien_photo', filePath);
-      console.log('Chemin de la photo mis à jour dans le formulaire:', filePath);
+      console.log('Chemin de la photo mis à jour dans le formulaire:', getValues('lien_photo'));
       
       // Charger l'aperçu
       loadPhotoPreview(filePath);
@@ -202,12 +210,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   // Supprimer la photo
   const handleRemovePhoto = async () => {
     const photoPath = control._formValues.lien_photo;
-    if (!photoPath) {
-      console.log('Aucun chemin de photo fourni');
-      return;
-    }
-    
-    console.log('Chargement de l\'aperçu de la photo:', photoPath);
+    if (!photoPath) return;
 
     console.log('Suppression de la photo:', photoPath);
     try {
@@ -218,7 +221,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       if (error) throw error;
 
       console.log('Photo supprimée avec succès');
-      setValue('lien_photo', '');
+      setValue('lien_photo', '', { shouldDirty: true });
+      console.log('Valeur du champ lien_photo après suppression:', getValues('lien_photo'));
       setPhotoPreview(null);
       
       addToast({
@@ -239,6 +243,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   // Soumettre le formulaire
   const onSubmit = async (data: PersonnelFormData) => {
     if (!profil?.com_contrat_client_id) {
+      console.log('Erreur: Profil utilisateur incomplet');
       addToast({
         label: 'Erreur: Profil utilisateur incomplet',
         icon: 'AlertTriangle',
@@ -249,6 +254,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
     setIsSubmitting(true);
     try {
+      // Récupérer la valeur la plus récente du champ lien_photo
+      const currentPhotoPath = getValues('lien_photo');
+      console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath);
+      
       // Récupérer la valeur la plus récente du champ lien_photo
       const currentPhotoPath = getValues('lien_photo');
       console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath);
@@ -269,7 +278,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         nif: data.nif === '' ? null : data.nif,
         email_perso: data.email_perso === '' ? null : data.email_perso,
         telephone: data.telephone === '' ? null : data.telephone,
-        lien_photo: currentPhotoPath || null
+        lien_photo: currentPhotoPath === '' ? null : currentPhotoPath
       };
       
       console.log('Données nettoyées avant envoi:', cleanedData);
@@ -278,6 +287,12 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       let result;
       
       if (mode === 'edit' && personnelId) {
+        console.log('Mode édition - Mise à jour du personnel avec ID:', personnelId);
+        console.log('Données à envoyer pour la mise à jour:', {
+          ...cleanedData,
+          com_contrat_client_id: profil.com_contrat_client_id
+        });
+        
         // Mode édition
         const { data: updatedData, error } = await supabase
           .from('rh_personnel')
@@ -289,10 +304,21 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Erreur Supabase lors de la mise à jour du personnel:', error);
+          throw error;
+        }
+        
         console.log('Personnel mis à jour avec succès:', updatedData);
+        console.log('Lien photo après mise à jour:', updatedData.lien_photo);
         result = updatedData;
       } else {
+        console.log('Mode création - Création d\'un nouveau personnel');
+        console.log('Données à envoyer pour la création:', {
+          ...cleanedData,
+          com_contrat_client_id: profil.com_contrat_client_id
+        });
+        
         // Mode création
         const { data: newData, error } = await supabase
           .from('rh_personnel')
@@ -303,8 +329,13 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Erreur Supabase lors de la création du personnel:', error);
+          throw error;
+        }
+        
         console.log('Personnel créé avec succès:', newData);
+        console.log('Lien photo après création:', newData.lien_photo);
         result = newData;
       }
 
