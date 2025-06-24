@@ -258,10 +258,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       const currentPhotoPath = getValues('lien_photo');
       console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath);
       
-      // Récupérer la valeur la plus récente du champ lien_photo
-      const currentPhotoPath = getValues('lien_photo');
-      console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath);
-      
       console.log('Données du formulaire avant nettoyage:', data);
       console.log('Valeur de lien_photo avant nettoyage:', data.lien_photo);
       // Nettoyer les données avant envoi - convertir les chaînes vides en null pour les champs optionnels
