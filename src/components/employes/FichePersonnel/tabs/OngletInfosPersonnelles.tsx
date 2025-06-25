@@ -22,6 +22,7 @@ interface OngletInfosPersonnellesProps {
   mode: 'create' | 'edit';
   personnelId?: string;
   onSave: (id: string) => void;
+  onClose?: () => void;
   addToast: (toast: Omit<ToastData, 'id'>) => void;
 }
 
@@ -29,6 +30,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   mode,
   personnelId,
   onSave,
+  onClose,
   addToast
 }) => {
   const { profil } = useProfil();
@@ -598,7 +600,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           <Button
             label="Annuler"
             color="#6B7280"
-            onClick={() => reset()}
+            onClick={() => onClose ? onClose() : reset()}
             type="button"
             disabled={isSubmitting}
           />
