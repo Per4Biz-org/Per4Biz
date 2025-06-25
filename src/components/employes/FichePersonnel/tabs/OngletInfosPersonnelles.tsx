@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { supabase } from '../../../../lib/supabase';
@@ -13,7 +13,7 @@ import { ToastData } from '../../../../components/ui/toast';
 import { User, Upload, X } from 'lucide-react';
 
 // Schéma de validation avec Zod
-export const personnelSchema = z.object({
+const personnelSchema = z.object({
   nom: z.string().min(1, 'Le nom est requis'),
   prenom: z.string().min(1, 'Le prénom est requis'),
   civilite: z.string().nullable().optional(),
@@ -34,24 +34,24 @@ export const personnelSchema = z.object({
   matricule: z.string().min(1, 'Le matricule est requis').max(12, 'Maximum 12 caractères')
 });
 
-// Types pour la gestion des photos
-export interface PhotoHandlers {
+// Types
+interface PhotoHandlers {
   handlePhotoUpload: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleRemovePhoto: () => Promise<void>;
   photoPreview: string | null;
 }
 
-export type PersonnelFormData = z.infer<typeof personnelSchema>;
+type PersonnelFormData = z.infer<typeof personnelSchema>;
 
-export interface OngletInfosPersonnellesProps {
+interface OngletInfosPersonnellesProps {
   mode: 'create' | 'edit';
   personnelId?: string;
   onSave: (id: string) => void;
   addToast: (toast: Omit<ToastData, 'id'>) => void;
 }
 
-// Hook personnalisé pour gérer les photos
-export const usePhotoManagement = (
+// Hook personnalisé pour gérer la photo
+const usePhotoManagement = (
   setValue: (name: string, value: any) => void,
   getValues: () => Record<string, any>,
   addToast: (toast: Omit<ToastData, 'id'>) => void
@@ -60,8 +60,8 @@ export const usePhotoManagement = (
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
-  // Fonction pour charger l'aperçu de la photo
-  const loadPhotoPreview = async (photoPath: string): Promise<void> => {
+  // Charger l'aperçu de la photo
+  const loadPhotoPreview = async (photoPath: string) => {
     try {
       console.log('Génération de l\'URL signée pour la photo:', photoPath);
       const { data, error } = await supabase.storage
@@ -80,7 +80,7 @@ export const usePhotoManagement = (
     }
   };
 
-  // Fonction pour gérer l'upload de la photo
+  // Gérer l'upload de la photo
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !profil?.com_contrat_client_id) return;
@@ -132,7 +132,7 @@ export const usePhotoManagement = (
     }
   };
 
-  // Fonction pour gérer la suppression de la photo
+  // Fonction pour supprimer la photo
   const handleRemovePhoto = async () => {
     const photoPath = getValues().lien_photo;
     if (!photoPath) return;
@@ -172,61 +172,6 @@ export const usePhotoManagement = (
   };
 };
 
-// Composant pour la section photo de profil
-const PhotoSection: React.FC<{
-  photoPreview: string | null;
-  isUploadingPhoto?: boolean;
-  handlePhotoUpload: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
-  handleRemovePhoto: () => Promise<void>;
-}> = ({ photoPreview, isUploadingPhoto = false, handlePhotoUpload, handleRemovePhoto }) => {
-  return (
-    <div className="flex flex-col items-center mb-8">
-      <div className="relative"> 
-        <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mb-4">
-          {photoPreview ? (
-            <img 
-              src={photoPreview} 
-              alt="Photo de profil" 
-              className="w-full h-full object-cover"
-            />
-          ) : ( 
-            <User className="w-16 h-16 text-gray-400" />
-          )}
-        </div>
-        <div className="absolute bottom-0 right-0 flex">
-          <input
-            type="file"
-            id="photo-upload"
-            accept="image/*"
-            className="hidden"
-            onChange={handlePhotoUpload}
-            disabled={isUploadingPhoto} 
-          />
-          <label
-            htmlFor="photo-upload"
-            className="bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors flex items-center justify-center"
-            title="Ajouter une photo"
-          >
-            <Upload size={16} />
-          </label> 
-          {photoPreview && (
-            <button
-              onClick={handleRemovePhoto}
-              className="bg-red-500 text-white p-2 rounded-full ml-2 hover:bg-red-600 transition-colors flex items-center justify-center"
-              title="Supprimer la photo"
-            >
-              <X size={16} />
-            </button> 
-          )}
-        </div>
-      </div>
-      <p className="text-sm text-gray-500">
-        {isUploadingPhoto ? 'Téléversement en cours...' : 'Cliquez pour ajouter une photo'}
-      </p>
-    </div>
-  );
-};
-
 export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = ({
   mode,
   personnelId,
@@ -237,9 +182,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTiersModalOpen, setIsTiersModalOpen] = useState(false);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
-  // Configuration du formulaire avec react-hook-form
+  // Initialiser le formulaire avec react-hook-form
   const { 
     control, 
     handleSubmit, 
@@ -271,14 +215,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     }
   });
 
-  // Utilisation du hook personnalisé pour gérer la photo
-  const { photoPreview, handlePhotoUpload, handleRemovePhoto } = usePhotoManagement(
-    setValue, 
-    getValues, 
-    addToast
-  );
+  // Utiliser le hook personnalisé pour gérer la photo
+  const { photoPreview, handlePhotoUpload, handleRemovePhoto } = usePhotoManagement(setValue, getValues, addToast);
 
-  // Effet pour charger les données du personnel en mode édition
+  // Charger les données du personnel en mode édition
   useEffect(() => {
     if (mode === 'edit' && personnelId) {
       const fetchPersonnel = async () => {
@@ -325,8 +265,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     }
   }, [mode, personnelId, reset, addToast]);
 
-  // Fonction pour charger l'aperçu de la photo
-  const loadPhotoPreview = async (photoPath: string): Promise<void> => {
+  // Charger l'aperçu de la photo
+  const loadPhotoPreview = async (photoPath: string) => {
     try {
       console.log('Génération de l\'URL signée pour la photo:', photoPath);
       const { data, error } = await supabase.storage
@@ -345,7 +285,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     }
   };
 
-  // Fonction pour soumettre le formulaire
+  // Soumettre le formulaire
   const onSubmit = async (data: PersonnelFormData) => {
     if (!profil?.com_contrat_client_id) {
       console.log('Erreur: Profil utilisateur incomplet');
@@ -472,7 +412,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     }
   };
 
-  // Configuration des options pour les listes déroulantes
+  // Options pour les listes déroulantes
   const civiliteOptions: DropdownOption[] = [
     { value: '', label: 'Sélectionner une civilité' },
     { value: 'Monsieur', label: 'Monsieur' },
@@ -486,9 +426,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     { value: 'Femme', label: 'Femme' }
   ];
 
-  // Fonction pour gérer la création d'un nouveau tiers
+  // Gérer la création d'un nouveau tiers
   const handleTiersSubmit = async (tiersData: any) => {
     try { 
+      // Vérifier si un tiers avec ce code existe déjà
       const { data: existingTiers, error: checkError } = await supabase
         .from('com_tiers')
         .select('id, code, nom')
@@ -499,9 +440,11 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       if (checkError) {
         throw checkError;
       }
-      
+
+      // Si un tiers avec ce code existe déjà, afficher un message et proposer de l'utiliser
       if (existingTiers) {
         if (window.confirm(`Un tiers avec le code "${tiersData.code}" existe déjà (${existingTiers.nom}). Voulez-vous l'utiliser ?`)) {
+          // Utiliser le tiers existant 
           setValue('id_tiers', existingTiers.id);
           
           addToast({
@@ -522,7 +465,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           return;
         }
       }
-
+      
+      // Vérifier si un type de tiers "salarié" existe
       const { data: typeTiersSalarie, error: typeTiersError } = await supabase
         .from('com_param_type_tiers')
         .select('id')
@@ -534,7 +478,9 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       if (typeTiersError) {
         throw typeTiersError;
       }
-      
+
+      // Si aucun type de tiers salarié n'est trouvé, utiliser le type fourni
+      // Sinon, utiliser le type salarié
       const id_type_tiers = (typeTiersSalarie && typeTiersSalarie.length > 0) 
         ? typeTiersSalarie[0].id 
         : tiersData.id_type_tiers; 
@@ -542,15 +488,17 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       const { data, error } = await supabase
         .from('com_tiers') 
         .insert({
-          ...tiersData, 
+          ...tiersData,
           id_type_tiers,
           com_contrat_client_id: profil?.com_contrat_client_id,
+          // code_user n'est plus nécessaire, remplacé par created_by 
         })
         .select()
         .single();
 
       if (error) throw error;
       
+      // Mettre à jour le formulaire avec le nouveau tiers
       setValue('id_tiers', data.id); 
       
       addToast({
@@ -563,6 +511,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     } catch (error) {
       console.error('Erreur lors de la création du tiers:', error);
       
+      // Gestion spécifique des erreurs de contrainte d'unicité
       let errorMessage = 'Erreur lors de la création du tiers';
       
       if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
@@ -585,16 +534,54 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
   return (
     <div className="space-y-6">
-      {/* Section photo de profil (composant extrait) */}
-      <PhotoSection 
-        photoPreview={photoPreview}
-        isUploadingPhoto={isUploadingPhoto}
-        handlePhotoUpload={handlePhotoUpload}
-        handleRemovePhoto={handleRemovePhoto}
-      />
+      {/* Section photo de profil */}
+      <div className="flex flex-col items-center mb-8">
+        <div className="relative"> 
+          <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mb-4">
+            {photoPreview ? (
+              <img 
+                src={photoPreview} 
+                alt="Photo de profil" 
+                className="w-full h-full object-cover"
+              />
+            ) : ( 
+              <User className="w-16 h-16 text-gray-400" />
+            )}
+          </div>
+          <div className="absolute bottom-0 right-0 flex">
+            <input
+              type="file"
+              id="photo-upload"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoUpload}
+              disabled={isUploadingPhoto} 
+            />
+            <label
+              htmlFor="photo-upload"
+              className="bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors flex items-center justify-center"
+              title="Ajouter une photo"
+            >
+              <Upload size={16} />
+            </label> 
+            {photoPreview && (
+              <button
+                onClick={handleRemovePhoto}
+                className="bg-red-500 text-white p-2 rounded-full ml-2 hover:bg-red-600 transition-colors flex items-center justify-center"
+                title="Supprimer la photo"
+              >
+                <X size={16} />
+              </button> 
+            )}
+          </div>
+        </div>
+        <p className="text-sm text-gray-500">
+          {isUploadingPhoto ? 'Téléversement en cours...' : 'Cliquez pour ajouter une photo'}
+        </p>
+      </div>
 
       <Form size={100} columns={3} onSubmit={handleSubmit(onSubmit)}> 
-        {/* Informations de base - Première ligne */}
+        {/* Première ligne */}
         <FormField
           label="Civilité"
           error={errors.civilite?.message}
@@ -650,7 +637,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           />
         </FormField>
 
-        {/* Informations de base - Deuxième ligne */}
+        {/* Deuxième ligne */}
         <FormField
           label="Sexe"
           error={errors.sexe?.message}
@@ -704,7 +691,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           />
         </FormField>
 
-        {/* Adresse - Troisième ligne */}
+        {/* Troisième ligne */}
         <FormField
           label="Adresse"
           error={errors.adresse?.message}
@@ -723,7 +710,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           />
         </FormField>
 
-        {/* Adresse - Quatrième ligne */}
+        {/* Quatrième ligne */}
         <FormField
           label="Code postal"
           error={errors.code_postal?.message}
@@ -775,7 +762,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           />
         </FormField>
 
-        {/* Contact - Cinquième ligne */}
+        {/* Cinquième ligne */}
         <FormField
           label="Email personnel"
           error={errors.email_perso?.message}
@@ -828,7 +815,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           />
         </FormField>
 
-        {/* Identifiants - Sixième ligne */}
+        {/* Sixième ligne */}
         <FormField
           label="Code court"
           required
@@ -856,7 +843,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           description="Matricule unique pour identifier le salarié (max 12 caractères)"
         >
           <Controller
-            name="matricule" 
+            name="matricule"
             control={control}
             render={({ field }) => (
               <FormInput 
@@ -876,7 +863,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           description="Tiers associé au salarié"
         >
           <div className="flex gap-2">
-            <div className="flex-1">
+            <div className="flex-1"> 
               <Controller
                 name="id_tiers"
                 control={control}
@@ -893,7 +880,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               label="Nouveau tiers"
               icon="Plus"
               color="var(--color-primary)"
-              onClick={() => setIsTiersModalOpen(true)} 
+              onClick={() => setIsTiersModalOpen(true)}
               disabled={isSubmitting} 
               size="sm"
             />
@@ -901,7 +888,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         </FormField>
 
         <FormActions>
-          <Button 
+          <Button
             label="Annuler"
             color="#6B7280"
             onClick={() => reset()}
@@ -918,7 +905,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         </FormActions>
       </Form>
 
-      {/* Modale de création de tiers */}
+      {/* Modale pour créer un nouveau tiers */}
       <TiersFormModal
         isOpen={isTiersModalOpen}
         onClose={() => setIsTiersModalOpen(false)}
