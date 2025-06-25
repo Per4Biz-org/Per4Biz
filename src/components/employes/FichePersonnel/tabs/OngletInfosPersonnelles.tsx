@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useForm, Controller, FieldValues } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { supabase } from '../../../../lib/supabase';
@@ -34,13 +34,6 @@ const personnelSchema = z.object({
   matricule: z.string().min(1, 'Le matricule est requis').max(12, 'Maximum 12 caractères')
 });
 
-// Types
-interface PhotoHandlers {
-  handlePhotoUpload: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
-  handleRemovePhoto: () => Promise<void>;
-  photoPreview: string | null;
-}
-
 type PersonnelFormData = z.infer<typeof personnelSchema>;
 
 interface OngletInfosPersonnellesProps {
@@ -49,128 +42,6 @@ interface OngletInfosPersonnellesProps {
   onSave: (id: string) => void;
   addToast: (toast: Omit<ToastData, 'id'>) => void;
 }
-
-// Hook personnalisé pour gérer la photo
-const usePhotoManagement = (
-  setValue: (name: string, value: any) => void,
-  getValues: () => Record<string, any>,
-  addToast: (toast: Omit<ToastData, 'id'>) => void
-): PhotoHandlers => {
-  const { profil } = useProfil();
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-
-  // Charger l'aperçu de la photo
-  const loadPhotoPreview = async (photoPath: string) => {
-    try {
-      console.log('Génération de l\'URL signée pour la photo:', photoPath);
-      const { data, error } = await supabase.storage
-        .from('personnel-photos')
-        .createSignedUrl(photoPath, 60);
-      
-      if (error) {
-        console.error('Erreur lors de la création de l\'URL signée:', error);
-        throw error;
-      }
-
-      console.log('URL signée créée avec succès, longueur:', data.signedUrl.length);
-      setPhotoPreview(data.signedUrl);
-    } catch (error) {
-      console.error('Erreur lors du chargement de la photo:', error);
-    }
-  };
-
-  // Gérer l'upload de la photo
-  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !profil?.com_contrat_client_id) return;
-    
-    console.log('Début du téléversement de la photo:', file.name, 'pour le contrat client:', profil.com_contrat_client_id);
-
-    setIsUploadingPhoto(true);
-    try {
-      // Créer un nom de fichier unique
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `${profil.com_contrat_client_id}/${fileName}`;
-      
-      console.log('Chemin du fichier à téléverser dans personnel-photos:', filePath);
-
-      // Uploader le fichier
-      const { error: uploadError } = await supabase.storage
-        .from('personnel-photos')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        console.error('Erreur lors du téléversement:', uploadError);
-        throw uploadError;
-      }
-      
-      console.log('Photo téléversée avec succès. Chemin complet:', filePath);
-
-      // Mettre à jour le formulaire avec le chemin du fichier
-      setValue('lien_photo', filePath);
-      console.log('Chemin de la photo mis à jour dans le formulaire:', getValues('lien_photo'));
-      
-      // Charger l'aperçu
-      loadPhotoPreview(filePath);
-
-      addToast({
-        label: 'Photo téléversée avec succès',
-        icon: 'Check',
-        color: '#22c55e'
-      });
-    } catch (error) {
-      console.error('Erreur lors du téléversement de la photo:', error);
-      addToast({
-        label: 'Erreur lors du téléversement de la photo',
-        icon: 'AlertTriangle',
-        color: '#ef4444'
-      });
-    } finally {
-      setIsUploadingPhoto(false);
-    }
-  };
-
-  // Fonction pour supprimer la photo
-  const handleRemovePhoto = async () => {
-    const photoPath = getValues().lien_photo;
-    if (!photoPath) return;
-
-    console.log('Suppression de la photo:', photoPath);
-    try {
-      const { error } = await supabase.storage
-        .from('personnel-photos')
-        .remove([photoPath]);
-
-      if (error) throw error;
-
-      console.log('Photo supprimée avec succès');
-      setValue('lien_photo', '', { shouldDirty: true });
-      console.log('Valeur du champ lien_photo après suppression:', getValues('lien_photo'));
-      setPhotoPreview(null);
-      
-      addToast({
-        label: 'Photo supprimée avec succès',
-        icon: 'Check',
-        color: '#22c55e'
-      });
-    } catch (error) {
-      console.error('Erreur lors de la suppression de la photo:', error);
-      addToast({
-        label: 'Erreur lors de la suppression de la photo',
-        icon: 'AlertTriangle',
-        color: '#ef4444'
-      });
-    }
-  };
-
-  return {
-    handlePhotoUpload,
-    handleRemovePhoto,
-    photoPreview
-  };
-};
 
 export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = ({
   mode,
@@ -182,6 +53,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTiersModalOpen, setIsTiersModalOpen] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
   // Initialiser le formulaire avec react-hook-form
   const { 
@@ -215,13 +88,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     }
   });
 
-  // Utiliser le hook personnalisé pour gérer la photo
-  const { photoPreview, handlePhotoUpload, handleRemovePhoto } = usePhotoManagement(setValue, getValues, addToast);
-
   // Charger les données du personnel en mode édition
   useEffect(() => {
-    if (mode === 'edit' && personnelId) {
-      const fetchPersonnel = async () => {
+    const fetchPersonnel = async () => {
+      if (mode === 'edit' && personnelId) {
         setLoading(true);
         try {
           console.log('Chargement du personnel avec ID:', personnelId);
@@ -259,10 +129,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         } finally {
           setLoading(false);
         }
-      };
+      }
+    };
 
-      fetchPersonnel();
-    }
+    fetchPersonnel();
   }, [mode, personnelId, reset, addToast]);
 
   // Charger l'aperçu de la photo
@@ -285,6 +155,91 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     }
   };
 
+  // Gérer l'upload de la photo
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !profil?.com_contrat_client_id) return;
+    
+    console.log('Début du téléversement de la photo:', file.name);
+
+    setIsUploadingPhoto(true);
+    try {
+      // Créer un nom de fichier unique
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `${profil.com_contrat_client_id}/${fileName}`;
+      
+      console.log('Chemin du fichier à téléverser:', filePath);
+
+      // Uploader le fichier
+      const { error: uploadError } = await supabase.storage
+        .from('personnel-photos')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Erreur lors du téléversement:', uploadError);
+        throw uploadError;
+      }
+      
+      console.log('Photo téléversée avec succès. Chemin:', filePath);
+
+      // Mettre à jour le formulaire avec le chemin du fichier
+      setValue('lien_photo', filePath);
+      console.log('Chemin de la photo mis à jour dans le formulaire:', getValues('lien_photo'));
+      
+      // Charger l'aperçu
+      loadPhotoPreview(filePath);
+      
+      addToast({
+        label: 'Photo téléversée avec succès',
+        icon: 'Check',
+        color: '#22c55e'
+      });
+    } catch (error) {
+      console.error('Erreur lors du téléversement de la photo:', error);
+      addToast({
+        label: 'Erreur lors du téléversement de la photo',
+        icon: 'AlertTriangle',
+        color: '#ef4444'
+      });
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
+  // Supprimer la photo
+  const handleRemovePhoto = async () => {
+    const photoPath = control._formValues.lien_photo;
+    if (!photoPath) return;
+
+    console.log('Suppression de la photo:', photoPath);
+    try {
+      const { error } = await supabase.storage
+        .from('personnel-photos')
+        .remove([photoPath]);
+
+      if (error) throw error;
+
+      console.log('Photo supprimée avec succès');
+      setValue('lien_photo', '', { shouldDirty: true });
+      console.log('Valeur du champ lien_photo après suppression:', getValues('lien_photo'));
+      setPhotoPreview(null);
+      
+      addToast({
+        label: 'Photo supprimée avec succès',
+        icon: 'Check',
+        color: '#22c55e'
+      });
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la photo:', error);
+      addToast({
+        label: 'Erreur lors de la suppression de la photo',
+        icon: 'AlertTriangle',
+        color: '#ef4444'
+      });
+    }
+  };
+
   // Soumettre le formulaire
   const onSubmit = async (data: PersonnelFormData) => {
     if (!profil?.com_contrat_client_id) {
@@ -299,7 +254,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
     setIsSubmitting(true);
     try {
-      // Récupérer la valeur actuelle du champ lien_photo
+      // Récupérer la valeur la plus récente du champ lien_photo
       const currentPhotoPath = getValues('lien_photo');
       console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath);
       
@@ -353,14 +308,14 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         console.log('Personnel mis à jour avec succès:', updatedData);
         console.log('Lien photo après mise à jour:', updatedData.lien_photo);
         result = updatedData;
-      } else { // Mode création
-        // Mode création
+      } else {
         console.log('Mode création - Création d\'un nouveau personnel');
         console.log('Données à envoyer pour la création:', {
           ...cleanedData,
           com_contrat_client_id: profil.com_contrat_client_id
         });
         
+        // Mode création
         const { data: newData, error } = await supabase
           .from('rh_personnel')
           .insert({
@@ -378,7 +333,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         console.log('Personnel créé avec succès:', newData);
         console.log('Lien photo après création:', newData.lien_photo);
         result = newData;
-      } // Fin mode création
+      }
 
       addToast({
         label: mode === 'create' ? 'Personnel créé avec succès' : 'Personnel mis à jour avec succès',
@@ -428,7 +383,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
   // Gérer la création d'un nouveau tiers
   const handleTiersSubmit = async (tiersData: any) => {
-    try { 
+    try {
       // Vérifier si un tiers avec ce code existe déjà
       const { data: existingTiers, error: checkError } = await supabase
         .from('com_tiers')
@@ -436,7 +391,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         .eq('code', tiersData.code)
         .eq('com_contrat_client_id', profil?.com_contrat_client_id)
         .maybeSingle();
-      
+
       if (checkError) {
         throw checkError;
       }
@@ -444,7 +399,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       // Si un tiers avec ce code existe déjà, afficher un message et proposer de l'utiliser
       if (existingTiers) {
         if (window.confirm(`Un tiers avec le code "${tiersData.code}" existe déjà (${existingTiers.nom}). Voulez-vous l'utiliser ?`)) {
-          // Utiliser le tiers existant 
+          // Utiliser le tiers existant
           setValue('id_tiers', existingTiers.id);
           
           addToast({
@@ -452,7 +407,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             icon: 'Check',
             color: '#22c55e'
           });
-           
+          
           setIsTiersModalOpen(false);
           return;
         } else {
@@ -465,7 +420,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           return;
         }
       }
-      
+
       // Vérifier si un type de tiers "salarié" existe
       const { data: typeTiersSalarie, error: typeTiersError } = await supabase
         .from('com_param_type_tiers')
@@ -473,7 +428,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         .eq('com_contrat_client_id', profil?.com_contrat_client_id)
         .eq('salarie', true)
         .eq('actif', true)
-        .limit(1); 
+        .limit(1);
 
       if (typeTiersError) {
         throw typeTiersError;
@@ -483,7 +438,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       // Sinon, utiliser le type salarié
       const id_type_tiers = (typeTiersSalarie && typeTiersSalarie.length > 0) 
         ? typeTiersSalarie[0].id 
-        : tiersData.id_type_tiers; 
+        : tiersData.id_type_tiers;
 
       const { data, error } = await supabase
         .from('com_tiers') 
@@ -491,7 +446,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           ...tiersData,
           id_type_tiers,
           com_contrat_client_id: profil?.com_contrat_client_id,
-          // code_user n'est plus nécessaire, remplacé par created_by 
+          // code_user n'est plus nécessaire, remplacé par created_by
         })
         .select()
         .single();
@@ -499,7 +454,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       if (error) throw error;
       
       // Mettre à jour le formulaire avec le nouveau tiers
-      setValue('id_tiers', data.id); 
+      setValue('id_tiers', data.id);
       
       addToast({
         label: 'Tiers créé avec succès',
@@ -507,7 +462,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         color: '#22c55e'
       });
       
-      setIsTiersModalOpen(false); 
+      setIsTiersModalOpen(false);
     } catch (error) {
       console.error('Erreur lors de la création du tiers:', error);
       
@@ -528,7 +483,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     }
   };
 
-  if (loading) { 
+  if (loading) {
     return <div className="flex justify-center items-center h-64">Chargement...</div>;
   }
 
@@ -536,7 +491,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     <div className="space-y-6">
       {/* Section photo de profil */}
       <div className="flex flex-col items-center mb-8">
-        <div className="relative"> 
+        <div className="relative">
           <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mb-4">
             {photoPreview ? (
               <img 
@@ -544,7 +499,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
                 alt="Photo de profil" 
                 className="w-full h-full object-cover"
               />
-            ) : ( 
+            ) : (
               <User className="w-16 h-16 text-gray-400" />
             )}
           </div>
@@ -555,7 +510,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               accept="image/*"
               className="hidden"
               onChange={handlePhotoUpload}
-              disabled={isUploadingPhoto} 
+              disabled={isUploadingPhoto}
             />
             <label
               htmlFor="photo-upload"
@@ -563,7 +518,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               title="Ajouter une photo"
             >
               <Upload size={16} />
-            </label> 
+            </label>
             {photoPreview && (
               <button
                 onClick={handleRemovePhoto}
@@ -571,7 +526,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
                 title="Supprimer la photo"
               >
                 <X size={16} />
-              </button> 
+              </button>
             )}
           </div>
         </div>
@@ -580,7 +535,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         </p>
       </div>
 
-      <Form size={100} columns={3} onSubmit={handleSubmit(onSubmit)}> 
+      <Form size={100} columns={3} onSubmit={handleSubmit(onSubmit)}>
         {/* Première ligne */}
         <FormField
           label="Civilité"
@@ -594,7 +549,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
                 options={civiliteOptions}
                 value={field.value || ''}
                 onChange={field.onChange}
-                label="Sélectionner une civilité" 
+                label="Sélectionner une civilité"
                 size="sm"
               />
             )}
@@ -610,7 +565,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="nom"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Nom"
                 error={!!errors.nom}
@@ -628,7 +583,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="prenom"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Prénom"
                 error={!!errors.prenom}
@@ -646,7 +601,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="sexe"
             control={control}
             render={({ field }) => (
-              <Dropdown 
+              <Dropdown
                 options={sexeOptions}
                 value={field.value || ''}
                 onChange={field.onChange}
@@ -665,7 +620,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="date_naissance"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 type="date"
                 {...field}
                 error={!!errors.date_naissance}
@@ -682,7 +637,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="numero_securite_sociale"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Numéro de sécurité sociale"
                 error={!!errors.numero_securite_sociale}
@@ -701,7 +656,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="adresse"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Adresse"
                 error={!!errors.adresse}
@@ -719,7 +674,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="code_postal"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Code postal"
                 error={!!errors.code_postal}
@@ -736,7 +691,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="ville"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Ville"
                 error={!!errors.ville}
@@ -753,7 +708,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="pays"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Pays"
                 error={!!errors.pays}
@@ -771,7 +726,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="email_perso"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 type="email"
                 {...field}
                 placeholder="Email personnel"
@@ -789,7 +744,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="telephone"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Téléphone"
                 error={!!errors.telephone}
@@ -806,7 +761,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="nif"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="NIF"
                 error={!!errors.nif}
@@ -826,7 +781,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="code_court"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Code court"
                 maxLength={12}
@@ -846,7 +801,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             name="matricule"
             control={control}
             render={({ field }) => (
-              <FormInput 
+              <FormInput
                 {...field}
                 placeholder="Matricule"
                 maxLength={12}
@@ -863,7 +818,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           description="Tiers associé au salarié"
         >
           <div className="flex gap-2">
-            <div className="flex-1"> 
+            <div className="flex-1">
               <Controller
                 name="id_tiers"
                 control={control}
@@ -872,7 +827,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
                     value={field.value}
                     onChange={field.onChange}
                     disabled={isSubmitting}
-                  /> 
+                  />
                 )}
               />
             </div>
@@ -881,7 +836,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               icon="Plus"
               color="var(--color-primary)"
               onClick={() => setIsTiersModalOpen(true)}
-              disabled={isSubmitting} 
+              disabled={isSubmitting}
               size="sm"
             />
           </div>
@@ -892,7 +847,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             label="Annuler"
             color="#6B7280"
             onClick={() => reset()}
-            type="button" 
+            type="button"
             disabled={isSubmitting}
           />
           <Button
@@ -900,7 +855,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             icon="Save"
             color="var(--color-primary)"
             type="submit"
-            disabled={isSubmitting} 
+            disabled={isSubmitting}
           />
         </FormActions>
       </Form>
@@ -909,7 +864,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       <TiersFormModal
         isOpen={isTiersModalOpen}
         onClose={() => setIsTiersModalOpen(false)}
-        onSubmit={handleTiersSubmit} 
+        onSubmit={handleTiersSubmit}
         isSubmitting={false}
       />
     </div>
