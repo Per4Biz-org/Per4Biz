@@ -115,13 +115,6 @@ const FichePersonnel: React.FC<FichePersonnelProps> = ({ mode, id, onClose }) =>
       <PageSection>
         <div className="mb-6 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Button
-              label=""
-              icon="ArrowLeft"
-              color="#6B7280"
-              onClick={onClose}
-              size="sm"
-            />
             <h1 className="text-2xl font-bold">
               {mode === 'create' ? 'Créer un nouveau personnel' : 'Modifier un personnel'}
             </h1>
