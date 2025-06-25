@@ -35,22 +35,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Hooks personnalisés
-  const { 
-    photoPreview, 
-    isUploadingPhoto, 
-    loadPhotoPreview, 
-    handlePhotoUpload, 
-    handleRemovePhoto 
-  } = usePhotoManagement();
-  
-  const {
-    isTiersModalOpen,
-    setIsTiersModalOpen,
-    handleTiersSubmit
-  } = useTiersManagement(setValue, addToast);
-
-  // Initialiser le formulaire avec react-hook-form
+  // Initialiser le formulaire avec react-hook-form AVANT les autres hooks
   const { 
     control, 
     handleSubmit, 
@@ -81,6 +66,21 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       matricule: ''
     }
   });
+
+  // Hooks personnalisés
+  const { 
+    photoPreview, 
+    isUploadingPhoto, 
+    loadPhotoPreview, 
+    handlePhotoUpload, 
+    handleRemovePhoto 
+  } = usePhotoManagement();
+  
+  const {
+    isTiersModalOpen,
+    setIsTiersModalOpen,
+    handleTiersSubmit
+  } = useTiersManagement(setValue, addToast);
 
   // Charger les données du personnel en mode édition
   useEffect(() => {
