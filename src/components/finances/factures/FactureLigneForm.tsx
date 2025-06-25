@@ -74,7 +74,7 @@ export function FactureLigneForm({
   // Chargement des catégories et sous-catégories avec dépendance sur currentEntiteIdRef.current
   useEffect(() => {
     const fetchData = async () => {
-      if (!profil?.com_contrat_client_id || !currentEntiteIdRef.current) return;
+      if (!profil?.com_contrat_client_id || !currentEntiteIdRef.current) return; 
 
       setLoading(true);
       try {

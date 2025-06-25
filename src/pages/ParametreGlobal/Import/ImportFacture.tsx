@@ -579,7 +579,7 @@ const ImportFacture: React.FC = () => {
             .insert({
               com_contrat_client_id: profil.com_contrat_client_id,
               id_entite: entiteData.id,
-              code_user: profil.code_user,
+              code_user: profil.code_user || 'SYSTEM',
               num_document: facture.num_document || null,
               date_facture: dateFacture,
               montant_ht: facture.montant_ht,
