@@ -34,11 +34,12 @@ const personnelSchema = z.object({
   matricule: z.string().min(1, 'Le matricule est requis').max(12, 'Maximum 12 caractères')
 });
 
-// Types
+// Types pour les props et les hooks
 interface PhotoHandlers {
   handlePhotoUpload: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleRemovePhoto: () => Promise<void>;
   photoPreview: string | null;
+  isUploadingPhoto?: boolean;
 }
 
 type PersonnelFormData = z.infer<typeof personnelSchema>;
@@ -170,6 +171,67 @@ const usePhotoManagement = (
     handleRemovePhoto,
     photoPreview
   };
+};
+
+// Composant pour la section photo de profil
+const PhotoSection = ({ 
+  photoPreview, 
+  handlePhotoUpload, 
+  handleRemovePhoto, 
+  isUploadingPhoto 
+}: PhotoHandlers) => {
+  return (
+    <div className="flex flex-col items-center mb-8">
+      <div className="relative"> 
+        <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mb-4">
+          {photoPreview ? (
+            <img 
+              src={photoPreview} 
+              alt="Photo de profil" 
+              className="w-full h-full object-cover"
+            />
+          ) : ( 
+            <User className="w-16 h-16 text-gray-400" />
+          )}
+        </div>
+        <div className="absolute bottom-0 right-0 flex">
+          <input
+            type="file"
+            id="photo-upload"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePhotoUpload}
+            disabled={isUploadingPhoto} 
+          />
+          <label
+            htmlFor="photo-upload"
+            className="bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors flex items-center justify-center"
+            title="Ajouter une photo"
+          >
+            <Upload size={16} />
+          </label> 
+          {photoPreview && (
+            <button
+              onClick={handleRemovePhoto}
+              className="bg-red-500 text-white p-2 rounded-full ml-2 hover:bg-red-600 transition-colors flex items-center justify-center"
+              title="Supprimer la photo"
+            >
+              <X size={16} />
+            </button> 
+          )}
+        </div>
+      </div>
+      <p className="text-sm text-gray-500">
+        {isUploadingPhoto ? 'Téléversement en cours...' : 'Cliquez pour ajouter une photo'}
+      </p>
+    </div>
+  );
+};
+
+// Composant pour gérer la création d'un nouveau tiers
+const handleTiersSubmit = async (
+  tiersData: any,
+  profil: any,
 };
 
 export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = ({
@@ -534,51 +596,13 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
   return (
     <div className="space-y-6">
-      {/* Section photo de profil */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="relative"> 
-          <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mb-4">
-            {photoPreview ? (
-              <img 
-                src={photoPreview} 
-                alt="Photo de profil" 
-                className="w-full h-full object-cover"
-              />
-            ) : ( 
-              <User className="w-16 h-16 text-gray-400" />
-            )}
-          </div>
-          <div className="absolute bottom-0 right-0 flex">
-            <input
-              type="file"
-              id="photo-upload"
-              accept="image/*"
-              className="hidden"
-              onChange={handlePhotoUpload}
-              disabled={isUploadingPhoto} 
-            />
-            <label
-              htmlFor="photo-upload"
-              className="bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors flex items-center justify-center"
-              title="Ajouter une photo"
-            >
-              <Upload size={16} />
-            </label> 
-            {photoPreview && (
-              <button
-                onClick={handleRemovePhoto}
-                className="bg-red-500 text-white p-2 rounded-full ml-2 hover:bg-red-600 transition-colors flex items-center justify-center"
-                title="Supprimer la photo"
-              >
-                <X size={16} />
-              </button> 
-            )}
-          </div>
-        </div>
-        <p className="text-sm text-gray-500">
-          {isUploadingPhoto ? 'Téléversement en cours...' : 'Cliquez pour ajouter une photo'}
-        </p>
-      </div>
+      {/* Section photo de profil - Extrait dans un composant séparé */}
+      <PhotoSection 
+        photoPreview={photoPreview}
+        handlePhotoUpload={handlePhotoUpload}
+        handleRemovePhoto={handleRemovePhoto}
+        isUploadingPhoto={isUploadingPhoto}
+      />
 
       <Form size={100} columns={3} onSubmit={handleSubmit(onSubmit)}> 
         {/* Première ligne */}
@@ -909,7 +933,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       <TiersFormModal
         isOpen={isTiersModalOpen}
         onClose={() => setIsTiersModalOpen(false)}
-        onSubmit={handleTiersSubmit} 
+        onSubmit={(tiersData) => handleTiersSubmit(tiersData, profil, setValue, addToast, setIsTiersModalOpen)} 
         isSubmitting={false}
       />
     </div>
