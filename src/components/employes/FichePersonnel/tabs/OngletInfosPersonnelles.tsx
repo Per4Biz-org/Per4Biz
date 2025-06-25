@@ -295,7 +295,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             render={({ field }) => (
               <Dropdown
                 options={civiliteOptions}
-            )
+              />
             )}
           />
         </FormField>
