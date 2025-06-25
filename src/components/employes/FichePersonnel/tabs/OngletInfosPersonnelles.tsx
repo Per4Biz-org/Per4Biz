@@ -256,21 +256,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     }
   };
 
-  // Options pour les listes déroulantes
-  const civiliteOptions: DropdownOption[] = [
-    { value: '', label: 'Sélectionner une civilité' },
-    { value: 'Monsieur', label: 'Monsieur' },
-    { value: 'Madame', label: 'Madame' },
-    { value: 'Mademoiselle', label: 'Mademoiselle' }
-  ];
-
-  const sexeOptions: DropdownOption[] = [
-    { value: '', label: 'Sélectionner un sexe' },
-    { value: 'Homme', label: 'Homme' },
-    { value: 'Femme', label: 'Femme' }
-  ];
-
-
   if (loading) {
     return <div className="flex justify-center items-center h-64">Chargement...</div>;
   }
