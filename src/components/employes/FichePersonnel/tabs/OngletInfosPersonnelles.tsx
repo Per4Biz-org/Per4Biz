@@ -296,6 +296,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             render={({ field }) => (
               <Dropdown
                 options={civiliteOptions}
+                value={field.value}
+                onChange={field.onChange}
+                label="Sélectionner une civilité"
+                disabled={isSubmitting}
               />
             )}
           />
@@ -348,6 +352,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             render={({ field }) => (
               <Dropdown
                 options={sexeOptions}
+                value={field.value}
+                onChange={field.onChange}
+                label="Sélectionner un sexe"
+                disabled={isSubmitting}
               />
             )}
           />
