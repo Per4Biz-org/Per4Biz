@@ -71,6 +71,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const { 
     photoPreview, 
     isUploadingPhoto, 
+    setPhotoPreview,
     loadPhotoPreview, 
     handlePhotoUpload, 
     handleRemovePhoto 
