@@ -388,131 +388,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         </FormField>
 
         {/* Troisième ligne */}
-        <FormField
-          label="Adresse"
-          error={errors.adresse?.message}
-          className="col-span-3"
-        >
-          <Controller
-            name="adresse"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                {...field}
-                placeholder="Adresse"
-                error={!!errors.adresse}
-              />
-            )}
-          />
-        </FormField>
-
-        {/* Quatrième ligne */}
-        <FormField
-          label="Code postal"
-          error={errors.code_postal?.message}
-        >
-          <Controller
-            name="code_postal"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                {...field}
-                placeholder="Code postal"
-                error={!!errors.code_postal}
-              />
-            )}
-          />
-        </FormField>
-
-        <FormField
-          label="Ville"
-          error={errors.ville?.message}
-        >
-          <Controller
-            name="ville"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                {...field}
-                placeholder="Ville"
-                error={!!errors.ville}
-              />
-            )}
-          />
-        </FormField>
-
-        <FormField
-          label="Pays"
-          error={errors.pays?.message}
-        >
-          <Controller
-            name="pays"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                {...field}
-                placeholder="Pays"
-                error={!!errors.pays}
-              />
-            )}
-          />
-        </FormField>
-
-        {/* Cinquième ligne */}
-        <FormField
-          label="Email personnel"
-          error={errors.email_perso?.message}
-        >
-          <Controller
-            name="email_perso"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                type="email"
-                {...field}
-                placeholder="Email personnel"
-                error={!!errors.email_perso}
-              />
-            )}
-          />
-        </FormField>
-
-        <FormField
-          label="Téléphone"
-          error={errors.telephone?.message}
-        >
-          <Controller
-            name="telephone"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                {...field}
-                placeholder="Téléphone"
-                error={!!errors.telephone}
-              />
-            )}
-          />
-        </FormField>
-
-        <FormField
-          label="NIF"
-          error={errors.nif?.message}
-        >
-          <Controller
-            name="nif"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                {...field}
-                placeholder="NIF"
-                error={!!errors.nif}
-              />
-            )}
-          />
-        </FormField>
-
-        {/* Sixième ligne */}
-        <FormField
+                <FormField
           label="Code court"
           required
           error={errors.code_court?.message}
@@ -581,6 +457,133 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               size="sm"
             />
           </div>
+        </FormField>
+        
+
+        {/* Quatrième ligne */}
+        <FormField
+          label="Adresse"
+          error={errors.adresse?.message}
+          className="col-span-3"
+        >
+          <Controller
+            name="adresse"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Adresse"
+                error={!!errors.adresse}
+              />
+            )}
+          />
+        </FormField>
+        
+
+        {/* Cinquième ligne */}
+        <FormField
+          label="Code postal"
+          error={errors.code_postal?.message}
+        >
+          <Controller
+            name="code_postal"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Code postal"
+                error={!!errors.code_postal}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="Ville"
+          error={errors.ville?.message}
+        >
+          <Controller
+            name="ville"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Ville"
+                error={!!errors.ville}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="Pays"
+          error={errors.pays?.message}
+        >
+          <Controller
+            name="pays"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Pays"
+                error={!!errors.pays}
+              />
+            )}
+          />
+        </FormField>
+        
+
+        {/* Sixième ligne */}
+<FormField
+          label="Email personnel"
+          error={errors.email_perso?.message}
+        >
+          <Controller
+            name="email_perso"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                type="email"
+                {...field}
+                placeholder="Email personnel"
+                error={!!errors.email_perso}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="Téléphone"
+          error={errors.telephone?.message}
+        >
+          <Controller
+            name="telephone"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Téléphone"
+                error={!!errors.telephone}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="NIF"
+          error={errors.nif?.message}
+        >
+          <Controller
+            name="nif"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="NIF"
+                error={!!errors.nif}
+              />
+            )}
+          />
         </FormField>
 
         <FormActions>
