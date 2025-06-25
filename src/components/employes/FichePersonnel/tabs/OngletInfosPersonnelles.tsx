@@ -10,29 +10,11 @@ import { Dropdown, DropdownOption } from '../../../../components/ui/dropdown';
 import { TiersSelector } from '../../../../components/ParametreGlobal/Tiers/TiersSelector';
 import { TiersFormModal } from '../../../../components/ParametreGlobal/Tiers/TiersFormModal';
 import { ToastData } from '../../../../components/ui/toast';
-import { User, Upload, X } from 'lucide-react';
-
-// Schéma de validation avec Zod
-const personnelSchema = z.object({
-  nom: z.string().min(1, 'Le nom est requis'),
-  prenom: z.string().min(1, 'Le prénom est requis'),
-  civilite: z.string().nullable().optional(),
-  sexe: z.string().nullable().optional(),
-  date_naissance: z.string().nullable().optional(),
-  adresse: z.string().nullable().optional(),
-  code_postal: z.string().nullable().optional(),
-  ville: z.string().nullable().optional(),
-  pays: z.string().nullable().optional(),
-  numero_securite_sociale: z.string().nullable().optional(),
-  nif: z.string().nullable().optional(),
-  email_perso: z.string().email('Email invalide').nullable().optional(),
-  telephone: z.string().nullable().optional(),
-  lien_photo: z.string().nullable().optional(),
-  id_tiers: z.string().min(1, 'Le tiers est requis'),
-  actif: z.boolean().default(true),
-  code_court: z.string().min(1, 'Le code court est requis').max(12, 'Maximum 12 caractères'),
-  matricule: z.string().min(1, 'Le matricule est requis').max(12, 'Maximum 12 caractères')
-});
+import { User } from 'lucide-react';
+import { ProfilePhotoUploader } from './components/ProfilePhotoUploader';
+import { personnelSchema } from './schemas/personnelSchema';
+import { usePhotoManagement } from './hooks/usePhotoManagement';
+import { useTiersManagement } from './hooks/useTiersManagement';
 
 type PersonnelFormData = z.infer<typeof personnelSchema>;
 
@@ -52,9 +34,21 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const { profil } = useProfil();
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isTiersModalOpen, setIsTiersModalOpen] = useState(false);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  
+  // Hooks personnalisés
+  const { 
+    photoPreview, 
+    isUploadingPhoto, 
+    loadPhotoPreview, 
+    handlePhotoUpload, 
+    handleRemovePhoto 
+  } = usePhotoManagement();
+  
+  const {
+    isTiersModalOpen,
+    setIsTiersModalOpen,
+    handleTiersSubmit
+  } = useTiersManagement(setValue, addToast);
 
   // Initialiser le formulaire avec react-hook-form
   const { 
@@ -117,7 +111,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           // Charger l'aperçu de la photo si disponible
           if (data.lien_photo) {
             console.log('Chargement de l\'aperçu de la photo:', data.lien_photo);
-            loadPhotoPreview(data.lien_photo);
+            loadPhotoPreview(data.lien_photo, setPhotoPreview);
           }
         } catch (error) {
           console.error('Erreur lors du chargement du personnel:', error);
@@ -134,111 +128,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
     fetchPersonnel();
   }, [mode, personnelId, reset, addToast]);
-
-  // Charger l'aperçu de la photo
-  const loadPhotoPreview = async (photoPath: string) => {
-    try {
-      console.log('Génération de l\'URL signée pour la photo:', photoPath);
-      const { data, error } = await supabase.storage
-        .from('personnel-photos')
-        .createSignedUrl(photoPath, 60);
-      
-      if (error) {
-        console.error('Erreur lors de la création de l\'URL signée:', error);
-        throw error;
-      }
-
-      console.log('URL signée créée avec succès, longueur:', data.signedUrl.length);
-      setPhotoPreview(data.signedUrl);
-    } catch (error) {
-      console.error('Erreur lors du chargement de la photo:', error);
-    }
-  };
-
-  // Gérer l'upload de la photo
-  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !profil?.com_contrat_client_id) return;
-    
-    console.log('Début du téléversement de la photo:', file.name);
-
-    setIsUploadingPhoto(true);
-    try {
-      // Créer un nom de fichier unique
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `${profil.com_contrat_client_id}/${fileName}`;
-      
-      console.log('Chemin du fichier à téléverser:', filePath);
-
-      // Uploader le fichier
-      const { error: uploadError } = await supabase.storage
-        .from('personnel-photos')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        console.error('Erreur lors du téléversement:', uploadError);
-        throw uploadError;
-      }
-      
-      console.log('Photo téléversée avec succès. Chemin:', filePath);
-
-      // Mettre à jour le formulaire avec le chemin du fichier
-      setValue('lien_photo', filePath);
-      console.log('Chemin de la photo mis à jour dans le formulaire:', getValues('lien_photo'));
-      
-      // Charger l'aperçu
-      loadPhotoPreview(filePath);
-      
-      addToast({
-        label: 'Photo téléversée avec succès',
-        icon: 'Check',
-        color: '#22c55e'
-      });
-    } catch (error) {
-      console.error('Erreur lors du téléversement de la photo:', error);
-      addToast({
-        label: 'Erreur lors du téléversement de la photo',
-        icon: 'AlertTriangle',
-        color: '#ef4444'
-      });
-    } finally {
-      setIsUploadingPhoto(false);
-    }
-  };
-
-  // Supprimer la photo
-  const handleRemovePhoto = async () => {
-    const photoPath = control._formValues.lien_photo;
-    if (!photoPath) return;
-
-    console.log('Suppression de la photo:', photoPath);
-    try {
-      const { error } = await supabase.storage
-        .from('personnel-photos')
-        .remove([photoPath]);
-
-      if (error) throw error;
-
-      console.log('Photo supprimée avec succès');
-      setValue('lien_photo', '', { shouldDirty: true });
-      console.log('Valeur du champ lien_photo après suppression:', getValues('lien_photo'));
-      setPhotoPreview(null);
-      
-      addToast({
-        label: 'Photo supprimée avec succès',
-        icon: 'Check',
-        color: '#22c55e'
-      });
-    } catch (error) {
-      console.error('Erreur lors de la suppression de la photo:', error);
-      addToast({
-        label: 'Erreur lors de la suppression de la photo',
-        icon: 'AlertTriangle',
-        color: '#ef4444'
-      });
-    }
-  };
 
   // Soumettre le formulaire
   const onSubmit = async (data: PersonnelFormData) => {
@@ -381,159 +270,33 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     { value: 'Femme', label: 'Femme' }
   ];
 
-  // Gérer la création d'un nouveau tiers
-  const handleTiersSubmit = async (tiersData: any) => {
-    try {
-      // Vérifier si un tiers avec ce code existe déjà
-      const { data: existingTiers, error: checkError } = await supabase
-        .from('com_tiers')
-        .select('id, code, nom')
-        .eq('code', tiersData.code)
-        .eq('com_contrat_client_id', profil?.com_contrat_client_id)
-        .maybeSingle();
-
-      if (checkError) {
-        throw checkError;
-      }
-
-      // Si un tiers avec ce code existe déjà, afficher un message et proposer de l'utiliser
-      if (existingTiers) {
-        if (window.confirm(`Un tiers avec le code "${tiersData.code}" existe déjà (${existingTiers.nom}). Voulez-vous l'utiliser ?`)) {
-          // Utiliser le tiers existant
-          setValue('id_tiers', existingTiers.id);
-          
-          addToast({
-            label: `Tiers existant "${existingTiers.nom}" sélectionné`,
-            icon: 'Check',
-            color: '#22c55e'
-          });
-          
-          setIsTiersModalOpen(false);
-          return;
-        } else {
-          // L'utilisateur ne veut pas utiliser le tiers existant
-          addToast({
-            label: 'Veuillez utiliser un code différent pour créer un nouveau tiers',
-            icon: 'AlertTriangle',
-            color: '#f59e0b'
-          });
-          return;
-        }
-      }
-
-      // Vérifier si un type de tiers "salarié" existe
-      const { data: typeTiersSalarie, error: typeTiersError } = await supabase
-        .from('com_param_type_tiers')
-        .select('id')
-        .eq('com_contrat_client_id', profil?.com_contrat_client_id)
-        .eq('salarie', true)
-        .eq('actif', true)
-        .limit(1);
-
-      if (typeTiersError) {
-        throw typeTiersError;
-      }
-
-      // Si aucun type de tiers salarié n'est trouvé, utiliser le type fourni
-      // Sinon, utiliser le type salarié
-      const id_type_tiers = (typeTiersSalarie && typeTiersSalarie.length > 0) 
-        ? typeTiersSalarie[0].id 
-        : tiersData.id_type_tiers;
-
-      const { data, error } = await supabase
-        .from('com_tiers') 
-        .insert({
-          ...tiersData,
-          id_type_tiers,
-          com_contrat_client_id: profil?.com_contrat_client_id,
-          // code_user n'est plus nécessaire, remplacé par created_by
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      
-      // Mettre à jour le formulaire avec le nouveau tiers
-      setValue('id_tiers', data.id);
-      
-      addToast({
-        label: 'Tiers créé avec succès',
-        icon: 'Check',
-        color: '#22c55e'
-      });
-      
-      setIsTiersModalOpen(false);
-    } catch (error) {
-      console.error('Erreur lors de la création du tiers:', error);
-      
-      // Gestion spécifique des erreurs de contrainte d'unicité
-      let errorMessage = 'Erreur lors de la création du tiers';
-      
-      if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
-        if (error.message.includes('com_tiers_code_unique')) {
-          errorMessage = 'Un tiers avec ce code existe déjà. Veuillez utiliser un code différent.';
-        }
-      }
-      
-      addToast({
-        label: errorMessage,
-        icon: 'AlertTriangle',
-        color: '#ef4444'
-      });
-    }
-  };
 
   if (loading) {
     return <div className="flex justify-center items-center h-64">Chargement...</div>;
   }
 
+  // Options pour les listes déroulantes
+  const civiliteOptions: DropdownOption[] = [
+    { value: '', label: 'Sélectionner une civilité' },
+    { value: 'Monsieur', label: 'Monsieur' },
+    { value: 'Madame', label: 'Madame' },
+    { value: 'Mademoiselle', label: 'Mademoiselle' }
+  ];
+
+  const sexeOptions: DropdownOption[] = [
+    { value: '', label: 'Sélectionner un sexe' },
+    { value: 'Homme', label: 'Homme' },
+    { value: 'Femme', label: 'Femme' }
+  ];
   return (
     <div className="space-y-6">
       {/* Section photo de profil */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="relative">
-          <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mb-4">
-            {photoPreview ? (
-              <img 
-                src={photoPreview} 
-                alt="Photo de profil" 
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <User className="w-16 h-16 text-gray-400" />
-            )}
-          </div>
-          <div className="absolute bottom-0 right-0 flex">
-            <input
-              type="file"
-              id="photo-upload"
-              accept="image/*"
-              className="hidden"
-              onChange={handlePhotoUpload}
-              disabled={isUploadingPhoto}
-            />
-            <label
-              htmlFor="photo-upload"
-              className="bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-colors flex items-center justify-center"
-              title="Ajouter une photo"
-            >
-              <Upload size={16} />
-            </label>
-            {photoPreview && (
-              <button
-                onClick={handleRemovePhoto}
-                className="bg-red-500 text-white p-2 rounded-full ml-2 hover:bg-red-600 transition-colors flex items-center justify-center"
-                title="Supprimer la photo"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
-        </div>
-        <p className="text-sm text-gray-500">
-          {isUploadingPhoto ? 'Téléversement en cours...' : 'Cliquez pour ajouter une photo'}
-        </p>
-      </div>
+      <ProfilePhotoUploader 
+        photoPreview={photoPreview}
+        isUploadingPhoto={isUploadingPhoto}
+        onPhotoUpload={handlePhotoUpload}
+        onPhotoRemove={handleRemovePhoto}
+      />
 
       <Form size={100} columns={3} onSubmit={handleSubmit(onSubmit)}>
         {/* Première ligne */}
@@ -547,11 +310,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             render={({ field }) => (
               <Dropdown
                 options={civiliteOptions}
-                value={field.value || ''}
-                onChange={field.onChange}
-                label="Sélectionner une civilité"
-                size="sm"
-              />
             )}
           />
         </FormField>
@@ -603,10 +361,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             render={({ field }) => (
               <Dropdown
                 options={sexeOptions}
-                value={field.value || ''}
-                onChange={field.onChange}
-                label="Sélectionner un sexe"
-                size="sm"
               />
             )}
           />
