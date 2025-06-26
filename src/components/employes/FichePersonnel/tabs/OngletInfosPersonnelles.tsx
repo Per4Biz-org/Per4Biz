@@ -18,6 +18,13 @@ import { useTiersManagement } from './hooks/useTiersManagement';
 
 type PersonnelFormData = z.infer<typeof personnelSchema>;
 
+interface TypeTiers {
+  id: string;
+  code: string;
+  libelle: string;
+  salarie: boolean;
+}
+
 interface OngletInfosPersonnellesProps {
   mode: 'create' | 'edit';
   personnelId?: string;
@@ -36,6 +43,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const { profil } = useProfil();
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [typesTiersSalarie, setTypesTiersSalarie] = useState<TypeTiers[]>([]);
   
   // Initialiser le formulaire avec react-hook-form AVANT les autres hooks
   const { 
@@ -44,6 +52,9 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     reset,
     getValues,
     setValue,
+    setError,
+    clearErrors,
+    setFocus,
     formState: { errors } 
   } = useForm<PersonnelFormData>({
     resolver: zodResolver(personnelSchema),
@@ -84,6 +95,106 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     setIsTiersModalOpen,
     handleTiersSubmit
   } = useTiersManagement(setValue, addToast);
+
+  // Charger les types de tiers "salarié"
+  useEffect(() => {
+    const fetchTypesTiersSalarie = async () => {
+      if (!profil?.com_contrat_client_id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('com_param_type_tiers')
+          .select('id, code, libelle, salarie')
+          .eq('com_contrat_client_id', profil.com_contrat_client_id)
+          .eq('salarie', true)
+          .eq('actif', true);
+          
+        if (error) throw error;
+        setTypesTiersSalarie(data || []);
+      } catch (error) {
+        console.error('Erreur lors du chargement des types de tiers salarié:', error);
+      }
+    };
+    
+    fetchTypesTiersSalarie();
+  }, [profil?.com_contrat_client_id]);
+
+  // Gestionnaire pour la vérification du code court
+  const handleCodeCourtBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const codeCourt = e.target.value.trim();
+    if (!codeCourt || mode !== 'create') return;
+    
+    try {
+      // Vérifier si le code existe déjà dans la table com_tiers
+      const { data, error } = await supabase
+        .from('com_tiers')
+        .select('id, code, nom')
+        .eq('code', codeCourt)
+        .eq('com_contrat_client_id', profil?.com_contrat_client_id);
+        
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        // Le code existe déjà
+        setError('code_court', { 
+          type: 'manual', 
+          message: 'Ce code court est déjà utilisé. Veuillez en choisir un autre.' 
+        });
+        setValue('code_court', '');
+        setFocus('code_court');
+      } else {
+        // Le code n'existe pas, on peut créer un tiers automatiquement
+        if (typesTiersSalarie.length > 0) {
+          const nom = getValues('nom');
+          const prenom = getValues('prenom');
+          
+          if (nom && prenom) {
+            // Créer un tiers automatiquement
+            const tiersData = {
+              code: codeCourt,
+              nom: `${prenom} ${nom}`,
+              id_type_tiers: typesTiersSalarie[0].id
+            };
+            
+            const { data: newTiers, error: createError } = await supabase
+              .from('com_tiers')
+              .insert({
+                ...tiersData,
+                com_contrat_client_id: profil?.com_contrat_client_id,
+                actif: true
+              })
+              .select()
+              .single();
+              
+            if (createError) throw createError;
+            
+            // Mettre à jour le champ id_tiers avec le nouveau tiers
+            setValue('id_tiers', newTiers.id);
+            clearErrors('code_court');
+            
+            addToast({
+              label: `Tiers "${prenom} ${nom}" créé automatiquement avec le code "${codeCourt}"`,
+              icon: 'Check',
+              color: '#22c55e'
+            });
+          }
+        } else {
+          addToast({
+            label: 'Aucun type de tiers "salarié" trouvé. Veuillez en créer un avant de continuer.',
+            icon: 'AlertTriangle',
+            color: '#f59e0b'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification du code court:', error);
+      addToast({
+        label: 'Erreur lors de la vérification du code court',
+        icon: 'AlertTriangle',
+        color: '#ef4444'
+      });
+    }
+  };
 
   // Charger les données du personnel en mode édition
   useEffect(() => {
@@ -411,6 +522,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               onClick={() => setIsTiersModalOpen(true)}
               disabled={isSubmitting}
               size="sm"
+              onBlur={handleCodeCourtBlur}
             />
           </div>
         </FormField>
