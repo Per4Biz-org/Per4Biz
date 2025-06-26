@@ -343,62 +343,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           />
         </FormField>
 
-        {/* Deuxième ligne */}
-        <FormField
-          label="Sexe"
-          error={errors.sexe?.message}
-        >
-          <Controller
-            name="sexe"
-            control={control}
-            render={({ field }) => (
-              <Dropdown
-                options={sexeOptions}
-                value={field.value}
-                onChange={field.onChange}
-                label="Sélectionner un sexe"
-                disabled={isSubmitting}
-              />
-            )}
-          />
-        </FormField>
-
-        <FormField
-          label="Date de naissance"
-          error={errors.date_naissance?.message}
-        >
-          <Controller
-            name="date_naissance"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                type="date"
-                {...field}
-                error={!!errors.date_naissance}
-              />
-            )}
-          />
-        </FormField>
-
-        <FormField
-          label="Numéro de sécurité sociale"
-          error={errors.numero_securite_sociale?.message}
-        >
-          <Controller
-            name="numero_securite_sociale"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                {...field}
-                placeholder="Numéro de sécurité sociale"
-                error={!!errors.numero_securite_sociale}
-              />
-            )}
-          />
-        </FormField>
-
-        {/* Troisième ligne */}
-                <FormField
+        {/* Deuxième ligne */}  
+       <FormField
           label="Code court"
           required
           error={errors.code_court?.message}
@@ -469,6 +415,59 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           </div>
         </FormField>
         
+        {/* Troisième ligne */}
+        <FormField
+          label="Sexe"
+          error={errors.sexe?.message}
+        >
+          <Controller
+            name="sexe"
+            control={control}
+            render={({ field }) => (
+              <Dropdown
+                options={sexeOptions}
+                value={field.value}
+                onChange={field.onChange}
+                label="Sélectionner un sexe"
+                disabled={isSubmitting}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="Date de naissance"
+          error={errors.date_naissance?.message}
+        >
+          <Controller
+            name="date_naissance"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                type="date"
+                {...field}
+                error={!!errors.date_naissance}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="Numéro de sécurité sociale"
+          error={errors.numero_securite_sociale?.message}
+        >
+          <Controller
+            name="numero_securite_sociale"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Numéro de sécurité sociale"
+                error={!!errors.numero_securite_sociale}
+              />
+            )}
+          />
+        </FormField>
 
         {/* Quatrième ligne */}
         <FormField
