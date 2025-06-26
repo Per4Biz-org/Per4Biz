@@ -16,6 +16,85 @@ import { personnelSchema } from './schemas/personnelSchema';
 import { usePhotoManagement } from './hooks/usePhotoManagement';
 import { useTiersManagement } from './hooks/useTiersManagement';
 
+// Fonction pour vérifier si un code existe déjà et créer un tiers si nécessaire
+const useCodeCourtHandler = (
+  setValue: (name: string, value: any, options?: any) => void,
+  addToast: (toast: Omit<ToastData, 'id'>) => void
+) => {
+  const { profil } = useProfil();
+  const [isCheckingCode, setIsCheckingCode] = useState(false);
+
+  const checkAndCreateTiers = async (codeValue: string) => {
+    if (!codeValue || !profil?.com_contrat_client_id) return;
+
+    setIsCheckingCode(true);
+    try {
+      // 1. Rechercher un type de tiers avec salarie=TRUE
+      const { data: typeTiersSalarie, error: typeTiersError } = await supabase
+        .from('com_param_type_tiers')
+        .select('id')
+        .eq('com_contrat_client_id', profil.com_contrat_client_id)
+        .eq('salarie', true)
+        .eq('actif', true)
+        .limit(1);
+
+      if (typeTiersError) throw typeTiersError;
+      
+      if (!typeTiersSalarie || typeTiersSalarie.length === 0) {
+        addToast({
+          label: 'Aucun type de tiers pour salarié trouvé. Veuillez en créer un avec l\'option "salarié" activée.',
+          icon: 'AlertTriangle',
+          color: '#ef4444'
+        });
+        return;
+      }
+      
+      const typeTiersId = typeTiersSalarie[0].id;
+
+      // 2. Vérifier si un tiers avec ce code existe déjà pour ce type
+      const { data: existingTiers, error: checkError } = await supabase
+        .from('com_tiers')
+        .select('id, code, nom')
+        .eq('code', codeValue)
+        .eq('id_type_tiers', typeTiersId)
+        .eq('com_contrat_client_id', profil.com_contrat_client_id)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      // Si un tiers existe déjà avec ce code et ce type
+      if (existingTiers) {
+        addToast({
+          label: `Le code "${codeValue}" est déjà utilisé pour un tiers. Veuillez utiliser un code différent.`,
+          icon: 'AlertTriangle',
+          color: '#f59e0b'
+        });
+        return false; // Code déjà utilisé
+      }
+
+      return {
+        success: true,
+        typeTiersId
+      };
+    } catch (error) {
+      console.error('Erreur lors de la vérification du code:', error);
+      addToast({
+        label: 'Erreur lors de la vérification du code',
+        icon: 'AlertTriangle',
+        color: '#ef4444'
+      });
+      return false;
+    } finally {
+      setIsCheckingCode(false);
+    }
+  };
+
+  return {
+    checkAndCreateTiers,
+    isCheckingCode
+  };
+};
+
 type PersonnelFormData = z.infer<typeof personnelSchema>;
 
 interface OngletInfosPersonnellesProps {
@@ -37,6 +116,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Référence pour le champ nom et prénom
+  const nomRef = React.useRef<string>('');
+  const prenomRef = React.useRef<string>('');
+  
   // Initialiser le formulaire avec react-hook-form AVANT les autres hooks
   const { 
     control, 
@@ -44,6 +127,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     reset,
     getValues,
     setValue,
+    watch,
     formState: { errors } 
   } = useForm<PersonnelFormData>({
     resolver: zodResolver(personnelSchema),
@@ -84,6 +168,72 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     setIsTiersModalOpen,
     handleTiersSubmit
   } = useTiersManagement(setValue, addToast);
+
+  // Gestionnaire pour le code court
+  const { checkAndCreateTiers, isCheckingCode } = useCodeCourtHandler(setValue, addToast);
+  
+  // Observer les changements de nom et prénom
+  const nom = watch('nom');
+  const prenom = watch('prenom');
+  const codeCourt = watch('code_court');
+  
+  // Mettre à jour les références
+  useEffect(() => {
+    nomRef.current = nom;
+  }, [nom]);
+  
+  useEffect(() => {
+    prenomRef.current = prenom;
+  }, [prenom]);
+  
+  // Gérer la sortie du champ code_court
+  const handleCodeCourtBlur = async () => {
+    if (!codeCourt) return;
+    
+    const result = await checkAndCreateTiers(codeCourt);
+    
+    if (result && result.success) {
+      // Créer automatiquement un tiers avec ce code
+      try {
+        const tiersData = {
+          code: codeCourt,
+          nom: `${prenomRef.current} ${nomRef.current}`,
+          id_type_tiers: result.typeTiersId,
+          com_contrat_client_id: profil?.com_contrat_client_id
+        };
+        
+        const { data, error } = await supabase
+          .from('com_tiers')
+          .insert(tiersData)
+          .select()
+          .single();
+          
+        if (error) throw error;
+        
+        // Mettre à jour le champ id_tiers avec l'ID du tiers créé
+        setValue('id_tiers', data.id);
+        
+        addToast({
+          label: 'Tiers créé automatiquement',
+          icon: 'Check',
+          color: '#22c55e'
+        });
+      } catch (error) {
+        console.error('Erreur lors de la création automatique du tiers:', error);
+        addToast({
+          label: 'Erreur lors de la création automatique du tiers',
+          icon: 'AlertTriangle',
+          color: '#ef4444'
+        });
+        
+        // Réinitialiser le code court en cas d'erreur
+        setValue('code_court', '');
+      }
+    } else if (result === false) {
+      // Code déjà utilisé, réinitialiser le champ
+      setValue('code_court', '');
+    }
+  };
 
   // Charger les données du personnel en mode édition
   useEffect(() => {
@@ -353,12 +503,22 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           <Controller
             name="code_court"
             control={control}
-            render={({ field }) => (
+            render={({ field: { onChange, onBlur, ...field } }) => (
               <FormInput
                 {...field}
+                onChange={(e) => {
+                  onChange(e);
+                }}
+                onBlur={(e) => {
+                  onBlur();
+                  if (mode === 'create') {
+                    handleCodeCourtBlur();
+                  }
+                }}
                 placeholder="Code court"
                 maxLength={12}
                 error={!!errors.code_court}
+                disabled={isSubmitting || isCheckingCode}
               />
             )}
           />
