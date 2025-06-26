@@ -118,23 +118,96 @@ const MesEmployes: React.FC = () => {
   const handleDelete = async (personne: Personnel) => {
     if (window.confirm(`Êtes-vous sûr de vouloir désactiver ${personne.prenom} ${personne.nom} ?`)) {
       try {
+        // Supprimer d'abord les pièces jointes
+        const { error: piecesJointesError } = await supabase
+          .from('rh_piece_jointe')
+          .delete()
+          .eq('id_personnel', personne.id);
+
+        if (piecesJointesError) {
+          console.error('Erreur lors de la suppression des pièces jointes:', piecesJointesError);
+        }
+
+        // Supprimer les coûts mensuels
+        const { error: coutsMensuelsError } = await supabase
+          .from('rh_cout_mensuel')
+          .delete()
+          .eq('id_personnel', personne.id);
+
+        if (coutsMensuelsError) {
+          console.error('Erreur lors de la suppression des coûts mensuels:', coutsMensuelsError);
+        }
+
+        // Supprimer l'historique financier
+        const { error: historiqueFinancierError } = await supabase
+          .from('rh_historique_financier')
+          .delete()
+          .eq('id_personnel', personne.id);
+
+        if (historiqueFinancierError) {
+          console.error('Erreur lors de la suppression de l\'historique financier:', historiqueFinancierError);
+        }
+
+        // Récupérer les IDs des contrats pour pouvoir supprimer les affectations
+        const { data: contrats, error: contratsError } = await supabase
+          .from('rh_historique_contrat')
+          .select('id')
+          .eq('id_personnel', personne.id);
+
+        if (contratsError) {
+          console.error('Erreur lors de la récupération des contrats:', contratsError);
+        } else if (contrats && contrats.length > 0) {
+          const contratIds = contrats.map(c => c.id);
+          
+          // Supprimer les affectations liées aux contrats
+          const { error: affectationsError } = await supabase
+            .from('rh_affectation')
+            .delete()
+            .in('id_contrat', contratIds);
+
+          if (affectationsError) {
+            console.error('Erreur lors de la suppression des affectations:', affectationsError);
+          }
+        }
+
+        // Supprimer les contrats
+        const { error: contratsDeleteError } = await supabase
+          .from('rh_historique_contrat')
+          .delete()
+          .eq('id_personnel', personne.id);
+
+        if (contratsDeleteError) {
+          console.error('Erreur lors de la suppression des contrats:', contratsDeleteError);
+        }
+
+        // Enfin, supprimer le personnel lui-même
         const { error } = await supabase
           .from('rh_personnel')
-          .update({ actif: false })
+          .delete()
           .eq('id', personne.id);
 
         if (error) throw error;
 
         await fetchPersonnel();
         addToast({
-          label: `${personne.prenom} ${personne.nom} a été désactivé avec succès`,
+          label: `${personne.prenom} ${personne.nom} a été supprimé avec succès`,
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
-        console.error('Erreur lors de la désactivation:', error);
+        console.error('Erreur lors de la suppression:', error);
+        
+        // Message d'erreur plus convivial en cas d'échec
+        let errorMessage = 'Erreur lors de la suppression de l\'employé';
+        
+        // Vérifier si l'erreur est due à une contrainte de clé étrangère
+        if (error.message?.includes('foreign key constraint') || 
+            error.message?.includes('violates foreign key constraint')) {
+          errorMessage = `Impossible de supprimer ${personne.prenom} ${personne.nom} car il est référencé dans d'autres parties de l'application. Veuillez le désactiver plutôt que le supprimer.`;
+        }
+        
         addToast({
-          label: 'Erreur lors de la désactivation de l\'employé',
+          label: errorMessage,
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -212,7 +285,7 @@ const MesEmployes: React.FC = () => {
       onClick: handleEdit
     },
     {
-      label: 'Désactiver',
+      label: 'Supprimer',
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -223,7 +296,7 @@ const MesEmployes: React.FC = () => {
     <div className={styles.container}>
       <PageSection
         title={loading || profilLoading ? "Chargement..." : "Mes Employés"}
-        description="Gérez les employés de votre organisation"
+        description="Gérez les employés de votre organisation. La suppression est définitive et supprime toutes les données associées."
         className={styles.header}
       >
         <div className="mb-6">

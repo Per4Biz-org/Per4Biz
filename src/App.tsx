@@ -42,6 +42,7 @@ import EditFactureAchat from './pages/finances/factures/EditFactureAchat'
 import TypeFonction from './pages/employes/ParametresEmployes/TypeFonction'
 import TypeContrat from './pages/employes/ParametresEmployes/TypeContrat'
 import MesEmployes from './pages/employes/MesEmployes'
+import ParamGeneraux from './pages/employes/ParametresEmployes/ParamGeneraux'
 
 // Lazy loading du composant MesFactures
 const MesFacturesLazy = React.lazy(() => import('./pages/finances/factures/MesFactures'))
@@ -298,6 +299,13 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <MesEmployes />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/employes/parametres-employes/param-generaux" element={
+            <PrivateRoute>
+              <Layout>
+                <ParamGeneraux />
               </Layout>
             </PrivateRoute>
           } />

@@ -8,6 +8,7 @@ import { menuItemsParametreGlobal } from '../../config/menuConfig';
 import { PageSection } from '../../components/ui/page-section';
 import { DataTable, Column } from '../../components/ui/data-table';
 import { Button } from '../../components/ui/button';
+import { Dropdown, DropdownOption } from '../../components/ui/dropdown';
 import { ToastContainer, ToastData } from '../../components/ui/toast';
 import { TiersFormModal } from '../../components/ParametreGlobal/Tiers/TiersFormModal';
 import styles from './styles.module.css';
@@ -32,10 +33,19 @@ interface Tiers {
   };
 }
 
+interface TypeTiers {
+  id: string;
+  code: string;
+  libelle: string;
+}
+
 const Tiers: React.FC = () => {
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [tiers, setTiers] = useState<Tiers[]>([]);
+  const [typesTiers, setTypesTiers] = useState<TypeTiers[]>([]);
+  const [filteredTiers, setFilteredTiers] = useState<Tiers[]>([]);
+  const [selectedTypeTiers, setSelectedTypeTiers] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTiers, setSelectedTiers] = useState<Tiers | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,6 +73,7 @@ const Tiers: React.FC = () => {
 
       if (error) throw error;
       setTiers(data || []);
+      setFilteredTiers(data || []);
     } catch (error) {
       console.error('Erreur lors de la récupération des tiers:', error);
       addToast({
@@ -75,12 +86,48 @@ const Tiers: React.FC = () => {
     }
   };
 
+  const fetchTypesTiers = async () => {
+    try {
+      if (!profil?.com_contrat_client_id) {
+        setTypesTiers([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('com_param_type_tiers')
+        .select('id, code, libelle')
+        .eq('com_contrat_client_id', profil.com_contrat_client_id)
+        .eq('actif', true)
+        .order('libelle');
+
+      if (error) throw error;
+      setTypesTiers(data || []);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des types de tiers:', error);
+    }
+  };
+
   useEffect(() => {
     setMenuItems(menuItemsParametreGlobal);
     if (!profilLoading) {
       fetchTiers();
+      fetchTypesTiers();
     }
   }, [setMenuItems, profilLoading, profil?.com_contrat_client_id]);
+
+  // Filtrer les tiers lorsque le type sélectionné change
+  useEffect(() => {
+    if (!selectedTypeTiers) {
+      // Si aucun type n'est sélectionné, afficher tous les tiers
+      setFilteredTiers(tiers);
+    } else {
+      // Filtrer les tiers par type
+      const filtered = tiers.filter(tier => 
+        tier.type_tiers.code === selectedTypeTiers
+      );
+      setFilteredTiers(filtered);
+    }
+  }, [selectedTypeTiers, tiers]);
 
   const addToast = (toast: Omit<ToastData, 'id'>) => {
     const newToast: ToastData = {
@@ -169,37 +216,61 @@ const Tiers: React.FC = () => {
     }
   };
 
+  const handleTypeChange = (value: string) => {
+    setSelectedTypeTiers(value);
+  };
+
   const handleEdit = (tiers: Tiers) => {
     setSelectedTiers(tiers);
     setIsModalOpen(true);
   };
 
   const handleDelete = async (tiers: Tiers) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir désactiver le tiers "${tiers.nom}" ?`)) {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le tiers "${tiers.nom}" ?`)) {
       try {
-        const { error } = await supabase
+        const { error: deleteError } = await supabase
           .from('com_tiers')
-          .update({ actif: false })
+          .delete()
           .eq('id', tiers.id);
 
-        if (error) throw error;
+        if (deleteError) {
+          // Vérifier si l'erreur est due à une contrainte de clé étrangère
+          if (deleteError.message?.includes('foreign key constraint') || 
+              deleteError.message?.includes('violates foreign key constraint')) {
+            throw new Error(
+              `Impossible de supprimer le tiers "${tiers.nom}" car il est utilisé dans d'autres parties de l'application (factures, employés, etc.). Vous pouvez le désactiver plutôt que le supprimer.`
+            );
+          }
+          throw deleteError;
+        }
 
         await fetchTiers();
         addToast({
-          label: `Le tiers "${tiers.nom}" a été désactivé avec succès`,
+          label: `Le tiers "${tiers.nom}" a été supprimé avec succès`,
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
-        console.error('Erreur lors de la désactivation:', error);
+        console.error('Erreur lors de la suppression:', error);
+        
+        // Afficher un message d'erreur plus convivial
         addToast({
-          label: 'Erreur lors de la désactivation du tiers',
+          label: error.message || 'Erreur lors de la suppression du tiers',
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
       }
     }
   };
+
+  // Préparer les options pour le dropdown des types de tiers
+  const typeTiersOptions: DropdownOption[] = [
+    { value: '', label: 'Tous les types de tiers' },
+    ...typesTiers.map(type => ({
+      value: type.code,
+      label: `${type.code} - ${type.libelle}`
+    }))
+  ];
 
   const columns: Column<Tiers>[] = [
     {
@@ -261,6 +332,7 @@ const Tiers: React.FC = () => {
     {
       label: 'Désactiver',
       icon: 'delete',
+      label: 'Supprimer',
       color: '#ef4444',
       onClick: handleDelete
     }
@@ -273,13 +345,22 @@ const Tiers: React.FC = () => {
         description="Gérez les tiers de votre organisation"
         className={styles.header}
       >
-        <div className="mb-6">
+        <div className="mb-6 flex justify-between items-center">
           <Button
             label="Ajouter un tiers"
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
           />
+          <div className="w-64">
+            <Dropdown
+              options={typeTiersOptions}
+              value={selectedTypeTiers}
+              onChange={handleTypeChange}
+              label="Tous les types de tiers"
+              size="sm"
+            />
+          </div>
         </div>
 
         {loading ? (
@@ -289,7 +370,7 @@ const Tiers: React.FC = () => {
         ) : (
           <DataTable
             columns={columns}
-            data={tiers}
+            data={filteredTiers}
             actions={actions}
             defaultRowsPerPage={10}
             emptyTitle="Aucun tiers"
