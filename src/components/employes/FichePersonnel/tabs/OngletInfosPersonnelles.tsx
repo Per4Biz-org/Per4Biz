@@ -523,6 +523,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               disabled={isSubmitting}
               size="sm"
               onBlur={handleCodeCourtBlur}
+              onBlur={handleCodeCourtBlur}
             />
           </div>
         </FormField>
