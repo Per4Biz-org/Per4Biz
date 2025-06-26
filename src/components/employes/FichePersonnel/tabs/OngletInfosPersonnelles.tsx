@@ -44,6 +44,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [typesTiersSalarie, setTypesTiersSalarie] = useState<TypeTiers[]>([]);
+  const [isCheckingCodeCourt, setIsCheckingCodeCourt] = useState(false);
   
   // Initialiser le formulaire avec react-hook-form AVANT les autres hooks
   const { 
@@ -122,20 +123,40 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   // Gestionnaire pour la vérification du code court
   const handleCodeCourtBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
     const codeCourt = e.target.value.trim();
-    if (!codeCourt || mode !== 'create') return;
+    if (!codeCourt || mode !== 'create' || isCheckingCodeCourt) return;
+    
+    setIsCheckingCodeCourt(true);
     
     try {
+      console.log('Vérification du code court:', codeCourt);
+      
+      // Vérifier si les types de tiers "salarié" sont disponibles
+      if (typesTiersSalarie.length === 0) {
+        console.warn('Aucun type de tiers "salarié" trouvé');
+        addToast({
+          label: 'Aucun type de tiers "salarié" trouvé. Veuillez en créer un avant de continuer.',
+          icon: 'AlertTriangle',
+          color: '#f59e0b'
+        });
+        setIsCheckingCodeCourt(false);
+        return;
+      }
+      
       // Vérifier si le code existe déjà dans la table com_tiers
       const { data, error } = await supabase
         .from('com_tiers')
         .select('id, code, nom')
         .eq('code', codeCourt)
-        .eq('com_contrat_client_id', profil?.com_contrat_client_id);
+        .eq('com_contrat_client_id', profil?.com_contrat_client_id)
+        .eq('id_type_tiers', typesTiersSalarie[0].id);
         
       if (error) throw error;
       
+      console.log('Résultat de la vérification:', data);
+      
       if (data && data.length > 0) {
         // Le code existe déjà
+        console.log('Code court déjà utilisé:', codeCourt);
         setError('code_court', { 
           type: 'manual', 
           message: 'Ce code court est déjà utilisé. Veuillez en choisir un autre.' 
@@ -147,6 +168,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         if (typesTiersSalarie.length > 0) {
           const nom = getValues('nom');
           const prenom = getValues('prenom');
+          console.log('Création automatique de tiers avec:', { codeCourt, nom, prenom });
           
           if (nom && prenom) {
             // Créer un tiers automatiquement
@@ -169,6 +191,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             if (createError) throw createError;
             
             // Mettre à jour le champ id_tiers avec le nouveau tiers
+            console.log('Tiers créé avec succès:', newTiers);
             setValue('id_tiers', newTiers.id);
             clearErrors('code_court');
             
@@ -193,6 +216,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
+    } finally {
+      setIsCheckingCodeCourt(false);
     }
   };
 
@@ -522,7 +547,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               onClick={() => setIsTiersModalOpen(true)}
               disabled={isSubmitting}
               size="sm"
-              onBlur={handleCodeCourtBlur}
               onBlur={handleCodeCourtBlur}
             />
           </div>
