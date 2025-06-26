@@ -43,10 +43,10 @@ const ParamGeneraux: React.FC = () => {
     taux_ss_salariale: '',
     ticket_resto_journalier: '',
     commentaire: '',
-    actif: true
-   mat_prefixe: '',
-   mat_chrono: '',
-   mat_nb_position: ''
+    actif: true,
+    mat_prefixe: '',
+    mat_chrono: '',
+    mat_nb_position: ''
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -215,13 +215,10 @@ const ParamGeneraux: React.FC = () => {
         taux_ss_salariale: '',
         ticket_resto_journalier: '',
         commentaire: '',
-       actif: true,
-       mat_prefixe: '',
-       mat_chrono: '1',
-       mat_nb_position: '3'
-       mat_prefixe: param.mat_prefixe || '',
-       mat_chrono: param.mat_chrono?.toString() || '1',
-       mat_nb_position: param.mat_nb_position?.toString() || '3'
+        actif: true,
+        mat_prefixe: '',
+        mat_chrono: '1',
+        mat_nb_position: '3'
       });
       addToast({
         label: `Paramètre général ${selectedParam ? 'modifié' : 'créé'} avec succès`,
@@ -257,7 +254,10 @@ const ParamGeneraux: React.FC = () => {
       taux_ss_salariale: param.taux_ss_salariale?.toString() || '',
       ticket_resto_journalier: param.ticket_resto_journalier?.toString() || '',
       commentaire: param.commentaire || '',
-      actif: param.actif
+      actif: param.actif,
+      mat_prefixe: param.mat_prefixe || '',
+      mat_chrono: param.mat_chrono?.toString() || '1',
+      mat_nb_position: param.mat_nb_position?.toString() || '3'
     });
     setIsModalOpen(true);
   };
@@ -391,7 +391,10 @@ const ParamGeneraux: React.FC = () => {
                 taux_ss_salariale: '',
                 ticket_resto_journalier: '',
                 commentaire: '',
-                actif: true
+                actif: true,
+                mat_prefixe: '',
+                mat_chrono: '1',
+                mat_nb_position: '3'
               });
               setIsModalOpen(true);
             }}
@@ -615,7 +618,10 @@ const ParamGeneraux: React.FC = () => {
                     taux_ss_salariale: '',
                     ticket_resto_journalier: '',
                     commentaire: '',
-                    actif: true
+                    actif: true,
+                    mat_prefixe: '',
+                    mat_chrono: '1',
+                    mat_nb_position: '3'
                   });
                   setFormErrors({});
                 }}
