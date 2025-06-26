@@ -122,37 +122,20 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   // Gestionnaire pour la vérification du code court
   const handleCodeCourtBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
     const codeCourt = e.target.value.trim();
-    console.log('handleCodeCourtBlur appelé avec:', codeCourt, 'mode:', mode);
     if (!codeCourt || mode !== 'create') return;
     
     try {
-      // Vérifier si nous avons des types de tiers "salarié"
-      if (typesTiersSalarie.length === 0) {
-        console.warn('Aucun type de tiers "salarié" trouvé');
-        addToast({
-          label: 'Aucun type de tiers "salarié" trouvé. Veuillez en créer un avant de continuer.',
-          icon: 'AlertTriangle',
-          color: '#f59e0b'
-        });
-        return;
-      }
-      
-      console.log('Types de tiers salarié disponibles:', typesTiersSalarie);
-      
       // Vérifier si le code existe déjà dans la table com_tiers
       const { data, error } = await supabase
         .from('com_tiers')
         .select('id, code, nom')
         .eq('code', codeCourt)
-        .eq('com_contrat_client_id', profil?.com_contrat_client_id)
-        .in('id_type_tiers', typesTiersSalarie.map(t => t.id));
+        .eq('com_contrat_client_id', profil?.com_contrat_client_id);
         
       if (error) throw error;
-      console.log('Résultat de la vérification du code:', data);
       
       if (data && data.length > 0) {
         // Le code existe déjà
-        console.log('Code court déjà utilisé:', codeCourt);
         setError('code_court', { 
           type: 'manual', 
           message: 'Ce code court est déjà utilisé. Veuillez en choisir un autre.' 
@@ -168,27 +151,22 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           if (nom && prenom) {
             // Créer un tiers automatiquement
             const tiersData = {
-              code: codeCourt.trim(),
-              nom: `${prenom.trim()} ${nom.trim()}`,
-              id_type_tiers: typesTiersSalarie[0].id,
-              actif: true,
-              com_contrat_client_id: profil?.com_contrat_client_id
+              code: codeCourt,
+              nom: `${prenom} ${nom}`,
+              id_type_tiers: typesTiersSalarie[0].id
             };
-            
-            console.log('Création automatique du tiers avec les données:', tiersData);
             
             const { data: newTiers, error: createError } = await supabase
               .from('com_tiers')
-              .insert(tiersData)
+              .insert({
+                ...tiersData,
+                com_contrat_client_id: profil?.com_contrat_client_id,
+                actif: true
+              })
               .select()
               .single();
               
-            if (createError) {
-              console.error('Erreur lors de la création du tiers:', createError);
-              throw createError;
-            }
-            
-            console.log('Tiers créé avec succès:', newTiers);
+            if (createError) throw createError;
             
             // Mettre à jour le champ id_tiers avec le nouveau tiers
             setValue('id_tiers', newTiers.id);
@@ -544,7 +522,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               onClick={() => setIsTiersModalOpen(true)}
               disabled={isSubmitting}
               size="sm"
-              onBlur={handleCodeCourtBlur}
               onBlur={handleCodeCourtBlur}
               onBlur={handleCodeCourtBlur}
             />
