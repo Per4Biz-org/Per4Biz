@@ -11,6 +11,7 @@ import { TiersSelector } from '../../../../components/ParametreGlobal/Tiers/Tier
 import { TiersFormModal } from '../../../../components/ParametreGlobal/Tiers/TiersFormModal';
 import { ToastData } from '../../../../components/ui/toast';
 import { User } from 'lucide-react';
+import { RHCalculMatricule } from '../../../../utils/rhUtils';
 import { ProfilePhotoUploader } from './components/ProfilePhotoUploader';
 import { personnelSchema } from './schemas/personnelSchema';
 import { usePhotoManagement } from './hooks/usePhotoManagement';
@@ -44,6 +45,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [typesTiersSalarie, setTypesTiersSalarie] = useState<TypeTiers[]>([]);
+  const [initialData, setInitialData] = useState<PersonnelFormData | null>(null);
   const [isCheckingCodeCourt, setIsCheckingCodeCourt] = useState(false);
   
   // Initialiser le formulaire avec react-hook-form AVANT les autres hooks
@@ -204,6 +206,18 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               color: '#22c55e'
             });
           }
+            // Générer un matricule automatiquement si on est en mode création
+            if (mode === 'create' && profil?.com_contrat_client_id) {
+              try {
+                const matricule = await RHCalculMatricule(profil.com_contrat_client_id);
+                if (matricule) {
+                  setValue('matricule', matricule);
+                  console.log('Matricule généré automatiquement:', matricule);
+                }
+              } catch (error) {
+                console.error('Erreur lors de la génération du matricule:', error);
+              }
+            }
         } else {
           addToast({
             label: 'Aucun type de tiers "salarié" trouvé. Veuillez en créer un avant de continuer.',
@@ -240,6 +254,9 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           if (error) throw error;
           console.log('Personnel chargé:', data);
           console.log('Lien photo:', data.lien_photo);
+          
+          // Sauvegarder les données initiales pour les comparaisons futures
+          setInitialData(data);
           
           // Formater la date de naissance pour l'input date
           let formattedData = { ...data };
@@ -508,7 +525,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           label="Matricule"
           required
           error={errors.matricule?.message}
-          description="Matricule unique pour identifier le salarié (max 12 caractères)"
+          description="Matricule généré automatiquement à partir du code court"
         >
           <Controller
             name="matricule"
@@ -519,6 +536,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
                 placeholder="Matricule"
                 maxLength={12}
                 error={!!errors.matricule}
+                disabled={true}
               />
             )}
           />
