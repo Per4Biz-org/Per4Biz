@@ -546,6 +546,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               color="var(--color-primary)"
               onClick={() => setIsTiersModalOpen(true)}
               disabled={isSubmitting}
+                  onBlur={handleCodeCourtBlur}
               size="sm"
               onBlur={handleCodeCourtBlur}
             />
