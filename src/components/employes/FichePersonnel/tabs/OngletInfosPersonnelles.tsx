@@ -123,7 +123,10 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   // Gestionnaire pour la vérification du code court
   const handleCodeCourtBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
     const codeCourt = e.target.value.trim();
-    if (!codeCourt || mode !== 'create' || isCheckingCodeCourt) return;
+    if (!codeCourt || isCheckingCodeCourt) return;
+    
+    // Ne pas vérifier en mode édition sauf si le code a changé
+    if (mode === 'edit' && personnelId && codeCourt === initialData?.code_court) return;
     
     setIsCheckingCodeCourt(true);
     
@@ -157,9 +160,9 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       if (data && data.length > 0) {
         // Le code existe déjà
         console.log('Code court déjà utilisé:', codeCourt);
-        setError('code_court', { 
+        setError('code_court', {
           type: 'manual', 
-          message: 'Ce code court est déjà utilisé. Veuillez en choisir un autre.' 
+          message: 'Ce code court est déjà utilisé. Veuillez en choisir un autre.'
         });
         setValue('code_court', '');
         setFocus('code_court');
@@ -495,6 +498,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
                 placeholder="Code court"
                 maxLength={12}
                 error={!!errors.code_court}
+                onBlur={handleCodeCourtBlur}
               />
             )}
           />
@@ -546,9 +550,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
               color="var(--color-primary)"
               onClick={() => setIsTiersModalOpen(true)}
               disabled={isSubmitting}
-                  onBlur={handleCodeCourtBlur}
               size="sm"
-              onBlur={handleCodeCourtBlur}
             />
           </div>
         </FormField>
