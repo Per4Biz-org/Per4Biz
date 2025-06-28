@@ -7,14 +7,11 @@ import { useProfil } from '../../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../../../components/ui/form';
 import { Button } from '../../../../components/ui/button';
 import { Dropdown, DropdownOption } from '../../../../components/ui/dropdown';
-import { TiersSelector } from '../../../../components/ParametreGlobal/Tiers/TiersSelector';
-import { TiersFormModal } from '../../../../components/ParametreGlobal/Tiers/TiersFormModal';
 import { ToastData } from '../../../../components/ui/toast';
 import { User } from 'lucide-react';
 import { RHCalculMatricule } from '../../../../utils/rhUtils';
 import { ProfilePhotoUploader } from './components/ProfilePhotoUploader';
 import { personnelSchema } from './schemas/personnelSchema';
-import { usePhotoManagement } from './hooks/usePhotoManagement';
 import { useTiersManagement } from './hooks/useTiersManagement';
 
 type PersonnelFormData = z.infer<typeof personnelSchema>;
@@ -93,12 +90,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     handleRemovePhoto 
   } = usePhotoManagement();
   
-  const {
-    isTiersModalOpen,
-    setIsTiersModalOpen,
-    handleTiersSubmit
-  } = useTiersManagement(setValue, addToast);
-
   // Charger les types de tiers "salarié"
   useEffect(() => {
     const fetchTypesTiersSalarie = async () => {
@@ -546,31 +537,19 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           label="Tiers associé"
           required
           error={errors.id_tiers?.message}
-          description="Tiers associé au salarié"
+          description="Tiers créé automatiquement à partir du code court"
         >
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <Controller
-                name="id_tiers"
-                control={control}
-                render={({ field }) => (
-                  <TiersSelector
-                    value={field.value}
-                    onChange={field.onChange}
-                    disabled={isSubmitting}
-                  />
-                )}
+          <Controller
+            name="id_tiers"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Créé automatiquement"
+                disabled={true}
               />
-            </div>
-            <Button
-              label="Nouveau tiers"
-              icon="Plus"
-              color="var(--color-primary)"
-              onClick={() => setIsTiersModalOpen(true)}
-              disabled={isSubmitting}
-              size="sm"
-            />
-          </div>
+            )}
+          />
         </FormField>
         
         {/* Troisième ligne */}
@@ -770,14 +749,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           />
         </FormActions>
       </Form>
-
-      {/* Modale pour créer un nouveau tiers */}
-      <TiersFormModal
-        isOpen={isTiersModalOpen}
-        onClose={() => setIsTiersModalOpen(false)}
-        onSubmit={handleTiersSubmit}
-        isSubmitting={false}
-      />
     </div>
   );
 };
