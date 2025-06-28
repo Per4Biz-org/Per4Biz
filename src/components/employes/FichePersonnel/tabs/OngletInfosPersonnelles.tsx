@@ -13,6 +13,7 @@ import { RHCalculMatricule } from '../../../../utils/rhUtils';
 import { ProfilePhotoUploader } from './components/ProfilePhotoUploader';
 import { personnelSchema } from './schemas/personnelSchema';
 import { useTiersManagement } from './hooks/useTiersManagement';
+import { usePhotoManagement } from './hooks/usePhotoManagement';
 
 type PersonnelFormData = z.infer<typeof personnelSchema>;
 
