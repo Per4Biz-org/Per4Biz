@@ -192,7 +192,15 @@ export function CategorieFluxForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    await onSubmit(formData);
+    
+    // Convertir les chaînes vides en null pour les champs UUID optionnels
+    const sanitizedData = {
+      ...formData,
+      id_entite: formData.id_entite.trim() === '' ? null : formData.id_entite,
+      nature_flux_id: formData.nature_flux_id.trim() === '' ? null : formData.nature_flux_id
+    };
+    
+    await onSubmit(sanitizedData);
   };
 
   const entiteOptions: DropdownOption[] = [
