@@ -9,6 +9,7 @@ import { PageSection } from '../../../components/ui/page-section';
 import { DataTable, Column } from '../../../components/ui/data-table';
 import { Button } from '../../../components/ui/button';
 import { ToastContainer, ToastData } from '../../../components/ui/toast';
+import { Dropdown, DropdownOption } from '../../../components/ui/dropdown';
 import { SousCategorieFluxForm } from '../../../components/ParametreFinances/SousCategorieFlux/SousCategorieFluxForm';
 import styles from './styles.module.css';
 
@@ -35,6 +36,9 @@ const SousCategorieFlux: React.FC = () => {
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [sousCategoriesFlux, setSousCategoriesFlux] = useState<SousCategorieFlux[]>([]);
+  const [categoriesFlux, setCategoriesFlux] = useState<{id: string, code: string, libelle: string}[]>([]);
+  const [filteredSousCategoriesFlux, setFilteredSousCategoriesFlux] = useState<SousCategorieFlux[]>([]);
+  const [selectedCategorieFlux, setSelectedCategorieFlux] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSousCategorie, setSelectedSousCategorie] = useState<SousCategorieFlux | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,12 +84,48 @@ const SousCategorieFlux: React.FC = () => {
     }
   };
 
+  const fetchCategoriesFlux = async () => {
+    try {
+      if (!profil?.com_contrat_client_id) {
+        setCategoriesFlux([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('fin_flux_categorie')
+        .select('id, code, libelle')
+        .eq('com_contrat_client_id', profil.com_contrat_client_id)
+        .eq('actif', true)
+        .order('code');
+
+      if (error) throw error;
+      setCategoriesFlux(data || []);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des catégories de flux:', error);
+    }
+  };
+
   useEffect(() => {
     setMenuItems(menuItemsParamGestionFinanciere);
     if (!profilLoading) {
       fetchSousCategoriesFlux();
+      fetchCategoriesFlux();
     }
   }, [setMenuItems, profilLoading, profil?.com_contrat_client_id]);
+
+  // Filtrer les sous-catégories lorsque la catégorie sélectionnée change
+  useEffect(() => {
+    if (!selectedCategorieFlux) {
+      // Si aucune catégorie n'est sélectionnée, afficher toutes les sous-catégories
+      setFilteredSousCategoriesFlux(sousCategoriesFlux);
+    } else {
+      // Filtrer les sous-catégories par catégorie
+      const filtered = sousCategoriesFlux.filter(sousCategorie => 
+        sousCategorie.id_categorie === selectedCategorieFlux
+      );
+      setFilteredSousCategoriesFlux(filtered);
+    }
+  }, [selectedCategorieFlux, sousCategoriesFlux]);
 
   const addToast = (toast: Omit<ToastData, 'id'>) => {
     const newToast: ToastData = {
@@ -197,6 +237,19 @@ const SousCategorieFlux: React.FC = () => {
     }
   };
 
+  const handleCategorieFluxChange = (value: string) => {
+    setSelectedCategorieFlux(value);
+  };
+
+  // Préparer les options pour le dropdown des catégories de flux
+  const categorieFluxOptions: DropdownOption[] = [
+    { value: '', label: 'Toutes les catégories de flux' },
+    ...categoriesFlux.map(categorie => ({
+      value: categorie.id,
+      label: `${categorie.code} - ${categorie.libelle}`
+    }))
+  ];
+
   const columns: Column<SousCategorieFlux>[] = [
     {
       label: 'Entité',
@@ -264,13 +317,22 @@ const SousCategorieFlux: React.FC = () => {
         description="Gérez les sous-catégories de flux financiers de votre organisation"
         className={styles.header}
       >
-        <div className="mb-6">
+        <div className="mb-6 flex justify-between items-center">
           <Button
             label="Ajouter une sous-catégorie"
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
           />
+          <div className="w-64">
+            <Dropdown
+              options={categorieFluxOptions}
+              value={selectedCategorieFlux}
+              onChange={handleCategorieFluxChange}
+              label="Toutes les catégories de flux"
+              size="sm"
+            />
+          </div>
         </div>
 
         {loading ? (
@@ -280,7 +342,7 @@ const SousCategorieFlux: React.FC = () => {
         ) : (
           <DataTable
             columns={columns}
-            data={sousCategoriesFlux}
+            data={filteredSousCategoriesFlux}
             actions={actions}
             defaultRowsPerPage={10}
             emptyTitle="Aucune sous-catégorie de flux"
