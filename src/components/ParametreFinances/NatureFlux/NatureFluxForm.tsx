@@ -16,14 +16,14 @@ interface NatureFluxFormData {
   code: string;
   libelle: string;
   description?: string;
-  id_entite: string;
+  id_entite: string | null;
   actif: boolean;
   salarie: boolean;
 }
 
 interface NatureFluxFormProps {
   initialData?: NatureFluxFormData;
-  onSubmit: (data: NatureFluxFormData) => Promise<void>;
+  onSubmit: (data: NatureFluxFormData & { id_entite: string | null }) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
 }
@@ -33,7 +33,7 @@ export function NatureFluxForm({
     code: '',
     libelle: '',
     description: '',
-    id_entite: '',
+    id_entite: null,
     actif: true,
     salarie: false
   },
@@ -97,7 +97,7 @@ export function NatureFluxForm({
   const handleEntiteChange = (value: string) => {
     setFormData(prev => ({
       ...prev,
-      id_entite: value
+      id_entite: value === '' ? null : value
     }));
     if (errors.id_entite) {
       setErrors(prev => ({
@@ -121,7 +121,14 @@ export function NatureFluxForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    await onSubmit(formData);
+    
+    // Préparer les données en convertissant les chaînes vides en null pour les UUID
+    const submitData = {
+      ...formData,
+      id_entite: formData.id_entite === '' ? null : formData.id_entite
+    };
+    
+    await onSubmit(submitData);
   };
 
   const entiteOptions: DropdownOption[] = [
@@ -142,7 +149,7 @@ export function NatureFluxForm({
       >
         <Dropdown
           options={entiteOptions}
-          value={formData.id_entite}
+          value={formData.id_entite || ''}
           onChange={handleEntiteChange}
           label="Sélectionner une entité"
           size="sm"

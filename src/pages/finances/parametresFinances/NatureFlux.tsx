@@ -93,7 +93,7 @@ const NatureFlux: React.FC = () => {
       code: string;
       libelle: string;
       description?: string;
-      id_entite: string;
+      id_entite: string | null;
       actif: boolean;
       salarie: boolean;
     }
@@ -112,7 +112,7 @@ const NatureFlux: React.FC = () => {
           code: formData.code,
           libelle: formData.libelle,
           description: formData.description || null,
-          id_entite: formData.id_entite,
+          id_entite: formData.id_entite || null,
           actif: formData.actif,
           salarie: formData.salarie,
           com_contrat_client_id: profil.com_contrat_client_id
@@ -129,7 +129,7 @@ const NatureFlux: React.FC = () => {
           code: formData.code,
           libelle: formData.libelle,
           description: formData.description || null,
-          id_entite: formData.id_entite,
+          id_entite: formData.id_entite || null,
           actif: formData.actif,
           salarie: formData.salarie,
           com_contrat_client_id: profil.com_contrat_client_id
@@ -169,25 +169,25 @@ const NatureFlux: React.FC = () => {
   };
 
   const handleDelete = async (nature: NatureFlux) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la nature de flux "${nature.libelle}" ?`)) {
+    if (window.confirm(`Êtes-vous sûr de vouloir désactiver la nature de flux "${nature.libelle}" ?`)) {
       try {
         const { error } = await supabase
           .from('fin_flux_nature')
-          .delete()
+          .update({ actif: false })
           .eq('id', nature.id);
 
         if (error) throw error;
 
         await fetchNaturesFlux();
         addToast({
-          label: `La nature de flux "${nature.libelle}" a été supprimée avec succès`,
+          label: `La nature de flux "${nature.libelle}" a été désactivée avec succès`,
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression de la nature de flux',
+          label: 'Erreur lors de la désactivation de la nature de flux',
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -267,7 +267,7 @@ const NatureFlux: React.FC = () => {
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: 'Désactiver',
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
