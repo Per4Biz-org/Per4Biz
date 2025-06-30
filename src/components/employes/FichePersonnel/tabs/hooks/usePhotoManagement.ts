@@ -70,7 +70,13 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
       // Mettre à jour le formulaire avec le chemin du fichier
       if (props?.setValue) {
         props.setValue('lien_photo', filePath, { shouldDirty: true });
-        console.log('Chemin de la photo mis à jour dans le formulaire:', props?.getValues ? props.getValues('lien_photo') : filePath);
+        console.log('Chemin de la photo mis à jour dans le formulaire:', props?.getValues ? props.getValues('lien_photo') : filePath, 'Type:', typeof filePath);
+        
+        // Vérifier si la valeur a bien été définie
+        setTimeout(() => {
+          const currentValue = props?.getValues ? props.getValues('lien_photo') : undefined;
+          console.log('Vérification après setValue - lien_photo:', currentValue, 'Type:', typeof currentValue);
+        }, 100);
       }
       
       // Charger l'aperçu
@@ -114,6 +120,12 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
       if (props?.setValue) {
         props.setValue('lien_photo', null, { shouldDirty: true });
         console.log('Valeur du champ lien_photo après suppression:', props?.getValues ? props.getValues('lien_photo') : null);
+        
+        // Vérifier si la valeur a bien été définie à null
+        setTimeout(() => {
+          const currentValue = props?.getValues ? props.getValues('lien_photo') : undefined;
+          console.log('Vérification après suppression - lien_photo:', currentValue, 'Type:', typeof currentValue);
+        }, 100);
       }
       setPhotoPreview(null);
       

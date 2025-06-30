@@ -301,6 +301,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       // Récupérer la valeur la plus récente du champ lien_photo
       const currentPhotoPath = getValues('lien_photo');
       console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath, typeof currentPhotoPath);
+      console.log('Toutes les valeurs du formulaire:', getValues());
       
       console.log('Données du formulaire avant nettoyage:', data);
       console.log('Valeur de lien_photo avant nettoyage:', data.lien_photo);
@@ -322,7 +323,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       };
       
       console.log('Données nettoyées avant envoi:', cleanedData);
-      console.log('Valeur de lien_photo après nettoyage:', cleanedData.lien_photo);
+      console.log('Valeur de lien_photo après nettoyage:', cleanedData.lien_photo, 'Type:', typeof cleanedData.lien_photo);
 
       let result;
       
@@ -336,11 +337,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         // Mode édition
         const { data: updatedData, error } = await supabase
           .from('rh_personnel')
-          .update(cleanedData.lien_photo === null ? {
-            ...cleanedData,
-            com_contrat_client_id: profil.com_contrat_client_id,
-            lien_photo: null
-          } : {
+          .update({
             ...cleanedData,
             com_contrat_client_id: profil.com_contrat_client_id
           })
@@ -367,11 +364,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         // Mode création
         const { data: newData, error } = await supabase
           .from('rh_personnel')
-          .insert(cleanedData.lien_photo === null ? {
-            ...cleanedData,
-            com_contrat_client_id: profil.com_contrat_client_id,
-            lien_photo: null
-          } : {
+          .insert({
             ...cleanedData,
             com_contrat_client_id: profil.com_contrat_client_id
           })
