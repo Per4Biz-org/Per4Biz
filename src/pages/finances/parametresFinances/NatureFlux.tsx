@@ -24,6 +24,7 @@ interface NatureFlux {
     code: string;
     libelle: string;
   };
+  salarie: boolean;
 }
 
 const NatureFlux: React.FC = () => {
@@ -88,7 +89,15 @@ const NatureFlux: React.FC = () => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   };
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: {
+      code: string;
+      libelle: string;
+      description?: string;
+      id_entite: string;
+      actif: boolean;
+      salarie: boolean;
+    }
+  ) => {
     setIsSubmitting(true);
     try {
       if (!profil?.com_contrat_client_id) {
@@ -105,6 +114,7 @@ const NatureFlux: React.FC = () => {
           description: formData.description || null,
           id_entite: formData.id_entite,
           actif: formData.actif,
+          salarie: formData.salarie,
           com_contrat_client_id: profil.com_contrat_client_id
         };
 
@@ -121,6 +131,7 @@ const NatureFlux: React.FC = () => {
           description: formData.description || null,
           id_entite: formData.id_entite,
           actif: formData.actif,
+          salarie: formData.salarie,
           com_contrat_client_id: profil.com_contrat_client_id
         };
 
@@ -204,6 +215,18 @@ const NatureFlux: React.FC = () => {
       label: 'Description',
       accessor: 'description',
       render: (value) => value || '-'
+    },
+    {
+      label: 'Salarié',
+      accessor: 'salarie',
+      align: 'center',
+      render: (value) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {value ? 'Oui' : 'Non'}
+        </span>
+      )
     },
     {
       label: 'Actif',
@@ -297,7 +320,8 @@ const NatureFlux: React.FC = () => {
                   libelle: selectedNature.libelle,
                   description: selectedNature.description || '',
                   id_entite: selectedNature.id_entite,
-                  actif: selectedNature.actif
+                  actif: selectedNature.actif,
+                  salarie: selectedNature.salarie || false
                 } : undefined}
                 onSubmit={handleSubmit}
                 onCancel={() => {

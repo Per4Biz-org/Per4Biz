@@ -18,6 +18,7 @@ interface NatureFluxFormData {
   description?: string;
   id_entite: string;
   actif: boolean;
+  salarie: boolean;
 }
 
 interface NatureFluxFormProps {
@@ -33,7 +34,8 @@ export function NatureFluxForm({
     libelle: '',
     description: '',
     id_entite: '',
-    actif: true
+    actif: true,
+    salarie: false
   },
   onSubmit,
   onCancel,
@@ -82,6 +84,13 @@ export function NatureFluxForm({
     setFormData(prev => ({
       ...prev,
       actif: checked
+    }));
+  };
+
+  const handleSalarieToggleChange = (checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      salarie: checked
     }));
   };
 
@@ -165,6 +174,20 @@ export function NatureFluxForm({
           onChange={handleInputChange}
           placeholder="Ex: Exploitation"
           className="h-9"
+        />
+      </FormField>
+
+      <FormField
+        label="Salarié"
+        description="Indique si cette nature de flux est liée aux salariés"
+        className="mb-3"
+      >
+        <Toggle
+          checked={formData.salarie}
+          onChange={handleSalarieToggleChange}
+          label={formData.salarie ? 'Oui' : 'Non'}
+          icon="Users"
+          size="sm"
         />
       </FormField>
 
