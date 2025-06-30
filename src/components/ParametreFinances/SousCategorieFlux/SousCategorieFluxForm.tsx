@@ -229,9 +229,9 @@ export function SousCategorieFluxForm({
           options={categorieOptions}
           value={formData.id_categorie}
           onChange={handleCategorieChange}
-          label={formData.id_entite ? "Sélectionner une catégorie" : "Sélectionner d'abord une entité"}
+          label="Sélectionner une catégorie"
           size="sm"
-          disabled={!formData.id_entite || categorieOptions.length === 0}
+          disabled={categorieOptions.length === 0}
         />
       </FormField>
 
