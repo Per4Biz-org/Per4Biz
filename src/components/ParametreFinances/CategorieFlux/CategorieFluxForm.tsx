@@ -294,9 +294,9 @@ export function CategorieFluxForm({
           options={natureFluxOptions}
           value={formData.nature_flux_id}
           onChange={handleNatureFluxChange}
-          label={formData.id_entite ? "Sélectionner une nature" : "Sélectionner d'abord une entité"}
+          label="Sélectionner une Nature de flux"
           size="sm"
-          disabled={!formData.id_entite || natureFluxOptions.length === 0}
+          disabled={natureFluxOptions.length === 0}
         />
       </FormField>
 
