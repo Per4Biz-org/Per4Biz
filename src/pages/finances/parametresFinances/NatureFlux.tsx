@@ -334,7 +334,6 @@ const NatureFlux: React.FC = () => {
                   id_entite: selectedNature.id_entite || '',
                   actif: selectedNature.actif,
                   salarie: selectedNature.salarie || false
-                  salarie: selectedNature.salarie || false
                 } : undefined}
                 onSubmit={handleSubmit}
                 onCancel={() => {
