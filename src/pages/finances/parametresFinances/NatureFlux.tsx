@@ -229,18 +229,6 @@ const NatureFlux: React.FC = () => {
       )
     },
     {
-      label: 'Salarié',
-      accessor: 'salarie',
-      align: 'center',
-      render: (value) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
-        }`}>
-          {value ? 'Oui' : 'Non'}
-        </span>
-      )
-    },
-    {
       label: 'Actif',
       accessor: 'actif',
       align: 'center',
