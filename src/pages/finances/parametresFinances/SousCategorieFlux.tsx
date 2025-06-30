@@ -211,25 +211,34 @@ const SousCategorieFlux: React.FC = () => {
   };
 
   const handleDelete = async (sousCategorie: SousCategorieFlux) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir désactiver la sous-catégorie de flux "${sousCategorie.libelle}" ?`)) {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la sous-catégorie de flux "${sousCategorie.libelle}" ? Cette action est irréversible et peut échouer si la sous-catégorie est utilisée dans des factures.`)) {
       try {
         const { error } = await supabase
           .from('fin_flux_sous_categorie')
-          .update({ actif: false })
+          .delete()
           .eq('id', sousCategorie.id);
 
         if (error) throw error;
 
         await fetchSousCategoriesFlux();
         addToast({
-          label: `La sous-catégorie de flux "${sousCategorie.libelle}" a été désactivée avec succès`,
+          label: `La sous-catégorie de flux "${sousCategorie.libelle}" a été supprimée avec succès`,
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
-        console.error('Erreur lors de la désactivation:', error);
+        console.error('Erreur lors de la suppression:', error);
+        
+        // Message d'erreur spécifique pour les contraintes de clé étrangère
+        let errorMessage = 'Erreur lors de la suppression de la sous-catégorie de flux';
+        
+        if (error.message?.includes('foreign key constraint') || 
+            error.message?.includes('violates foreign key constraint')) {
+          errorMessage = 'Impossible de supprimer cette sous-catégorie car elle est utilisée dans des factures ou d\'autres éléments. Veuillez la désactiver plutôt que la supprimer.';
+        }
+        
         addToast({
-          label: 'Erreur lors de la désactivation de la sous-catégorie de flux',
+          label: errorMessage,
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -303,7 +312,7 @@ const SousCategorieFlux: React.FC = () => {
       onClick: handleEdit
     },
     {
-      label: 'Désactiver',
+      label: 'Supprimer',
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
