@@ -9,6 +9,7 @@ import { PageSection } from '../../../components/ui/page-section';
 import { DataTable, Column } from '../../../components/ui/data-table';
 import { Button } from '../../../components/ui/button';
 import { ToastContainer, ToastData } from '../../../components/ui/toast';
+import { Dropdown, DropdownOption } from '../../../components/ui/dropdown';
 import { CategorieFluxForm } from '../../../components/ParametreFinances/CategorieFlux/CategorieFluxForm';
 import styles from './styles.module.css';
 
@@ -38,6 +39,9 @@ const CategorieFlux: React.FC = () => {
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [categoriesFlux, setCategoriesFlux] = useState<CategorieFlux[]>([]);
+  const [naturesFlux, setNaturesFlux] = useState<{id: string, code: string, libelle: string}[]>([]);
+  const [filteredCategoriesFlux, setFilteredCategoriesFlux] = useState<CategorieFlux[]>([]);
+  const [selectedNatureFlux, setSelectedNatureFlux] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategorie, setSelectedCategorie] = useState<CategorieFlux | null>(null);
   const [loading, setLoading] = useState(true);
@@ -82,12 +86,48 @@ const CategorieFlux: React.FC = () => {
     }
   };
 
+  const fetchNaturesFlux = async () => {
+    try {
+      if (!profil?.com_contrat_client_id) {
+        setNaturesFlux([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('fin_flux_nature')
+        .select('id, code, libelle')
+        .eq('com_contrat_client_id', profil.com_contrat_client_id)
+        .eq('actif', true)
+        .order('code');
+
+      if (error) throw error;
+      setNaturesFlux(data || []);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des natures de flux:', error);
+    }
+  };
+
   useEffect(() => {
     setMenuItems(menuItemsParamGestionFinanciere);
     if (!profilLoading) {
       fetchCategoriesFlux();
+      fetchNaturesFlux();
     }
   }, [setMenuItems, profilLoading, profil?.com_contrat_client_id]);
+
+  // Filtrer les catégories lorsque la nature de flux sélectionnée change
+  useEffect(() => {
+    if (!selectedNatureFlux) {
+      // Si aucune nature n'est sélectionnée, afficher toutes les catégories
+      setFilteredCategoriesFlux(categoriesFlux);
+    } else {
+      // Filtrer les catégories par nature de flux
+      const filtered = categoriesFlux.filter(categorie => 
+        categorie.nature_flux_id === selectedNatureFlux
+      );
+      setFilteredCategoriesFlux(filtered);
+    }
+  }, [selectedNatureFlux, categoriesFlux]);
 
   const addToast = (toast: Omit<ToastData, 'id'>) => {
     const newToast: ToastData = {
@@ -205,6 +245,19 @@ const CategorieFlux: React.FC = () => {
     }
   };
 
+  const handleNatureFluxChange = (value: string) => {
+    setSelectedNatureFlux(value);
+  };
+
+  // Préparer les options pour le dropdown des natures de flux
+  const natureFluxOptions: DropdownOption[] = [
+    { value: '', label: 'Toutes les natures de flux' },
+    ...naturesFlux.map(nature => ({
+      value: nature.id,
+      label: `${nature.code} - ${nature.libelle}`
+    }))
+  ];
+
   const columns: Column<CategorieFlux>[] = [
     {
       label: 'Entité',
@@ -290,13 +343,22 @@ const CategorieFlux: React.FC = () => {
         description="Gérez les catégories de flux financiers de votre organisation"
         className={styles.header}
       >
-        <div className="mb-6">
+        <div className="mb-6 flex justify-between items-center">
           <Button
             label="Créer une catégorie de flux"
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
           />
+          <div className="w-64">
+            <Dropdown
+              options={natureFluxOptions}
+              value={selectedNatureFlux}
+              onChange={handleNatureFluxChange}
+              label="Toutes les natures de flux"
+              size="sm"
+            />
+          </div>
         </div>
 
         {loading ? (
@@ -306,7 +368,7 @@ const CategorieFlux: React.FC = () => {
         ) : (
           <DataTable
             columns={columns}
-            data={categoriesFlux}
+            data={filteredCategoriesFlux}
             actions={actions}
             defaultRowsPerPage={10}
             emptyTitle="Aucune catégorie de flux"
