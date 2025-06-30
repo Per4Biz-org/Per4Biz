@@ -58,6 +58,8 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: true
+        }
+        )
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: true
