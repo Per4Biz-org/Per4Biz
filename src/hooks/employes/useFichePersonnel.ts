@@ -78,12 +78,21 @@ export const useFichePersonnel = (mode: 'create' | 'edit', id?: string) => {
   const savePersonnel = async (data: Personnel): Promise<string | null> => {
     if (!profil?.com_contrat_client_id) {
       setError('Profil utilisateur incomplet');
+      console.error('Profil utilisateur incomplet');
       return null;
     }
+
+    console.log('savePersonnel - Données reçues:', data);
+    console.log('savePersonnel - lien_photo:', data.lien_photo, 'Type:', typeof data.lien_photo);
 
     try {
       if (mode === 'edit' && id) {
         // Mode édition
+        console.log('savePersonnel - Mode édition - Données à envoyer:', {
+          ...data,
+          com_contrat_client_id: profil.com_contrat_client_id
+        });
+        
         const { data: updatedData, error } = await supabase
           .from('rh_personnel')
           .update({
@@ -95,10 +104,17 @@ export const useFichePersonnel = (mode: 'create' | 'edit', id?: string) => {
           .single();
 
         if (error) throw error;
+        console.log('savePersonnel - Mise à jour réussie, données retournées:', updatedData);
+        console.log('savePersonnel - lien_photo après mise à jour:', updatedData.lien_photo);
         setPersonnel(updatedData);
         return updatedData.id;
       } else {
         // Mode création
+        console.log('savePersonnel - Mode création - Données à envoyer:', {
+          ...data,
+          com_contrat_client_id: profil.com_contrat_client_id
+        });
+        
         const { data: newData, error } = await supabase
           .from('rh_personnel')
           .insert({
@@ -109,6 +125,8 @@ export const useFichePersonnel = (mode: 'create' | 'edit', id?: string) => {
           .single();
 
         if (error) throw error;
+        console.log('savePersonnel - Création réussie, données retournées:', newData);
+        console.log('savePersonnel - lien_photo après création:', newData.lien_photo);
         setPersonnel(newData);
         return newData.id;
       }
