@@ -329,14 +329,28 @@ const ImportFacture: React.FC = () => {
       // Créer une map pour les sous-catégories avec la clé : "code_entite:code_sous_categorie"
       const sousCategoriesParEntite = new Map();
       sousCategoriesResult.data?.forEach(sousCategorie => {
-        const codeEntite = sousCategorie.categorie?.entite?.code;
-        if (codeEntite) {
-          const cle = `${codeEntite}:${sousCategorie.code}`;
-          sousCategoriesParEntite.set(cle, {
-            id: sousCategorie.id,
-            id_categorie: sousCategorie.id_categorie,
-            code: sousCategorie.code,
-            entite_code: codeEntite
+        // Récupérer le code de l'entité ou utiliser "GLOBAL" si id_entite est null
+        const codeEntite = sousCategorie.categorie?.entite?.code || "GLOBAL";
+        
+        // Créer une clé spécifique à l'entité
+        const cle = `${codeEntite}:${sousCategorie.code}`;
+        sousCategoriesParEntite.set(cle, {
+          id: sousCategorie.id,
+          id_categorie: sousCategorie.id_categorie,
+          code: sousCategorie.code,
+          entite_code: codeEntite
+        });
+        
+        // Si c'est une sous-catégorie globale, l'ajouter aussi avec le code de chaque entité
+        if (codeEntite === "GLOBAL") {
+          entitesExistantes.forEach(entiteCode => {
+            const cleEntite = `${entiteCode}:${sousCategorie.code}`;
+            sousCategoriesParEntite.set(cle, {
+              id: sousCategorie.id,
+              id_categorie: sousCategorie.id_categorie,
+              code: sousCategorie.code,
+              entite_code: "GLOBAL"
+            });
           });
         }
       });
@@ -344,13 +358,26 @@ const ImportFacture: React.FC = () => {
       // Créer une map pour les catégories avec la clé : "code_entite:code_categorie"
       const categoriesParEntite = new Map();
       categoriesResult.data?.forEach(categorie => {
-        const codeEntite = categorie.entite?.code;
-        if (codeEntite) {
-          const cle = `${codeEntite}:${categorie.code}`;
-          categoriesParEntite.set(cle, {
-            id: categorie.id,
-            code: categorie.code,
-            entite_code: codeEntite
+        // Récupérer le code de l'entité ou utiliser "GLOBAL" si id_entite est null
+        const codeEntite = categorie.entite?.code || "GLOBAL";
+        
+        // Créer une clé spécifique à l'entité
+        const cle = `${codeEntite}:${categorie.code}`;
+        categoriesParEntite.set(cle, {
+          id: categorie.id,
+          code: categorie.code,
+          entite_code: codeEntite
+        });
+        
+        // Si c'est une catégorie globale, l'ajouter aussi avec le code de chaque entité
+        if (codeEntite === "GLOBAL") {
+          entitesExistantes.forEach(entiteCode => {
+            const cleEntite = `${entiteCode}:${categorie.code}`;
+            categoriesParEntite.set(cle, {
+              id: categorie.id,
+              code: categorie.code,
+              entite_code: "GLOBAL"
+            });
           });
         }
       });
@@ -631,26 +658,22 @@ const ImportFacture: React.FC = () => {
               // Trouver la sous-catégorie correspondante pour cette entité spécifique
               const { data: sousCategoriesData } = await supabase
                 .from('fin_flux_sous_categorie')
-                .select(`
-                  id,
-                  id_categorie,
-                  categorie:id_categorie (
-                    id,
-                    id_entite,
-                    entite:id_entite (
-                      code
-                    )
-                  )
-                `)
+                .select('id, id_categorie')
                 .eq('com_contrat_client_id', profil.com_contrat_client_id)
                 .eq('code', champ.sousCategorie) 
-                .eq('categorie.entite.code', facture.entite);
-                //.single();
+                .in('id_categorie', function(builder) {
+                  builder
+                    .select('id')
+                    .from('fin_flux_categorie')
+                    .where('code', '=', champ.sousCategorie)
+                    .where(function() {
+                      this.where('id_entite', '=', entiteData.id)
+                          .orWhereNull('id_entite');
+                    });
+                });
 
-              // Filtrer pour trouver la sous-catégorie de la bonne entité
-              const sousCategorieData = sousCategoriesData?.find(sc => 
-                sc.categorie?.entite?.code === facture.entite
-              );
+              // Prendre la première sous-catégorie trouvée
+              const sousCategorieData = sousCategoriesData?.[0];
 
               if (sousCategorieData) {
                 console.log(`✅ Sous-catégorie trouvée: ${champ.sousCategorie} (ID: ${sousCategorieData.id}, Catégorie: ${sousCategorieData.id_categorie}) pour l'entité ${facture.entite}`);
