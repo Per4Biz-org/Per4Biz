@@ -302,6 +302,13 @@ function App() {
               </Layout>
             </PrivateRoute>
           } />
+          <Route path="/employes/parametres-employes/param-categorie" element={
+            <PrivateRoute>
+              <Layout>
+                <ParamSousCategoriesRH />
+              </Layout>
+            </PrivateRoute>
+          } />
           <Route path="/employes/parametres-employes/param-generaux" element={
             <PrivateRoute>
               <Layout>
