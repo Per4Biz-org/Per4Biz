@@ -4,7 +4,7 @@ import { useProfil } from '../../../../../context/ProfilContext';
 import { ToastData } from '../../../../../components/ui/toast';
 
 export const useTiersManagement = (
-  setValue: (name: string, value: any, options?: any) => void,
+  setValue?: (name: string, value: any, options?: any) => void,
   addToast: (toast: Omit<ToastData, 'id'>) => void
 ) => {
   const { profil } = useProfil();
@@ -13,6 +13,11 @@ export const useTiersManagement = (
   // Gérer la création d'un nouveau tiers
   const handleTiersSubmit = async (tiersData: any) => {
     try {
+      if (!setValue) {
+        console.error('setValue function is not provided to useTiersManagement');
+        return;
+      }
+      
       // Vérifier si un tiers avec ce code existe déjà
       const { data: existingTiers, error: checkError } = await supabase
         .from('com_tiers')

@@ -89,7 +89,11 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     loadPhotoPreview, 
     handlePhotoUpload, 
     handleRemovePhoto 
-  } = usePhotoManagement();
+  } = usePhotoManagement({
+    setValue,
+    getValues,
+    addToast
+  });
   
   // Charger les types de tiers "salarié"
   useEffect(() => {
@@ -247,14 +251,14 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           console.log('Personnel chargé:', data);
           console.log('Lien photo:', data.lien_photo);
           
-          // Sauvegarder les données initiales pour les comparaisons futures
-          setInitialData(data);
-          
           // Formater la date de naissance pour l'input date
           let formattedData = { ...data };
           if (data.date_naissance) {
             formattedData.date_naissance = new Date(data.date_naissance).toISOString().split('T')[0];
           }
+          
+          // Sauvegarder les données initiales pour les comparaisons futures
+          setInitialData(formattedData);
           
           // Mettre à jour le formulaire avec les données
           reset(formattedData);
@@ -296,7 +300,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     try {
       // Récupérer la valeur la plus récente du champ lien_photo
       const currentPhotoPath = getValues('lien_photo');
-      console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath);
+      console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath, typeof currentPhotoPath);
       
       console.log('Données du formulaire avant nettoyage:', data);
       console.log('Valeur de lien_photo avant nettoyage:', data.lien_photo);
@@ -314,7 +318,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         nif: data.nif === '' ? null : data.nif,
         email_perso: data.email_perso === '' ? null : data.email_perso,
         telephone: data.telephone === '' ? null : data.telephone,
-        lien_photo: currentPhotoPath === '' ? null : currentPhotoPath
+        lien_photo: !currentPhotoPath || currentPhotoPath === '' ? null : currentPhotoPath
       };
       
       console.log('Données nettoyées avant envoi:', cleanedData);
