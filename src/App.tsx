@@ -42,6 +42,7 @@ import EditFactureAchat from './pages/finances/factures/EditFactureAchat'
 import TypeFonction from './pages/employes/ParametresEmployes/TypeFonction'
 import TypeContrat from './pages/employes/ParametresEmployes/TypeContrat'
 import MesEmployes from './pages/employes/MesEmployes'
+import ParamSousCategoriesRH from './pages/employes/ParametresEmployes/ParamSousCategoriesRH'
 import ParamGeneraux from './pages/employes/ParametresEmployes/ParamGeneraux'
 
 // Lazy loading du composant MesFactures
