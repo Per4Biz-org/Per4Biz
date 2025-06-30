@@ -307,17 +307,17 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       // Nettoyer les données avant envoi - convertir les chaînes vides en null pour les champs optionnels
       const cleanedData = {
         ...data,
-        date_naissance: data.date_naissance === '' ? null : data.date_naissance,
-        civilite: data.civilite === '' ? null : data.civilite,
-        sexe: data.sexe === '' ? null : data.sexe,
-        adresse: data.adresse === '' ? null : data.adresse,
-        code_postal: data.code_postal === '' ? null : data.code_postal,
-        ville: data.ville === '' ? null : data.ville,
-        pays: data.pays === '' ? null : data.pays,
-        numero_securite_sociale: data.numero_securite_sociale === '' ? null : data.numero_securite_sociale,
-        nif: data.nif === '' ? null : data.nif,
-        email_perso: data.email_perso === '' ? null : data.email_perso,
-        telephone: data.telephone === '' ? null : data.telephone,
+        date_naissance: !data.date_naissance || data.date_naissance === '' ? null : data.date_naissance,
+        civilite: !data.civilite || data.civilite === '' ? null : data.civilite,
+        sexe: !data.sexe || data.sexe === '' ? null : data.sexe,
+        adresse: !data.adresse || data.adresse === '' ? null : data.adresse,
+        code_postal: !data.code_postal || data.code_postal === '' ? null : data.code_postal,
+        ville: !data.ville || data.ville === '' ? null : data.ville,
+        pays: !data.pays || data.pays === '' ? null : data.pays,
+        numero_securite_sociale: !data.numero_securite_sociale || data.numero_securite_sociale === '' ? null : data.numero_securite_sociale,
+        nif: !data.nif || data.nif === '' ? null : data.nif,
+        email_perso: !data.email_perso || data.email_perso === '' ? null : data.email_perso,
+        telephone: !data.telephone || data.telephone === '' ? null : data.telephone,
         lien_photo: !currentPhotoPath || currentPhotoPath === '' ? null : currentPhotoPath
       };
       
@@ -327,7 +327,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       let result;
       
       if (mode === 'edit' && personnelId) {
-        console.log('Mode édition - Mise à jour du personnel avec ID:', personnelId);
+        console.log('Mode édition - Mise à jour du personnel avec ID:', personnelId, 'et lien_photo:', cleanedData.lien_photo);
         console.log('Données à envoyer pour la mise à jour:', {
           ...cleanedData,
           com_contrat_client_id: profil.com_contrat_client_id
@@ -336,7 +336,11 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         // Mode édition
         const { data: updatedData, error } = await supabase
           .from('rh_personnel')
-          .update({
+          .update(cleanedData.lien_photo === null ? {
+            ...cleanedData,
+            com_contrat_client_id: profil.com_contrat_client_id,
+            lien_photo: null
+          } : {
             ...cleanedData,
             com_contrat_client_id: profil.com_contrat_client_id
           })
@@ -356,13 +360,18 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         console.log('Mode création - Création d\'un nouveau personnel');
         console.log('Données à envoyer pour la création:', {
           ...cleanedData,
-          com_contrat_client_id: profil.com_contrat_client_id
+          com_contrat_client_id: profil.com_contrat_client_id,
+          lien_photo: cleanedData.lien_photo
         });
         
         // Mode création
         const { data: newData, error } = await supabase
           .from('rh_personnel')
-          .insert({
+          .insert(cleanedData.lien_photo === null ? {
+            ...cleanedData,
+            com_contrat_client_id: profil.com_contrat_client_id,
+            lien_photo: null
+          } : {
             ...cleanedData,
             com_contrat_client_id: profil.com_contrat_client_id
           })

@@ -38,7 +38,7 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
   // Gérer l'upload de la photo
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !profil?.com_contrat_client_id || !props?.setValue || !props?.getValues || !props?.addToast) return;
+    if (!file || !profil?.com_contrat_client_id) return;
     
     console.log('Début du téléversement de la photo:', file.name);
 
@@ -58,6 +58,9 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: true
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
         });
 
       if (uploadError) {
@@ -68,24 +71,30 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
       console.log('Photo téléversée avec succès. Chemin:', filePath);
 
       // Mettre à jour le formulaire avec le chemin du fichier
-      props.setValue('lien_photo', filePath, { shouldDirty: true });
-      console.log('Chemin de la photo mis à jour dans le formulaire:', props.getValues('lien_photo'));
+      if (props?.setValue) {
+        props.setValue('lien_photo', filePath, { shouldDirty: true });
+        console.log('Chemin de la photo mis à jour dans le formulaire:', props?.getValues ? props.getValues('lien_photo') : filePath);
+      }
       
       // Charger l'aperçu
       loadPhotoPreview(filePath, setPhotoPreview);
       
-      props.addToast({
-        label: 'Photo téléversée avec succès',
-        icon: 'Check',
-        color: '#22c55e'
-      });
+      if (props?.addToast) {
+        props.addToast({
+          label: 'Photo téléversée avec succès',
+          icon: 'Check',
+          color: '#22c55e'
+        });
+      }
     } catch (error) {
       console.error('Erreur lors du téléversement de la photo:', error);
-      props.addToast({
-        label: 'Erreur lors du téléversement de la photo',
-        icon: 'AlertTriangle',
-        color: '#ef4444'
-      });
+      if (props?.addToast) {
+        props.addToast({
+          label: 'Erreur lors du téléversement de la photo',
+          icon: 'AlertTriangle',
+          color: '#ef4444'
+        });
+      }
     } finally {
       setIsUploadingPhoto(false);
     }
@@ -93,9 +102,7 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
 
   // Supprimer la photo
   const handleRemovePhoto = async () => {
-    if (!props?.setValue || !props?.getValues || !props?.addToast) return;
-    
-    const photoPath = props.getValues().lien_photo;
+    const photoPath = props?.getValues ? props.getValues().lien_photo : null;
     if (!photoPath) return;
 
     console.log('Suppression de la photo:', photoPath);
@@ -107,22 +114,28 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
       if (error) throw error;
 
       console.log('Photo supprimée avec succès');
-      props.setValue('lien_photo', null, { shouldDirty: true });
-      console.log('Valeur du champ lien_photo après suppression:', props.getValues('lien_photo'));
+      if (props?.setValue) {
+        props.setValue('lien_photo', null, { shouldDirty: true });
+        console.log('Valeur du champ lien_photo après suppression:', props?.getValues ? props.getValues('lien_photo') : null);
+      }
       setPhotoPreview(null);
       
-      props.addToast({
-        label: 'Photo supprimée avec succès',
-        icon: 'Check',
-        color: '#22c55e'
-      });
+      if (props?.addToast) {
+        props.addToast({
+          label: 'Photo supprimée avec succès',
+          icon: 'Check',
+          color: '#22c55e'
+        });
+      }
     } catch (error) {
       console.error('Erreur lors de la suppression de la photo:', error);
-      props.addToast({
-        label: 'Erreur lors de la suppression de la photo',
-        icon: 'AlertTriangle',
-        color: '#ef4444'
-      });
+      if (props?.addToast) {
+        props.addToast({
+          label: 'Erreur lors de la suppression de la photo',
+          icon: 'AlertTriangle',
+          color: '#ef4444'
+        });
+      }
     }
   };
 
