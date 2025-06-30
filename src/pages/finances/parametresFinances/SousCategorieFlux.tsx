@@ -211,25 +211,25 @@ const SousCategorieFlux: React.FC = () => {
   };
 
   const handleDelete = async (sousCategorie: SousCategorieFlux) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la sous-catégorie de flux "${sousCategorie.libelle}" ?`)) {
+    if (window.confirm(`Êtes-vous sûr de vouloir désactiver la sous-catégorie de flux "${sousCategorie.libelle}" ?`)) {
       try {
         const { error } = await supabase
           .from('fin_flux_sous_categorie')
-          .delete()
+          .update({ actif: false })
           .eq('id', sousCategorie.id);
 
         if (error) throw error;
 
         await fetchSousCategoriesFlux();
         addToast({
-          label: `La sous-catégorie de flux "${sousCategorie.libelle}" a été supprimée avec succès`,
+          label: `La sous-catégorie de flux "${sousCategorie.libelle}" a été désactivée avec succès`,
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
-        console.error('Erreur lors de la suppression:', error);
+        console.error('Erreur lors de la désactivation:', error);
         addToast({
-          label: 'Erreur lors de la suppression de la sous-catégorie de flux',
+          label: 'Erreur lors de la désactivation de la sous-catégorie de flux',
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -303,7 +303,7 @@ const SousCategorieFlux: React.FC = () => {
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: 'Désactiver',
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
