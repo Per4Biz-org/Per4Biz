@@ -167,13 +167,32 @@ export const OngletHistoriqueFinancier: React.FC<OngletHistoriqueFinancierProps>
         }
 
         // Charger les catégories de flux RH
-        const { data: categoriesData, error: categoriesError } = await supabase
+        // D'abord, récupérer les IDs des natures de flux liées aux salariés
+        const { data: natureFluxSalarieData, error: natureFluxError } = await supabase
+          .from('fin_flux_nature')
+          .select('id')
+          .eq('com_contrat_client_id', profil.com_contrat_client_id)
+          .eq('salarie', true);
+
+        if (natureFluxError) throw natureFluxError;
+
+        const natureFluxSalarieIds = natureFluxSalarieData?.map(n => n.id) || [];
+
+        // Ensuite, charger les catégories de flux RH
+        let categoriesQuery = supabase
           .from('fin_flux_categorie')
           .select('id, code, libelle, id_entite')
           .eq('com_contrat_client_id', profil.com_contrat_client_id)
-          .or('id_entite.is.null,nature_flux.salarie.eq.true')
-          .eq('actif', true)
-          .order('libelle');
+          .eq('actif', true);
+
+        // Construire la clause OR correctement
+        if (natureFluxSalarieIds.length > 0) {
+          categoriesQuery = categoriesQuery.or(`id_entite.is.null,nature_flux_id.in.(${natureFluxSalarieIds.join(',')})`);
+        } else {
+          categoriesQuery = categoriesQuery.is('id_entite', null);
+        }
+
+        const { data: categoriesData, error: categoriesError } = await categoriesQuery.order('libelle');
 
         if (categoriesError) throw categoriesError;
         setCategories(categoriesData || []);
