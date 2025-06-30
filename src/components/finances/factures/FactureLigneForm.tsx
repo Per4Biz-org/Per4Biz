@@ -81,9 +81,9 @@ export function FactureLigneForm({
         // Récupérer les catégories de flux pour cette entité
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('fin_flux_categorie')
-          .select('id, code, libelle, id_entite')
+          .select('id, code, libelle, id_entite, entite:id_entite(id, code)')
           .eq('com_contrat_client_id', profil.com_contrat_client_id) 
-          .eq('id_entite', currentEntiteIdRef.current)
+          .or(`id_entite.eq.${currentEntiteIdRef.current},id_entite.is.null`)
           .eq('actif', true)
           .order('libelle');
 
@@ -165,8 +165,10 @@ export function FactureLigneForm({
       // Filtrer les sous-catégories qui appartiennent à cette catégorie
       // ET dont la catégorie parente appartient à l'entité courante
       const filtered = sousCategories.filter(sc => 
-        sc.id_categorie === formData.id_categorie_flux &&
-        sc.categorie?.id_entite === currentEntiteIdRef.current
+        sc.id_categorie === formData.id_categorie_flux && (
+          sc.categorie?.id_entite === currentEntiteIdRef.current || 
+          sc.categorie?.id_entite === null
+        )
       );
       
       console.log(`Sous-catégories filtrées pour la catégorie ${formData.id_categorie_flux}:`, filtered.length);
