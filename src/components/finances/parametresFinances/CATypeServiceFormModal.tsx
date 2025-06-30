@@ -99,7 +99,8 @@ export function CATypeServiceFormModal({
           id, 
           code, 
           libelle, 
-          id_entite
+          id_entite, 
+          entite:id_entite(id, code)
         `)
         .eq('actif', true)
         .eq('com_contrat_client_id', profil.com_contrat_client_id)
@@ -140,8 +141,10 @@ export function CATypeServiceFormModal({
   // Filtrer les catégories en fonction de l'entité sélectionnée
   useEffect(() => {
     if (formData.id_entite) {
-      // Filtrer les catégories qui appartiennent à cette entité
-      const filtered = categories.filter(cat => cat.id_entite === formData.id_entite);
+      // Filtrer les catégories qui appartiennent à cette entité OU qui sont globales
+      const filtered = categories.filter(cat => 
+        cat.id_entite === formData.id_entite || cat.id_entite === null
+      );
       setFilteredCategories(filtered);
 
       // Réinitialiser la catégorie sélectionnée si elle n'est pas valide pour cette entité
