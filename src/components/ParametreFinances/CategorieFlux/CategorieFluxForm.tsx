@@ -100,9 +100,19 @@ export function CategorieFluxForm({
   // Filtrer les natures de flux selon l'entité sélectionnée et gérer l'initialisation
   useEffect(() => {
     if (!dataLoaded) return;
-    
+
+    // Filtrer les natures de flux:
+    // - Si une entité est sélectionnée, inclure les natures spécifiques à cette entité ET les natures globales
+    // - Si aucune entité n'est sélectionnée (mode global), n'inclure que les natures globales
+    let filtered = [];
     if (formData.id_entite) {
-      const filtered = naturesFlux.filter(nature => nature.id_entite === formData.id_entite);
+      filtered = naturesFlux.filter(nature => 
+        nature.id_entite === formData.id_entite || nature.id_entite === null
+      );
+    } else {
+      filtered = naturesFlux.filter(nature => nature.id_entite === null);
+    }
+
       setFilteredNaturesFlux(filtered);
       
       // En mode édition, vérifier si la nature de flux sélectionnée existe dans les données filtrées
@@ -115,13 +125,6 @@ export function CategorieFluxForm({
           nature_flux_id: ''
         }));
       }
-    } else {
-      setFilteredNaturesFlux([]);
-      setFormData(prev => ({
-        ...prev,
-        nature_flux_id: ''
-      }));
-    }
   }, [formData.id_entite, naturesFlux, formData.nature_flux_id, dataLoaded, initialData?.nature_flux_id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -176,11 +179,11 @@ export function CategorieFluxForm({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CategorieFluxFormData, string>> = {};
 
-    if (!formData.code) newErrors.code = 'Le code est requis';
-    if (!formData.libelle) newErrors.libelle = 'Le libellé est requis';
-    if (!formData.type_flux) newErrors.type_flux = 'Le type de flux est requis';
-    if (!formData.nature_flux_id) newErrors.nature_flux_id = 'La nature de flux est requise';
-    if (!formData.id_entite) newErrors.id_entite = 'L\'entité est requise';
+    if (!formData.code.trim()) newErrors.code = 'Le code est requis';
+    if (!formData.libelle.trim()) newErrors.libelle = 'Le libellé est requis';
+    if (!formData.type_flux.trim()) newErrors.type_flux = 'Le type de flux est requis';
+    if (!formData.nature_flux_id.trim()) newErrors.nature_flux_id = 'La nature de flux est requise';
+    // id_entite peut être null pour une catégorie globale
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -192,10 +195,13 @@ export function CategorieFluxForm({
     await onSubmit(formData);
   };
 
-  const entiteOptions: DropdownOption[] = entites.map(entite => ({
-    value: entite.id,
-    label: `${entite.code} - ${entite.libelle}`
-  }));
+  const entiteOptions: DropdownOption[] = [
+    { value: '', label: 'Global (toutes les entités)' },
+    ...entites.map(entite => ({
+      value: entite.id,
+      label: `${entite.code} - ${entite.libelle}`
+    }))
+  ];
 
   const natureFluxOptions: DropdownOption[] = filteredNaturesFlux.map(nature => ({
     value: nature.id,
@@ -212,8 +218,8 @@ export function CategorieFluxForm({
     <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
       <FormField
         label="Entité"
-        required
         error={errors.id_entite}
+        description="Laissez vide pour une catégorie globale applicable à toutes les entités"
         className="mb-3"
       >
         <Dropdown

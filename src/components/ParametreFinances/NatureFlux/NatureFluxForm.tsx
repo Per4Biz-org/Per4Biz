@@ -110,9 +110,9 @@ export function NatureFluxForm({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof NatureFluxFormData, string>> = {};
 
-    if (!formData.code) newErrors.code = 'Le code est requis';
-    if (!formData.libelle) newErrors.libelle = 'Le libellé est requis';
-    if (!formData.id_entite) newErrors.id_entite = 'L\'entité est requise';
+    if (!formData.code.trim()) newErrors.code = 'Le code est requis';
+    if (!formData.libelle.trim()) newErrors.libelle = 'Le libellé est requis';
+    // id_entite peut être null pour une nature globale
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -124,17 +124,20 @@ export function NatureFluxForm({
     await onSubmit(formData);
   };
 
-  const entiteOptions: DropdownOption[] = entites.map(entite => ({
-    value: entite.id,
-    label: `${entite.code} - ${entite.libelle}`
-  }));
+  const entiteOptions: DropdownOption[] = [
+    { value: '', label: 'Global (toutes les entités)' },
+    ...entites.map(entite => ({
+      value: entite.id,
+      label: `${entite.code} - ${entite.libelle}`
+    }))
+  ];
 
   return (
     <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
       <FormField
         label="Entité"
-        required
         error={errors.id_entite}
+        description="Laissez vide pour une nature globale applicable à toutes les entités"
         className="mb-3"
       >
         <Dropdown

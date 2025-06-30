@@ -201,7 +201,7 @@ const SousCategorieFlux: React.FC = () => {
     {
       label: 'Entité',
       accessor: 'categorie',
-      render: (value) => `${value.entite.code} - ${value.entite.libelle}`
+      render: (value) => value.entite ? `${value.entite.code} - ${value.entite.libelle}` : 'Global (toutes les entités)'
     },
     {
       label: 'Catégorie de flux',
@@ -314,7 +314,7 @@ const SousCategorieFlux: React.FC = () => {
                   code: selectedSousCategorie.code,
                   libelle: selectedSousCategorie.libelle,
                   id_categorie: selectedSousCategorie.id_categorie,
-                  id_entite: selectedSousCategorie.categorie?.id_entite || '',
+                  id_entite: selectedSousCategorie.categorie?.id_entite || null,
                   description: selectedSousCategorie.description || '',
                   ordre_affichage: selectedSousCategorie.ordre_affichage,
                   actif: selectedSousCategorie.actif

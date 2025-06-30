@@ -199,7 +199,7 @@ const NatureFlux: React.FC = () => {
     {
       label: 'Entité',
       accessor: 'entite',
-      render: (value) => `${value.code} - ${value.libelle}`
+      render: (value) => value ? `${value.code} - ${value.libelle}` : 'Global (toutes les entités)'
     },
     {
       label: 'Code',
@@ -215,6 +215,18 @@ const NatureFlux: React.FC = () => {
       label: 'Description',
       accessor: 'description',
       render: (value) => value || '-'
+    },
+    {
+      label: 'Salarié',
+      accessor: 'salarie',
+      align: 'center',
+      render: (value) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {value ? 'Oui' : 'Non'}
+        </span>
+      )
     },
     {
       label: 'Salarié',
@@ -319,8 +331,9 @@ const NatureFlux: React.FC = () => {
                   code: selectedNature.code,
                   libelle: selectedNature.libelle,
                   description: selectedNature.description || '',
-                  id_entite: selectedNature.id_entite,
+                  id_entite: selectedNature.id_entite || '',
                   actif: selectedNature.actif,
+                  salarie: selectedNature.salarie || false
                   salarie: selectedNature.salarie || false
                 } : undefined}
                 onSubmit={handleSubmit}

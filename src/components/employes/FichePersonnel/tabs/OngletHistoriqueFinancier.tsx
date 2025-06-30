@@ -169,8 +169,9 @@ export const OngletHistoriqueFinancier: React.FC<OngletHistoriqueFinancierProps>
         // Charger les catégories de flux RH
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('fin_flux_categorie')
-          .select('id, code, libelle')
+          .select('id, code, libelle, id_entite')
           .eq('com_contrat_client_id', profil.com_contrat_client_id)
+          .or('id_entite.is.null,nature_flux.salarie.eq.true')
           .eq('actif', true)
           .order('libelle');
 
@@ -180,7 +181,17 @@ export const OngletHistoriqueFinancier: React.FC<OngletHistoriqueFinancierProps>
         // Charger toutes les sous-catégories
         const { data: sousCategoriesData, error: sousCategoriesError } = await supabase
           .from('fin_flux_sous_categorie')
-          .select('id, code, libelle, id_categorie')
+          .select(`
+            id, 
+            code, 
+            libelle, 
+            id_categorie,
+            categorie:id_categorie (
+              id,
+              id_entite,
+              nature_flux_id
+            )
+          `)
           .eq('com_contrat_client_id', profil.com_contrat_client_id)
           .eq('actif', true)
           .order('libelle');

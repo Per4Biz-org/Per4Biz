@@ -209,7 +209,7 @@ const CategorieFlux: React.FC = () => {
     {
       label: 'Entité',
       accessor: 'entite',
-      render: (value) => `${value.code} - ${value.libelle}`
+      render: (value) => value ? `${value.code} - ${value.libelle}` : 'Global (toutes les entités)'
     },
     {
       label: 'Code',
@@ -340,8 +340,8 @@ const CategorieFlux: React.FC = () => {
                   code: selectedCategorie.code,
                   libelle: selectedCategorie.libelle,
                   type_flux: selectedCategorie.type_flux,
-                  nature_flux_id: selectedCategorie.nature_flux_id,
-                  id_entite: selectedCategorie.id_entite,
+                  nature_flux_id: selectedCategorie.nature_flux_id || '',
+                  id_entite: selectedCategorie.id_entite || '',
                   description: selectedCategorie.description || '',
                   couleur: selectedCategorie.couleur || '',
                   ordre_affichage: selectedCategorie.ordre_affichage,

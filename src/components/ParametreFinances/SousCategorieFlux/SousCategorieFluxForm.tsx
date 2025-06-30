@@ -95,9 +95,19 @@ export function SousCategorieFluxForm({
   // Filtrer les catégories de flux selon l'entité sélectionnée et gérer l'initialisation
   useEffect(() => {
     if (!dataLoaded) return;
-    
+
+    // Filtrer les catégories de flux:
+    // - Si une entité est sélectionnée, inclure les catégories spécifiques à cette entité ET les catégories globales
+    // - Si aucune entité n'est sélectionnée (mode global), n'inclure que les catégories globales
+    let filtered = [];
     if (formData.id_entite) {
-      const filtered = categoriesFlux.filter(categorie => categorie.id_entite === formData.id_entite);
+      filtered = categoriesFlux.filter(categorie => 
+        categorie.id_entite === formData.id_entite || categorie.id_entite === null
+      );
+    } else {
+      filtered = categoriesFlux.filter(categorie => categorie.id_entite === null);
+    }
+
       setFilteredCategoriesFlux(filtered);
       
       // En mode édition, vérifier si la catégorie sélectionnée existe dans les données filtrées
@@ -110,13 +120,6 @@ export function SousCategorieFluxForm({
           id_categorie: ''
         }));
       }
-    } else {
-      setFilteredCategoriesFlux([]);
-      setFormData(prev => ({
-        ...prev,
-        id_categorie: ''
-      }));
-    }
   }, [formData.id_entite, categoriesFlux, formData.id_categorie, dataLoaded, initialData?.id_categorie]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -171,10 +174,10 @@ export function SousCategorieFluxForm({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof SousCategorieFluxFormData, string>> = {};
 
-    if (!formData.code) newErrors.code = 'Le code est requis';
-    if (!formData.libelle) newErrors.libelle = 'Le libellé est requis';
-    if (!formData.id_entite) newErrors.id_entite = 'L\'entité est requise';
+    if (!formData.code.trim()) newErrors.code = 'Le code est requis';
+    if (!formData.libelle.trim()) newErrors.libelle = 'Le libellé est requis';
     if (!formData.id_categorie) newErrors.id_categorie = 'La catégorie de flux est requise';
+    // id_entite peut être null pour une sous-catégorie liée à une catégorie globale
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -186,10 +189,13 @@ export function SousCategorieFluxForm({
     await onSubmit(formData);
   };
 
-  const entiteOptions: DropdownOption[] = entites.map(entite => ({
-    value: entite.id,
-    label: `${entite.code} - ${entite.libelle}`
-  }));
+  const entiteOptions: DropdownOption[] = [
+    { value: '', label: 'Global (toutes les entités)' },
+    ...entites.map(entite => ({
+      value: entite.id,
+      label: `${entite.code} - ${entite.libelle}`
+    }))
+  ];
 
   const categorieOptions: DropdownOption[] = filteredCategoriesFlux.map(categorie => ({
     value: categorie.id,
@@ -200,8 +206,8 @@ export function SousCategorieFluxForm({
     <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
       <FormField
         label="Entité"
-        required
         error={errors.id_entite}
+        description="Laissez vide pour une sous-catégorie liée à une catégorie globale"
         className="mb-3"
       >
         <Dropdown

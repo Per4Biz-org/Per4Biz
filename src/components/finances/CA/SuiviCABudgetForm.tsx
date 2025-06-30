@@ -147,7 +147,7 @@ export function SuiviCABudgetForm({
         // Charger les catégories de flux
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('fin_flux_categorie')
-          .select('id, code, libelle, type_flux, id_entite')
+          .select('id, code, libelle, type_flux, id_entite, entite:id_entite(id, code)')
           .eq('actif', true)
           .eq('com_contrat_client_id', profil.com_contrat_client_id)
           .order('libelle');
@@ -265,7 +265,10 @@ export function SuiviCABudgetForm({
   // Filtrer les catégories par entité
   useEffect(() => {
     if (budgetData.id_entite) {
-      const filtered = categoriesFlux.filter(cat => cat.id_entite === budgetData.id_entite);
+      // Inclure les catégories spécifiques à l'entité ET les catégories globales
+      const filtered = categoriesFlux.filter(cat => 
+        cat.id_entite === budgetData.id_entite || cat.id_entite === null
+      );
       setFilteredCategories(filtered);
 
       // Réinitialiser la catégorie si elle n'est pas valide pour cette entité
