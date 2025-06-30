@@ -76,6 +76,7 @@ const ParamSousCategoriesRH: React.FC = () => {
   const [parametres, setParametres] = useState<ParamSousCategorie[]>([]);
   const [sousCategories, setSousCategories] = useState<SousCategorie[]>([]);
   const [sousCategoriesRH, setSousCategoriesRH] = useState<SousCategorie[]>([]);
+  const [sousCategoriesCharges, setSousCategoriesCharges] = useState<SousCategorie[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedParam, setSelectedParam] = useState<ParamSousCategorie | null>(null);
   const [loading, setLoading] = useState(true);
@@ -190,8 +191,14 @@ const ParamSousCategoriesRH: React.FC = () => {
       const rhSousCategories = data?.filter(sc => 
         sc.categorie?.nature_flux?.salarie === true
       ) || [];
-      
       setSousCategoriesRH(rhSousCategories);
+      
+      // Filtrer pour les sous-catégories qui peuvent recevoir des charges
+      // (également liées à une nature "salarie")
+      const chargesSousCategories = data?.filter(sc => 
+        sc.categorie?.nature_flux?.salarie === true
+      ) || [];
+      setSousCategoriesCharges(chargesSousCategories);
       
     } catch (error) {
       console.error('Erreur lors de la récupération des sous-catégories:', error);
@@ -409,13 +416,13 @@ const ParamSousCategoriesRH: React.FC = () => {
   }));
 
   // Toutes les sous-catégories pour les charges
-  const sousCategorieChargeOptions: DropdownOption[] = [
+  const sousCategorieChargeOptions: DropdownOption[] = sousCategoriesCharges.length > 0 ? [
     { value: '', label: 'Sélectionner une sous-catégorie' },
-    ...sousCategories.map(sc => ({
+    ...sousCategoriesCharges.map(sc => ({
       value: sc.id,
       label: `${sc.code} - ${sc.libelle} (${sc.categorie?.code})`
     }))
-  ];
+  ] : [{ value: '', label: 'Aucune sous-catégorie disponible' }];
 
   // Colonnes pour le tableau
   const columns: Column<ParamSousCategorie>[] = [
@@ -603,8 +610,8 @@ const ParamSousCategoriesRH: React.FC = () => {
                 <FormField
                   label="Sous-catégorie pour les charges patronales"
                   required
+                  description="Sous-catégorie liée à une nature de flux 'Salarié'"
                   error={formErrors.id_sous_categorie_charge_patronale}
-                  description="Sous-catégorie où seront enregistrées les charges patronales calculées"
                 >
                   <Dropdown
                     options={sousCategorieChargeOptions}
@@ -640,8 +647,8 @@ const ParamSousCategoriesRH: React.FC = () => {
                 <FormField
                   label="Sous-catégorie pour les charges salariales"
                   required
+                  description="Sous-catégorie liée à une nature de flux 'Salarié'"
                   error={formErrors.id_sous_categorie_charge_salariale}
-                  description="Sous-catégorie où seront enregistrées les charges salariales calculées"
                 >
                   <Dropdown
                     options={sousCategorieChargeOptions}
