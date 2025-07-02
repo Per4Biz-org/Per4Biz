@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabase';
 import { useMenu } from '../../context/MenuContext';
 import { useProfil } from '../../context/ProfilContext';
 import { menuItemsGestionRH } from '../../config/menuConfig';
