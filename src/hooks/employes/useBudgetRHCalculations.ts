@@ -369,7 +369,7 @@ export function useBudgetRHCalculations() {
             });
             
             // Ajouter les lignes de sous-catégories
-            for (const [_, sousCategorie] of sousCategoriesMap) {
+            for (const [_, sousCategorie] of Array.from(sousCategoriesMap.entries())) {
               // Ligne pour la sous-catégorie
               const sousCatLine: BudgetData = {
                 type: 'sous_categorie',
