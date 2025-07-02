@@ -93,10 +93,9 @@ export function useBudgetRHCollapse() {
    */
   const initializeDefaultState = useCallback(() => {
     setCollapsedItems({
-      entites: new Set<string>(),
-      fonctions: new Set<string>(),
-      // Par défaut, tous les personnels sont pliés (leurs sous-catégories sont masquées)
-      personnel: new Set<string>(),
+      entites: new Set<string>(), // Entités dépliées par défaut
+      fonctions: new Set<string>(), // Fonctions dépliées par défaut
+      personnel: new Set<string>(), // Personnels dépliés par défaut (sera modifié dans BudgetTableRH)
     });
   }, []);
 

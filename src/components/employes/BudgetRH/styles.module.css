@@ -98,6 +98,27 @@
   border-left: 3px solid rgba(59, 130, 246, 0.3);
 }
 
+.toggleIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.toggleIcon:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.collapseIcon {
+  color: #4b5563;
+  transition: transform 0.2s;
+}
+
 .exportButton {
   display: inline-flex;
   align-items: center;

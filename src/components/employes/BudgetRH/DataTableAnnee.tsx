@@ -17,6 +17,7 @@ interface DataTableAnneeProps<T> {
   className?: string;
   getRowClassName?: (row: T, index: number) => string;
   footerData?: T | null;
+  compareRows?: boolean;
 }
 
 export function DataTableAnnee<T>({
@@ -26,7 +27,8 @@ export function DataTableAnnee<T>({
   totalColumn,
   className = '',
   getRowClassName,
-  footerData
+  footerData,
+  compareRows = false
 }: DataTableAnneeProps<T>) {
   // Fonction pour accéder à la valeur d'une colonne
   const getColumnValue = (row: T, accessor: keyof T | ((row: T) => any)) => {
@@ -37,9 +39,9 @@ export function DataTableAnnee<T>({
   };
 
   // Fonction pour rendre une cellule
-  const renderCell = (row: T, column: ColumnAnnee<T>) => {
+  const renderCell = (row: T, column: ColumnAnnee<T>, previousRow?: T | null) => {
     const value = getColumnValue(row, column.accessor);
-    return column.render ? column.render(value, row) : value;
+    return column.render ? column.render(value, row, previousRow) : value;
   };
 
   return (
@@ -68,8 +70,8 @@ export function DataTableAnnee<T>({
         </thead>
         <tbody>
           {data.map((row, rowIndex) => {
-            // Référence à la ligne précédente pour comparer les valeurs
-            const previousRow = rowIndex > 0 ? data[rowIndex - 1] : null;
+            // Référence à la ligne précédente pour comparer les valeurs si nécessaire
+            const previousRow = compareRows && rowIndex > 0 ? data[rowIndex - 1] : null;
             
             return (
               <tr 
@@ -81,9 +83,7 @@ export function DataTableAnnee<T>({
                     key={colIndex} 
                     className={`${styles.cell} ${column.align ? styles[column.align] : ''}`}
                   >
-                    {column.render 
-                      ? column.render(getColumnValue(row, column.accessor), row, previousRow)
-                      : getColumnValue(row, column.accessor)}
+                    {renderCell(row, column, previousRow)}
                   </td>
                 ))}
                 {monthColumns.map((month) => (
@@ -94,6 +94,13 @@ export function DataTableAnnee<T>({
                   </td>
                 ))}
                 <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
+                  {typeof row[totalColumn as keyof T] === 'number'
+                    ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[totalColumn as keyof T] as number)
+                    : row[totalColumn as keyof T] || '-'}
+                </td>
+              </tr>
+            );
+          })}
                   {typeof row[totalColumn as keyof T] === 'number'
                     ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[totalColumn as keyof T] as number)
                     : row[totalColumn as keyof T] || '-'}
