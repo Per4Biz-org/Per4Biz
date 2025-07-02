@@ -43,6 +43,7 @@ import TypeFonction from './pages/employes/ParametresEmployes/TypeFonction'
 import TypeContrat from './pages/employes/ParametresEmployes/TypeContrat'
 import MesEmployes from './pages/employes/MesEmployes'
 import ParamSousCategoriesRH from './pages/employes/ParametresEmployes/ParamSousCategoriesRH'
+import BudgetRh from './pages/employes/BudgetRh'
 import ParamGeneraux from './pages/employes/ParametresEmployes/ParamGeneraux'
 
 // Lazy loading du composant MesFactures
@@ -272,6 +273,13 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <Employes />
+              </Layout>
+            </PrivateRoute>
+          } />
+          <Route path="/employes/budget-rh" element={
+            <PrivateRoute>
+              <Layout>
+                <BudgetRh />
               </Layout>
             </PrivateRoute>
           } />

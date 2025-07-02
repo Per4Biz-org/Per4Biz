@@ -22,7 +22,9 @@
     "date-fns": "^3.3.1",
     "lucide-react": "^0.344.0",
     "xlsx": "^0.18.5",
-    "@types/xlsx": "^0.0.36"
+    "@types/xlsx": "^0.0.36",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",
