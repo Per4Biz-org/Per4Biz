@@ -89,13 +89,13 @@ export function DataTableAnnee<T>({
                 {monthColumns.map((month) => (
                   <td key={month} className={`${styles.cell} ${styles.right}`}>
                     {typeof row[month as keyof T] === 'number' 
-                      ? (row[month as keyof T] as number).toFixed(2) + ' €'
+                      ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month as keyof T] as number)
                       : row[month as keyof T] || '-'}
                   </td>
                 ))}
                 <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
                   {typeof row[totalColumn as keyof T] === 'number'
-                    ? (row[totalColumn as keyof T] as number).toFixed(2) + ' €'
+                    ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[totalColumn as keyof T] as number)
                     : row[totalColumn as keyof T] || '-'}
                 </td>
               </tr>
@@ -116,13 +116,13 @@ export function DataTableAnnee<T>({
               {monthColumns.map((month) => (
                 <td key={month} className={`${styles.footerCell} ${styles.right}`}>
                   {typeof footerData[month as keyof T] === 'number' 
-                    ? (footerData[month as keyof T] as number).toFixed(2) + ' €'
+                    ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(footerData[month as keyof T] as number)
                     : footerData[month as keyof T] || '-'}
                 </td>
               ))}
               <td className={`${styles.footerCell} ${styles.right} ${styles.totalColumn}`}>
                 {typeof footerData[totalColumn as keyof T] === 'number'
-                  ? (footerData[totalColumn as keyof T] as number).toFixed(2) + ' €'
+                  ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(footerData[totalColumn as keyof T] as number)
                   : footerData[totalColumn as keyof T] || '-'}
               </td>
             </tr>

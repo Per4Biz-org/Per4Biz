@@ -25,12 +25,12 @@ export function BudgetRHFooter({ data, months }: BudgetRHFooterProps) {
       
       {months.map(month => (
         <td key={month} className={`${styles.footerCell} ${styles.right}`}>
-          {totals[month] ? `${totals[month].toFixed(2)} €` : '-'}
+          {totals[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(totals[month]) : '-'}
         </td>
       ))}
       
       <td className={`${styles.footerCell} ${styles.right} ${styles.totalColumn}`}>
-        {totals.total ? `${totals.total.toFixed(2)} €` : '-'}
+        {totals.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(totals.total) : '-'}
       </td>
     </tr>
   );

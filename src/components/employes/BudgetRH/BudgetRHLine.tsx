@@ -33,12 +33,12 @@ export function BudgetRHLine({ data, months }: BudgetRHLineProps) {
       
       {months.map(month => (
         <td key={month} className={`${styles.cell} ${styles.right}`}>
-          {data[month] ? `${data[month].toFixed(2)} €` : '-'}
+          {data[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(data[month]) : '-'}
         </td>
       ))}
       
       <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
-        {data.total ? `${data.total.toFixed(2)} €` : '-'}
+        {data.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(data.total) : '-'}
       </td>
     </tr>
   );
