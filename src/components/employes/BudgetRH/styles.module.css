@@ -35,6 +35,7 @@
 
 .row {
   transition: background-color 0.2s;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .row:hover {
@@ -81,16 +82,20 @@
 
 .categoryRow {
   background-color: #e5e7eb;
-  font-weight: 600;
+  font-weight: 700;
+  border-top: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .personnelRow {
   background-color: #f9fafb;
+  border-left: 3px solid transparent;
 }
 
 .sousCategorieRow {
   background-color: #f3f4f6;
   font-style: italic;
+  padding-left: 1rem;
+  border-left: 3px solid rgba(59, 130, 246, 0.3);
 }
 
 .exportButton {

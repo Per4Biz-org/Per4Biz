@@ -1,8 +1,5 @@
 import React from 'react';
 import { DataTableAnnee, ColumnAnnee } from './DataTableAnnee';
-import { BudgetRHTableHeader } from './BudgetRHTableHeader';
-import { BudgetRHFooter } from './BudgetRHFooter';
-import { BudgetRHLine } from './BudgetRHLine';
 import { BudgetData } from '../../../hooks/employes/useBudgetRHCalculations';
 
 interface BudgetTableRHProps {
@@ -22,22 +19,57 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
     {
       label: 'Restaurant',
       accessor: 'entite_libelle',
-      width: '150px'
+      width: '150px',
+      render: (value, row, previousRow) => {
+        // Afficher le restaurant uniquement s'il est différent du précédent
+        // ou si c'est une ligne de type 'entite'
+        if (row.type === 'entite' || !previousRow || previousRow.entite_id !== row.entite_id) {
+          return <span className="font-medium">{value}</span>;
+        }
+        return null; // Ne rien afficher si c'est le même restaurant
+      }
     },
     {
       label: 'Fonction',
       accessor: 'fonction_libelle',
-      width: '150px'
+      width: '150px',
+      render: (value, row, previousRow) => {
+        // Afficher la fonction uniquement s'il s'agit d'une nouvelle fonction
+        // ou si c'est une ligne de type 'fonction'
+        if (row.type === 'fonction' || 
+            !previousRow || 
+            previousRow.fonction_id !== row.fonction_id ||
+            previousRow.entite_id !== row.entite_id) {
+          return value;
+        }
+        return null; // Ne rien afficher si c'est la même fonction
+      }
     },
     {
       label: 'Employé',
-      accessor: row => `${row.prenom} ${row.nom}`,
-      width: '180px'
+      accessor: row => row.prenom && row.nom ? `${row.prenom} ${row.nom}` : '',
+      width: '180px',
+      render: (value, row, previousRow) => {
+        // Afficher l'employé uniquement s'il s'agit d'un nouvel employé
+        // ou si c'est une ligne de type 'personnel'
+        if (row.type === 'personnel' || 
+            !previousRow || 
+            previousRow.personnel_id !== row.personnel_id ||
+            previousRow.fonction_id !== row.fonction_id ||
+            previousRow.entite_id !== row.entite_id) {
+          return value;
+        }
+        return null; // Ne rien afficher si c'est le même employé
+      }
     },
     {
       label: 'Sous-catégorie',
       accessor: 'sous_categorie_libelle',
-      width: '180px'
+      width: '180px',
+      render: (value, row, previousRow) => {
+        // Toujours afficher la sous-catégorie car c'est l'information la plus détaillée
+        return value;
+      }
     }
   ];
   
@@ -74,7 +106,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
   // Déterminer la classe CSS pour chaque ligne
   const getRowClassName = (row: BudgetData, index: number): string => {
     if (row.type === 'entite') return 'bg-blue-50 font-semibold';
-    if (row.type === 'fonction') return 'bg-gray-100';
+    if (row.type === 'fonction') return 'bg-gray-100 font-medium';
     if (row.type === 'personnel') return '';
     if (row.type === 'sous_categorie') return 'bg-gray-50 italic';
     return '';

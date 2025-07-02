@@ -6,7 +6,7 @@ export interface ColumnAnnee<T> {
   accessor: keyof T | ((row: T) => any);
   width?: string;
   align?: 'left' | 'center' | 'right';
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: any, row: T, previousRow?: T | null) => React.ReactNode;
 }
 
 interface DataTableAnneeProps<T> {
@@ -67,33 +67,40 @@ export function DataTableAnnee<T>({
           </tr>
         </thead>
         <tbody>
-          {data.map((row, rowIndex) => (
-            <tr 
-              key={rowIndex} 
-              className={`${styles.row} ${getRowClassName ? getRowClassName(row, rowIndex) : ''}`}
-            >
-              {columns.map((column, colIndex) => (
-                <td 
-                  key={colIndex} 
-                  className={`${styles.cell} ${column.align ? styles[column.align] : ''}`}
-                >
-                  {renderCell(row, column)}
+          {data.map((row, rowIndex) => {
+            // Référence à la ligne précédente pour comparer les valeurs
+            const previousRow = rowIndex > 0 ? data[rowIndex - 1] : null;
+            
+            return (
+              <tr 
+                key={rowIndex} 
+                className={`${styles.row} ${getRowClassName ? getRowClassName(row, rowIndex) : ''}`}
+              >
+                {columns.map((column, colIndex) => (
+                  <td 
+                    key={colIndex} 
+                    className={`${styles.cell} ${column.align ? styles[column.align] : ''}`}
+                  >
+                    {column.render 
+                      ? column.render(getColumnValue(row, column.accessor), row, previousRow)
+                      : getColumnValue(row, column.accessor)}
+                  </td>
+                ))}
+                {monthColumns.map((month) => (
+                  <td key={month} className={`${styles.cell} ${styles.right}`}>
+                    {typeof row[month as keyof T] === 'number' 
+                      ? (row[month as keyof T] as number).toFixed(2) + ' €'
+                      : row[month as keyof T] || '-'}
+                  </td>
+                ))}
+                <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
+                  {typeof row[totalColumn as keyof T] === 'number'
+                    ? (row[totalColumn as keyof T] as number).toFixed(2) + ' €'
+                    : row[totalColumn as keyof T] || '-'}
                 </td>
-              ))}
-              {monthColumns.map((month) => (
-                <td key={month} className={`${styles.cell} ${styles.right}`}>
-                  {typeof row[month as keyof T] === 'number' 
-                    ? (row[month as keyof T] as number).toFixed(2) + ' €'
-                    : row[month as keyof T] || '-'}
-                </td>
-              ))}
-              <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
-                {typeof row[totalColumn as keyof T] === 'number'
-                  ? (row[totalColumn as keyof T] as number).toFixed(2) + ' €'
-                  : row[totalColumn as keyof T] || '-'}
-              </td>
-            </tr>
-          ))}
+              </tr>
+            );
+          })}
         </tbody>
         {footerData && (
           <tfoot>
