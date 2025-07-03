@@ -68,26 +68,6 @@
   font-weight: 600;
 }
 
-.toggleButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  cursor: pointer;
-  color: #4b5563;
-  transition: color 0.2s;
-}
-
-.toggleButton:hover {
-  color: #1f2937;
-}
-
-.toggleIcon {
-  transition: transform 0.2s;
-}
-
 .center {
   text-align: center;
 }
