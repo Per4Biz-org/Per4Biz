@@ -4,6 +4,7 @@ import { BudgetData } from '../../../hooks/employes/useBudgetRHCalculations';
 import { BudgetRHLine } from './BudgetRHLine';
 import { BudgetRHFooter } from './BudgetRHFooter';
 import { useBudgetRHCollapse } from '../../../hooks/employes/useBudgetRHCollapse';
+import { CollapseToggle } from './CollapseToggle';
 import styles from './styles.module.css';
 
 interface BudgetTableRHProps {
