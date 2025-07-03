@@ -94,6 +94,11 @@
   background-color: #e5e7eb;
 }
 
+.mergedFonctionCell {
+  font-weight: 600;
+  background-color: #e5e7eb;
+}
+
 .personnelRow {
   background-color: #f9fafb;
   border-left: 2px solid transparent;

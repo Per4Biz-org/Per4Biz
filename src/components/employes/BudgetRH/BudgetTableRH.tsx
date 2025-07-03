@@ -129,6 +129,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
               // Récupérer la ligne précédente pour comparer
               const previousRow = index > 0 ? visibleRows[index - 1] : null;
               const isEntiteRow = row.type === 'entite';
+              const isFonctionRow = row.type === 'fonction';
               
               return (
               isEntiteRow ? (
@@ -158,6 +159,35 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                   </td>
                 </tr>
               ) : (
+                isFonctionRow ? (
+                  <tr key={getLineId(row)} className={`${styles.row} ${styles.categoryRow}`}>
+                    <td className={`${styles.cell}`}>
+                      {row.entite_libelle}
+                    </td>
+                    <td 
+                      colSpan={3} 
+                      className={`${styles.cell} ${styles.mergedFonctionCell}`}
+                      onClick={() => toggleCollapse(getLineId(row))}
+                    >
+                      <div className="flex items-center">
+                        <CollapseToggle 
+                          isExpanded={isExpanded(getLineId(row), true)} 
+                          onToggle={() => toggleCollapse(getLineId(row))} 
+                          className="mr-2"
+                        />
+                        {row.fonction_libelle}
+                      </div>
+                    </td>
+                    {months.map(month => (
+                      <td key={month} className={`${styles.cell} ${styles.right}`}>
+                        {row[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month]) : '-'}
+                      </td>
+                    ))}
+                    <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
+                      {row.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row.total) : '-'}
+                    </td>
+                  </tr>
+                ) : (
                 <BudgetRHLine
                   key={getLineId(row)}
                   data={row}
@@ -167,6 +197,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                   showToggle={row.type !== 'sous_categorie'}
                   previousRow={previousRow}
                 />
+                )
               )
             )})}
           </tbody>
