@@ -133,6 +133,15 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
               const isPersonnelRow = row.type === 'personnel';
               const isSousCategorieRow = row.type === 'sous_categorie';
               
+              // Déterminer la classe CSS pour la ligne
+              const rowClassName = isEntiteRow 
+                ? `${styles.row} ${styles.categoryRow} ${styles.entiteRow}`
+                : isFonctionRow 
+                  ? `${styles.row} ${styles.fonctionRow}`
+                  : isPersonnelRow 
+                    ? `${styles.row} ${styles.personnelRow}`
+                    : `${styles.row} ${styles.sousCategorieRow}`;
+              
               // Déterminer si on doit afficher le nom du restaurant
               const showEntite = () => {
                 if (index === 0) return true;
@@ -164,7 +173,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
               
               return (
               isEntiteRow ? (
-                <tr key={getLineId(row)} className={`${styles.row} ${styles.categoryRow}`}>
+                <tr key={getLineId(row)} className={rowClassName}>
                   <td 
                     colSpan={3} 
                     className={`${styles.cell} ${styles.mergedEntiteCell}`}
@@ -191,7 +200,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                 </tr>
               ) : (
                 isFonctionRow ? (
-                  <tr key={getLineId(row)} className={`${styles.row} ${styles.categoryRow}`}>
+                  <tr key={getLineId(row)} className={rowClassName}>
                     <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
                       {showEntite() ? row.entite_libelle : ''}
                     </td>
@@ -220,7 +229,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                   </tr>
                 ) : (
                   isPersonnelRow ? (
-                    <tr key={getLineId(row)} className={`${styles.row} ${styles.personnelRow}`}>
+                    <tr key={getLineId(row)} className={rowClassName}>
                       <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
                         {showEntite() ? row.entite_libelle : ''}
                       </td>
@@ -251,7 +260,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                       </td>
                     </tr>
                   ) : (
-                    <tr key={getLineId(row)} className={`${styles.row} ${styles.sousCategorieRow}`}>
+                    <tr key={getLineId(row)} className={rowClassName}>
                       <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
                         {showEntite() ? row.entite_libelle : ''}
                       </td>

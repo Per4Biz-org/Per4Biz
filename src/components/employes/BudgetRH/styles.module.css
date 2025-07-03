@@ -89,6 +89,17 @@
   border-top: 2px solid rgba(0, 0, 0, 0.1);
 }
 
+.entiteRow {
+  background-color: #e5e7eb;
+  font-weight: 600;
+  border-top: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.fonctionRow {
+  background-color: #f3f4f6;
+  font-weight: 500;
+}
+
 .mergedEntiteCell {
   font-weight: 600;
   background-color: #e5e7eb;
@@ -96,7 +107,7 @@
 
 .mergedFonctionCell {
   font-weight: 600;
-  background-color: #e5e7eb;
+  background-color: #f3f4f6;
 }
 
 .mergedPersonnelCell {
