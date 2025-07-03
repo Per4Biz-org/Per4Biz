@@ -130,6 +130,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
               const previousRow = index > 0 ? visibleRows[index - 1] : null;
               const isEntiteRow = row.type === 'entite';
               const isFonctionRow = row.type === 'fonction';
+              const isPersonnelRow = row.type === 'personnel';
               
               return (
               isEntiteRow ? (
@@ -188,6 +189,38 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                     </td>
                   </tr>
                 ) : (
+                  isPersonnelRow ? (
+                    <tr key={getLineId(row)} className={`${styles.row} ${styles.personnelRow}`}>
+                      <td className={`${styles.cell}`}>
+                        {row.entite_libelle}
+                      </td>
+                      <td className={`${styles.cell}`}>
+                        {row.fonction_libelle}
+                      </td>
+                      <td 
+                        colSpan={2} 
+                        className={`${styles.cell} ${styles.mergedPersonnelCell}`}
+                        onClick={() => toggleCollapse(getLineId(row))}
+                      >
+                        <div className="flex items-center">
+                          <CollapseToggle 
+                            isExpanded={isExpanded(getLineId(row), false)} 
+                            onToggle={() => toggleCollapse(getLineId(row))} 
+                            className="mr-2"
+                          />
+                          {`${row.prenom || ''} ${row.nom || ''}`.trim()}
+                        </div>
+                      </td>
+                      {months.map(month => (
+                        <td key={month} className={`${styles.cell} ${styles.right}`}>
+                          {row[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month]) : '-'}
+                        </td>
+                      ))}
+                      <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
+                        {row.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row.total) : '-'}
+                      </td>
+                    </tr>
+                  ) : (
                 <BudgetRHLine
                   key={getLineId(row)}
                   data={row}
@@ -197,6 +230,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                   showToggle={row.type !== 'sous_categorie'}
                   previousRow={previousRow}
                 />
+                  )
                 )
               )
             )})}
