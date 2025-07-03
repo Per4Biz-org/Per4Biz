@@ -10,6 +10,7 @@ import { ToastContainer, ToastData } from '../../components/ui/toast';
 import { BudgetTableRH } from '../../components/employes/BudgetRH/BudgetTableRH';
 import { BudgetRHExportButtons } from '../../components/employes/BudgetRH/BudgetRHExportButtons';
 import { useBudgetRHCalculations } from '../../hooks/employes/useBudgetRHCalculations';
+import { useBudgetRHCollapse } from '../../hooks/employes/useBudgetRHCollapse';
 import styles from './styles.module.css';
 
 const BudgetRh: React.FC = () => {
@@ -27,6 +28,16 @@ const BudgetRh: React.FC = () => {
     error: calculationError,
     calculateBudget
   } = useBudgetRHCalculations();
+  
+  // Utiliser le hook de pliage/dépliage
+  const { initializeCollapseState } = useBudgetRHCollapse();
+  
+  // Initialiser l'état de pliage lorsque les données sont chargées
+  useEffect(() => {
+    if (budgetData.length > 0) {
+      initializeCollapseState(budgetData);
+    }
+  }, [budgetData, initializeCollapseState]);
 
   // Configurer le menu
   useEffect(() => {
