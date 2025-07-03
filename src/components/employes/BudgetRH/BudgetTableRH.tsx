@@ -103,9 +103,6 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
   // Calculer les totaux
   const footerData = calculateFooterData();
   
-  // Calculer les totaux
-  const footerData = calculateFooterData();
-  
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className={styles.tableContainer}>
