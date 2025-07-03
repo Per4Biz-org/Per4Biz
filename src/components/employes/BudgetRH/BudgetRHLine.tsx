@@ -16,7 +16,7 @@ export interface BudgetRHLineProps {
   showToggle?: boolean;
 }
 
-export function BudgetRHLine({ data, months, isCollapsed, isExpanded, onToggle }: BudgetRHLineProps) {
+export function BudgetRHLine({ 
   data, 
   months, 
   isCollapsed = false,
@@ -88,26 +88,6 @@ export function BudgetRHLine({ data, months, isCollapsed, isExpanded, onToggle }
           )}
           {data.entite_libelle}
         </div>
-      </td>
-      <td className={styles.cell}>
-        {data.fonction_libelle}
-      </td>
-      <td className={styles.cell}>
-        {data.prenom} {data.nom}
-      </td>
-      <td className={styles.cell}>
-        {data.sous_categorie_libelle}
-      </td>
-            onClick={handleToggleClick}
-            title={isCollapsed ? "Déplier" : "Plier"}
-          >
-            {isCollapsed ? 
-              <ChevronRight size={16} className={styles.collapseIcon} /> : 
-              <ChevronDown size={16} className={styles.collapseIcon} />
-            }
-          </span>
-        )}
-        {data.entite_libelle}
       </td>
       <td className={styles.cell}>
         {data.fonction_libelle}
