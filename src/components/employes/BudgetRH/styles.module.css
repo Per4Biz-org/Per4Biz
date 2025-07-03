@@ -89,6 +89,11 @@
   border-top: 2px solid rgba(0, 0, 0, 0.1);
 }
 
+.mergedEntiteCell {
+  font-weight: 600;
+  background-color: #e5e7eb;
+}
+
 .personnelRow {
   background-color: #f9fafb;
   border-left: 2px solid transparent;
@@ -140,4 +145,17 @@
 
 .collapseIconExpanded {
   transform: rotate(90deg);
+}
+
+/* Ajustement des largeurs de colonnes */
+.restaurantColumn {
+  width: 30%;
+}
+
+.fonctionColumn {
+  width: 20%;
+}
+
+.employeColumn {
+  width: 20%;
 }

@@ -23,8 +23,6 @@ export function BudgetRHLine({
   // Déterminer la classe CSS en fonction du type de ligne
   const getRowClass = () => {
     switch (data.type) {
-      case 'entite':
-        return styles.categoryRow;
       case 'fonction':
         return styles.categoryRow;
       case 'personnel':
@@ -56,6 +54,13 @@ export function BudgetRHLine({
     if (data.fonction_id !== previousRow.fonction_id) return true;
     return data.personnel_id !== previousRow.personnel_id;
   };
+  
+  // Formater le nom de l'employé
+  const getEmployeeName = () => {
+    if (!showPersonnel()) return '';
+    if (!data.prenom && !data.nom) return '';
+    return `${data.prenom || ''} ${data.nom || ''}`.trim();
+  };
 
   return (
     <tr className={`${styles.row} ${getRowClass()}`}>
@@ -75,9 +80,7 @@ export function BudgetRHLine({
         {showFonction() ? data.fonction_libelle : ''}
       </td>
       <td className={styles.cell}>
-        {showPersonnel() && data.prenom && data.nom ? `${data.prenom} ${data.nom}` : 
-         showPersonnel() && (data.prenom || data.nom) ? (data.prenom || data.nom) : 
-         ''}
+        {getEmployeeName()}
       </td>
       <td className={styles.cell}>
         {data.sous_categorie_libelle}

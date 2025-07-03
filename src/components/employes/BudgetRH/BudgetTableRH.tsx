@@ -103,15 +103,18 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
   // Calculer les totaux
   const footerData = calculateFooterData();
   
+  // Calculer les totaux
+  const footerData = calculateFooterData();
+  
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th className={styles.headerCell}>Restaurant</th>
-              <th className={styles.headerCell}>Fonction</th>
-              <th className={styles.headerCell}>Employé</th>
+              <th className={`${styles.headerCell} ${styles.restaurantColumn}`}>Restaurant</th>
+              <th className={`${styles.headerCell} ${styles.fonctionColumn}`}>Fonction</th>
+              <th className={`${styles.headerCell} ${styles.employeColumn}`}>Employé</th>
               <th className={styles.headerCell}>Sous-catégorie</th>
               {months.map(month => (
                 <th key={month} className={`${styles.headerCell} ${styles.right}`}>
@@ -127,17 +130,46 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
             {visibleRows.map((row, index) => {
               // Récupérer la ligne précédente pour comparer
               const previousRow = index > 0 ? visibleRows[index - 1] : null;
+              const isEntiteRow = row.type === 'entite';
               
               return (
-              <BudgetRHLine
-                key={getLineId(row)}
-                data={row}
-                months={months}
-                isExpanded={isExpanded(getLineId(row), row.type === 'entite' || row.type === 'fonction')}
-                onToggle={() => toggleCollapse(getLineId(row))}
-                showToggle={row.type !== 'sous_categorie'}
-                previousRow={previousRow}
-              />
+              isEntiteRow ? (
+                <tr key={getLineId(row)} className={`${styles.row} ${styles.categoryRow}`}>
+                  <td 
+                    colSpan={3} 
+                    className={`${styles.cell} ${styles.mergedEntiteCell}`}
+                    onClick={() => toggleCollapse(getLineId(row))}
+                  >
+                    <div className="flex items-center">
+                      <CollapseToggle 
+                        isExpanded={isExpanded(getLineId(row), true)} 
+                        onToggle={() => toggleCollapse(getLineId(row))} 
+                        className="mr-2"
+                      />
+                      {row.entite_libelle}
+                    </div>
+                  </td>
+                  <td className={styles.cell}></td>
+                  {months.map(month => (
+                    <td key={month} className={`${styles.cell} ${styles.right}`}>
+                      {row[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month]) : '-'}
+                    </td>
+                  ))}
+                  <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
+                    {row.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row.total) : '-'}
+                  </td>
+                </tr>
+              ) : (
+                <BudgetRHLine
+                  key={getLineId(row)}
+                  data={row}
+                  months={months}
+                  isExpanded={isExpanded(getLineId(row), row.type === 'entite' || row.type === 'fonction')}
+                  onToggle={() => toggleCollapse(getLineId(row))}
+                  showToggle={row.type !== 'sous_categorie'}
+                  previousRow={previousRow}
+                />
+              )
             )})}
           </tbody>
           <tfoot>
