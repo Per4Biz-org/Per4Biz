@@ -75,7 +75,9 @@ export function BudgetRHLine({
         {showFonction() ? data.fonction_libelle : ''}
       </td>
       <td className={styles.cell}>
-        {showPersonnel() ? `${data.prenom} ${data.nom}` : ''}
+        {showPersonnel() && data.prenom && data.nom ? `${data.prenom} ${data.nom}` : 
+         showPersonnel() && (data.prenom || data.nom) ? (data.prenom || data.nom) : 
+         ''}
       </td>
       <td className={styles.cell}>
         {data.sous_categorie_libelle}
