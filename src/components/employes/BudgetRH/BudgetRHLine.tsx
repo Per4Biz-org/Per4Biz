@@ -9,6 +9,7 @@ interface BudgetRHLineProps {
   isExpanded: boolean;
   onToggle: () => void;
   showToggle: boolean;
+  previousRow?: BudgetData | null;
 }
 
 export function BudgetRHLine({ 
@@ -16,7 +17,8 @@ export function BudgetRHLine({
   months, 
   isExpanded, 
   onToggle,
-  showToggle = true
+  showToggle = true,
+  previousRow = null
 }: BudgetRHLineProps) {
   // Déterminer la classe CSS en fonction du type de ligne
   const getRowClass = () => {
@@ -34,17 +36,25 @@ export function BudgetRHLine({
     }
   };
 
-  // Générer un ID unique pour cette ligne
-  const getLineId = () => {
-    if (data.type === 'entite') {
-      return `entite-${data.entite_id}`;
-    } else if (data.type === 'fonction') {
-      return `fonction-${data.entite_id}-${data.fonction_id}`;
-    } else if (data.type === 'personnel') {
-      return `personnel-${data.entite_id}-${data.fonction_id}-${data.personnel_id}`;
-    } else {
-      return `sous-categorie-${data.entite_id}-${data.fonction_id}-${data.personnel_id}-${data.sous_categorie_id}`;
-    }
+  // Déterminer si on doit afficher le nom du restaurant
+  const showEntite = () => {
+    if (!previousRow) return true;
+    return data.entite_id !== previousRow.entite_id;
+  };
+  
+  // Déterminer si on doit afficher la fonction
+  const showFonction = () => {
+    if (!previousRow) return true;
+    if (data.entite_id !== previousRow.entite_id) return true;
+    return data.fonction_id !== previousRow.fonction_id;
+  };
+  
+  // Déterminer si on doit afficher le nom de l'employé
+  const showPersonnel = () => {
+    if (!previousRow) return true;
+    if (data.entite_id !== previousRow.entite_id) return true;
+    if (data.fonction_id !== previousRow.fonction_id) return true;
+    return data.personnel_id !== previousRow.personnel_id;
   };
 
   return (
@@ -58,14 +68,14 @@ export function BudgetRHLine({
               className="mr-2"
             />
           )}
-          {data.entite_libelle}
+          {showEntite() ? data.entite_libelle : ''}
         </div>
       </td>
       <td className={styles.cell}>
-        {data.fonction_libelle}
+        {showFonction() ? data.fonction_libelle : ''}
       </td>
       <td className={styles.cell}>
-        {data.prenom} {data.nom}
+        {showPersonnel() ? `${data.prenom} ${data.nom}` : ''}
       </td>
       <td className={styles.cell}>
         {data.sous_categorie_libelle}

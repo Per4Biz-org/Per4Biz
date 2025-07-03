@@ -124,7 +124,11 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
             </tr>
           </thead>
           <tbody>
-            {visibleRows.map((row, index) => (
+            {visibleRows.map((row, index) => {
+              // Récupérer la ligne précédente pour comparer
+              const previousRow = index > 0 ? visibleRows[index - 1] : null;
+              
+              return (
               <BudgetRHLine
                 key={getLineId(row)}
                 data={row}
@@ -132,8 +136,9 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                 isExpanded={isExpanded(getLineId(row), row.type === 'entite' || row.type === 'fonction')}
                 onToggle={() => toggleCollapse(getLineId(row))}
                 showToggle={row.type !== 'sous_categorie'}
+                previousRow={previousRow}
               />
-            ))}
+            )})}
           </tbody>
           <tfoot>
             <BudgetRHFooter data={data} months={months} />

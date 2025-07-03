@@ -92,6 +92,7 @@
 .personnelRow {
   background-color: #f9fafb;
   border-left: 2px solid transparent;
+  border-top: 1px solid #e5e7eb;
 }
 
 .sousCategorieRow {
@@ -99,6 +100,7 @@
   font-style: italic;
   padding-left: 1rem;
   border-left: 2px solid rgba(59, 130, 246, 0.3);
+  border-top: 1px solid #e5e7eb;
 }
 
 .exportButton {
