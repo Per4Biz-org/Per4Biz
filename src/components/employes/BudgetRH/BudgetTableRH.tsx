@@ -131,6 +131,36 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
               const isEntiteRow = row.type === 'entite';
               const isFonctionRow = row.type === 'fonction';
               const isPersonnelRow = row.type === 'personnel';
+              const isSousCategorieRow = row.type === 'sous_categorie';
+              
+              // Déterminer si on doit afficher le nom du restaurant
+              const showEntite = () => {
+                if (index === 0) return true;
+                if (isEntiteRow) return true;
+                const prevRow = visibleRows[index - 1];
+                return row.entite_id !== prevRow.entite_id;
+              };
+              
+              // Déterminer si on doit afficher la fonction
+              const showFonction = () => {
+                if (index === 0) return true;
+                if (isEntiteRow) return false;
+                if (isFonctionRow) return true;
+                const prevRow = visibleRows[index - 1];
+                if (row.entite_id !== prevRow.entite_id) return true;
+                return row.fonction_id !== prevRow.fonction_id;
+              };
+              
+              // Déterminer si on doit afficher le nom de l'employé
+              const showPersonnel = () => {
+                if (index === 0) return true;
+                if (isEntiteRow || isFonctionRow) return false;
+                if (isPersonnelRow) return true;
+                const prevRow = visibleRows[index - 1];
+                if (row.entite_id !== prevRow.entite_id) return true;
+                if (row.fonction_id !== prevRow.fonction_id) return true;
+                return row.personnel_id !== prevRow.personnel_id;
+              };
               
               return (
               isEntiteRow ? (
@@ -162,8 +192,8 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
               ) : (
                 isFonctionRow ? (
                   <tr key={getLineId(row)} className={`${styles.row} ${styles.categoryRow}`}>
-                    <td className={`${styles.cell}`}>
-                      {row.entite_libelle}
+                    <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
+                      {showEntite() ? row.entite_libelle : ''}
                     </td>
                     <td 
                       colSpan={3} 
@@ -191,11 +221,11 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                 ) : (
                   isPersonnelRow ? (
                     <tr key={getLineId(row)} className={`${styles.row} ${styles.personnelRow}`}>
-                      <td className={`${styles.cell}`}>
-                        {row.entite_libelle}
+                      <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
+                        {showEntite() ? row.entite_libelle : ''}
                       </td>
-                      <td className={`${styles.cell}`}>
-                        {row.fonction_libelle}
+                      <td className={`${styles.cell}`} style={{ opacity: showFonction() ? 1 : 0 }}>
+                        {showFonction() ? row.fonction_libelle : ''}
                       </td>
                       <td 
                         colSpan={2} 
@@ -221,15 +251,28 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                       </td>
                     </tr>
                   ) : (
-                <BudgetRHLine
-                  key={getLineId(row)}
-                  data={row}
-                  months={months}
-                  isExpanded={isExpanded(getLineId(row), row.type === 'entite' || row.type === 'fonction')}
-                  onToggle={() => toggleCollapse(getLineId(row))}
-                  showToggle={row.type !== 'sous_categorie'}
-                  previousRow={previousRow}
-                />
+                    <tr key={getLineId(row)} className={`${styles.row} ${styles.sousCategorieRow}`}>
+                      <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
+                        {showEntite() ? row.entite_libelle : ''}
+                      </td>
+                      <td className={`${styles.cell}`} style={{ opacity: showFonction() ? 1 : 0 }}>
+                        {showFonction() ? row.fonction_libelle : ''}
+                      </td>
+                      <td className={`${styles.cell}`} style={{ opacity: showPersonnel() ? 1 : 0 }}>
+                        {showPersonnel() ? `${row.prenom || ''} ${row.nom || ''}`.trim() : ''}
+                      </td>
+                      <td className={`${styles.cell}`}>
+                        {row.sous_categorie_libelle}
+                      </td>
+                      {months.map(month => (
+                        <td key={month} className={`${styles.cell} ${styles.right}`}>
+                          {row[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month]) : '-'}
+                        </td>
+                      ))}
+                      <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
+                        {row.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row.total) : '-'}
+                      </td>
+                    </tr>
                   )
                 )
               )
