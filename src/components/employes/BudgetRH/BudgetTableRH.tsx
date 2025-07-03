@@ -164,10 +164,10 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
               
               return (
               isEntiteRow ? (
-                <tr key={getLineId(row)} className={`${styles.row} ${styles.entiteRow}`}>
+                <tr key={getLineId(row)} className={styles.entiteRow}>
                   <td
                     colSpan={4}
-                    className={`${styles.cell} ${styles.mergedEntiteCell}`}
+                    className={`${styles.cell}`}
                     onClick={() => toggleCollapse(getLineId(row))}
                   >
                     <div className="flex items-center">
@@ -190,13 +190,13 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                 </tr>
               ) : (
                 isFonctionRow ? (
-                  <tr key={getLineId(row)} className={`${styles.row} ${styles.fonctionRow}`}>
+                  <tr key={getLineId(row)} className={styles.fonctionRow}>
                     <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
                       {showEntite() ? row.entite_libelle : ''}
                     </td>
                     <td 
                       colSpan={3} 
-                      className={`${styles.cell} ${styles.mergedFonctionCell}`}
+                      className={`${styles.cell}`}
                       onClick={() => toggleCollapse(getLineId(row))}
                     >
                       <div className="flex items-center">
@@ -219,7 +219,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                   </tr>
                 ) : (
                   isPersonnelRow ? (
-                    <tr key={getLineId(row)} className={`${styles.row} ${styles.personnelRow}`}>
+                    <tr key={getLineId(row)} className={styles.personnelRow}>
                       <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
                         {showEntite() ? row.entite_libelle : ''}
                       </td>
@@ -228,7 +228,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                       </td>
                       <td 
                         colSpan={2} 
-                        className={`${styles.cell} ${styles.mergedPersonnelCell}`}
+                        className={`${styles.cell}`}
                         onClick={() => toggleCollapse(getLineId(row))}
                       >
                         <div className="flex items-center">
@@ -250,7 +250,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                       </td>
                     </tr>
                   ) : (
-                    <tr key={getLineId(row)} className={`${styles.row} ${styles.sousCategorieRow}`}>
+                    <tr key={getLineId(row)} className={styles.sousCategorieRow}>
                       <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
                         {showEntite() ? row.entite_libelle : ''}
                       </td>

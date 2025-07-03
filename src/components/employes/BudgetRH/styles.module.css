@@ -90,36 +90,24 @@
 }
 
 .entiteRow {
-  background-color: #e5e7eb;
+  background-color: #e5e7eb !important;
   font-weight: 700;
   border-top: 2px solid rgba(0, 0, 0, 0.1) !important;
 }
 
 .fonctionRow {
-  background-color: #f3f4f6;
-  font-weight: 500;
-}
-
-.mergedEntiteCell {
-  font-weight: 600;
-}
-
-.mergedFonctionCell {
-  font-weight: 600;
-}
-
-.mergedPersonnelCell {
+  background-color: #f3f4f6 !important;
   font-weight: 500;
 }
 
 .personnelRow {
-  background-color: #f9fafb;
+  background-color: #f9fafb !important;
   border-left: 2px solid transparent;
   border-top: 1px solid #e5e7eb;
 }
 
 .sousCategorieRow {
-  background-color: #f3f4f6;
+  background-color: #f3f4f6 !important;
   font-style: italic;
   padding-left: 1rem;
   border-left: 2px solid rgba(59, 130, 246, 0.3);
