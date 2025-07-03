@@ -1,145 +1,127 @@
-.tableContainer {
-  width: 100%;
-  overflow-x: auto;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+import React from 'react';
+import { DataTableAnnee, ColumnAnnee } from './DataTableAnnee';
+import { BudgetData } from '../../../hooks/employes/useBudgetRHCalculations';
+
+interface BudgetTableRHProps {
+  data: BudgetData[];
+  year: number;
 }
 
-.table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background-color: white;
-}
-
-.headerCell {
-  position: sticky;
-  top: 0;
-  background-color: #f9fafb;
-  padding: 0.75rem 1rem;
-  font-weight: 600;
-  text-align: left;
-  color: #374151;
-  border-bottom: 2px solid #e5e7eb;
-  white-space: nowrap;
-  font-size: 0.75rem;
-  z-index: 10;
-}
-
-.cell {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 0.875rem;
-  color: #1f2937;
-}
-
-.row {
-  transition: background-color 0.2s;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.row:hover {
-  background-color: #f9fafb;
-}
-
-.row:nth-child(even) {
-  background-color: #f9fafb;
-}
-
-.row:nth-child(even):hover {
-  background-color: #f3f4f6;
-}
-
-.footerRow {
-  background-color: #f3f4f6;
-  font-weight: 600;
-}
-
-.footerCell {
-  padding: 0.75rem 1rem;
-  border-top: 2px solid #e5e7eb;
-  border-bottom: none;
-  font-size: 0.875rem;
-  color: #1f2937;
-}
-
-.totalColumn {
-  background-color: #f3f4f6;
-  font-weight: 600;
-}
-
-.center {
-  text-align: center;
-}
-
-.right {
-  text-align: right;
-}
-
-.left {
-  text-align: left;
-}
-
-.categoryRow {
-  background-color: #e5e7eb;
-  font-weight: 700;
-  border-top: 2px solid rgba(0, 0, 0, 0.1);
-}
-
-.personnelRow {
-  background-color: #f9fafb;
-  border-left: 3px solid transparent;
-}
-
-.sousCategorieRow {
-  background-color: #f3f4f6;
-  font-style: italic;
-  padding-left: 1rem;
-  border-left: 3px solid rgba(59, 130, 246, 0.3);
-}
-
-.exportButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.exportButton:hover {
-  opacity: 0.9;
-}
-
-.pdfButton {
-  background-color: #ef4444;
-  color: white;
-}
-
-.excelButton {
-  background-color: #16a34a;
-  color: white;
-}
-
-.toggleIcon {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  border-radius: 3px;
-  transition: background-color 0.2s;
-}
-
-.toggleIcon:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-.collapseIcon {
-  color: #6b7280;
-  transition: transform 0.2s;
+export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
+  // Mois de l'année
+  const months = [
+    'janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin',
+    'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'
+  ];
+  
+  // Colonnes fixes (avant les mois)
+  const fixedColumns: ColumnAnnee<BudgetData>[] = [
+    {
+      label: 'Restaurant',
+      accessor: 'entite_libelle',
+      width: '150px',
+      render: (value, row, previousRow) => {
+        // Afficher le restaurant uniquement s'il est différent du précédent
+        // ou si c'est une ligne de type 'entite'
+        if (row.type === 'entite' || !previousRow || previousRow.entite_id !== row.entite_id) {
+          return <span className="font-medium">{value}</span>;
+        }
+        return null; // Ne rien afficher si c'est le même restaurant
+      }
+    },
+    {
+      label: 'Fonction',
+      accessor: 'fonction_libelle',
+      width: '150px',
+      render: (value, row, previousRow) => {
+        // Afficher la fonction uniquement s'il s'agit d'une nouvelle fonction
+        // ou si c'est une ligne de type 'fonction'
+        if (row.type === 'fonction' || 
+            !previousRow || 
+            previousRow.fonction_id !== row.fonction_id ||
+            previousRow.entite_id !== row.entite_id) {
+          return value;
+        }
+        return null; // Ne rien afficher si c'est la même fonction
+      }
+    },
+    {
+      label: 'Employé',
+      accessor: row => row.prenom && row.nom ? `${row.prenom} ${row.nom}` : '',
+      width: '180px',
+      render: (value, row, previousRow) => {
+        // Afficher l'employé uniquement s'il s'agit d'un nouvel employé
+        // ou si c'est une ligne de type 'personnel'
+        if (row.type === 'personnel' || 
+            !previousRow || 
+            previousRow.personnel_id !== row.personnel_id ||
+            previousRow.fonction_id !== row.fonction_id ||
+            previousRow.entite_id !== row.entite_id) {
+          return value;
+        }
+        return null; // Ne rien afficher si c'est le même employé
+      }
+    },
+    {
+      label: 'Sous-catégorie',
+      accessor: 'sous_categorie_libelle',
+      width: '180px',
+      render: (value, row, previousRow) => {
+        // Toujours afficher la sous-catégorie car c'est l'information la plus détaillée
+        return value;
+      }
+    }
+  ];
+  
+  // Calculer les totaux pour le pied de tableau
+  const calculateFooterData = (): BudgetData => {
+    const footerData: any = {
+      entite_libelle: 'TOTAL',
+      fonction_libelle: '',
+      nom: '',
+      prenom: '',
+      sous_categorie_libelle: '',
+      total: 0
+    };
+    
+    // Initialiser les totaux pour chaque mois
+    months.forEach(month => {
+      footerData[month] = 0;
+    });
+    
+    // Calculer les totaux
+    data.forEach(row => {
+      // Total annuel
+      footerData.total += row.total || 0;
+      
+      // Totaux mensuels
+      months.forEach(month => {
+        footerData[month] += row[month] || 0;
+      });
+    });
+    
+    return footerData as BudgetData;
+  };
+  
+  // Déterminer la classe CSS pour chaque ligne
+  const getRowClassName = (row: BudgetData, index: number): string => {
+    if (row.type === 'entite') return 'bg-blue-50 font-semibold';
+    if (row.type === 'fonction') return 'bg-gray-100 font-medium';
+    if (row.type === 'personnel') return '';
+    if (row.type === 'sous_categorie') return 'bg-gray-50 italic';
+    return '';
+  };
+  
+  return (
+    <div className="bg-white rounded-lg shadow overflow-hidden">
+      <DataTableAnnee
+        data={data}
+        columns={fixedColumns}
+        monthColumns={months}
+        totalColumn="total"
+        getRowClassName={getRowClassName}
+        footerData={calculateFooterData()}
+      />
+    </div>
+  );
 }
