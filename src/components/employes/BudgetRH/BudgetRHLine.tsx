@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import styles from './styles.module.css';
 import { BudgetData } from '../../../hooks/employes/useBudgetRHCalculations';
 
@@ -7,12 +8,15 @@ export interface BudgetRHLineProps {
   data: BudgetData;
   months: string[];
   isCollapsed?: boolean;
+  isExpanded?: boolean;
+  onToggle?: () => void;
+  isCollapsed?: boolean;
   isParentCollapsed?: boolean;
   onToggleCollapse?: () => void;
   showToggle?: boolean;
 }
 
-export function BudgetRHLine({ 
+export function BudgetRHLine({ data, months, isCollapsed, isExpanded, onToggle }: BudgetRHLineProps) {
   data, 
   months, 
   isCollapsed = false,
@@ -36,6 +40,26 @@ export function BudgetRHLine({
     }
   };
   
+  // Déterminer si la ligne peut être pliée/dépliée
+  const isToggleable = data.type === 'entite' || data.type === 'fonction' || data.type === 'personnel';
+  
+  // Icône de pliage/dépliage
+  const renderToggleIcon = () => {
+    if (!isToggleable) return null;
+    
+    if (data.type === 'personnel') {
+      // Pour le personnel, on utilise l'état d'expansion
+      return isExpanded ? 
+        <ChevronDown size={16} className={styles.toggleIcon} /> : 
+        <ChevronRight size={16} className={styles.toggleIcon} />;
+    } else {
+      // Pour les entités et fonctions, on utilise l'état de collapse
+      return isCollapsed ? 
+        <ChevronRight size={16} className={styles.toggleIcon} /> : 
+        <ChevronDown size={16} className={styles.toggleIcon} />;
+    }
+  };
+  
   // Déterminer si on doit afficher le toggle pour ce type de ligne
   const shouldShowToggle = showToggle && ['entite', 'fonction', 'personnel'].includes(data.type || '');
   
@@ -50,9 +74,30 @@ export function BudgetRHLine({
   return (
     <tr className={`${styles.row} ${getRowClass()}`}>
       <td className={styles.cell}>
-        {shouldShowToggle && (
-          <span 
-            className={styles.toggleIcon} 
+        <div className="flex items-center">
+          {isToggleable && (
+            <span 
+              className={styles.toggleButton} 
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggle?.();
+              }}
+            >
+              {renderToggleIcon()}
+            </span>
+          )}
+          {data.entite_libelle}
+        </div>
+      </td>
+      <td className={styles.cell}>
+        {data.fonction_libelle}
+      </td>
+      <td className={styles.cell}>
+        {data.prenom} {data.nom}
+      </td>
+      <td className={styles.cell}>
+        {data.sous_categorie_libelle}
+      </td>
             onClick={handleToggleClick}
             title={isCollapsed ? "Déplier" : "Plier"}
           >
