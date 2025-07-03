@@ -174,8 +174,8 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
               return (
               isEntiteRow ? (
                 <tr key={getLineId(row)} className={rowClassName}>
-                  <td 
-                    colSpan={3} 
+                  <td
+                    colSpan={4}
                     className={`${styles.cell} ${styles.mergedEntiteCell}`}
                     onClick={() => toggleCollapse(getLineId(row))}
                   >
@@ -188,7 +188,6 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                       {row.entite_libelle}
                     </div>
                   </td>
-                  <td className={styles.cell}></td>
                   {months.map(month => (
                     <td key={month} className={`${styles.cell} ${styles.right}`}>
                       {row[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month]) : '-'}
