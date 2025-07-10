@@ -73,22 +73,37 @@ export function useBudgetRHCalculations() {
         return;
       }
       
-      // 1.2 Récupérer les paramètres généraux RH pour l'année
+      // 1.2 Récupérer tous les paramètres généraux RH applicables pour chaque mois de l'année
       const { data: paramsGeneraux, error: paramsError } = await supabase
         .from('rh_param_generaux')
         .select('*')
         .eq('com_contrat_client_id', profil.com_contrat_client_id)
         .eq('actif', true)
-        .lte('date_debut', `${year}-12-31`)
         .or(`date_fin.is.null,date_fin.gte.${year}-01-01`)
-        .order('date_debut', { ascending: false })
-        .limit(1);
+        .lte('date_debut', `${year}-12-31`)
+        .order('date_debut', { ascending: false });
         
       if (paramsError) throw paramsError;
       
-      const params = paramsGeneraux?.[0] || null;
-      const tauxPatronal = params?.taux_ss_patronale || 0;
-      const tauxSalarial = params?.taux_ss_salariale || 0;
+      // Créer une map des paramètres par mois pour un accès rapide
+      const paramsParMois = new Map<number, any>();
+      
+      // Pour chaque mois de l'année, trouver les paramètres applicables
+      for (let mois = 1; mois <= 12; mois++) {
+        const dateMois = new Date(year, mois - 1, 15); // 15e jour du mois pour éviter les problèmes de fin de mois
+        const dateMoisStr = dateMois.toISOString().split('T')[0];
+        
+        // Trouver les paramètres applicables pour ce mois
+        const paramsApplicables = paramsGeneraux?.filter(param => {
+          const dateDebut = new Date(param.date_debut);
+          const dateFin = param.date_fin ? new Date(param.date_fin) : null;
+          
+          return dateDebut <= dateMois && (!dateFin || dateFin >= dateMois);
+        }).sort((a, b) => new Date(b.date_debut).getTime() - new Date(a.date_debut).getTime());
+        
+        // Utiliser les paramètres les plus récents pour ce mois
+        paramsParMois.set(mois, paramsApplicables?.[0] || null);
+      }
       
       // 1.3 Récupérer les paramètres de sous-catégories RH
       const { data: paramsSousCategories, error: paramsSCError } = await supabase
@@ -321,9 +336,9 @@ export function useBudgetRHCalculations() {
                 return;
               }
               
-              // Calculer les mois concernés
-              const debutMois = dateDebut.getFullYear() === year ? dateDebut.getMonth() : 0;
-              const finMois = dateFin && dateFin.getFullYear() === year ? dateFin.getMonth() : 11;
+              // Calculer les mois concernés pour l'année spécifiée
+              const debutMois = dateDebut.getFullYear() < year ? 0 : dateDebut.getMonth();
+              const finMois = !dateFin ? 11 : (dateFin.getFullYear() > year ? 11 : dateFin.getMonth());
               
               // Récupérer le paramètre de sous-catégorie RH
               const paramSousCategorie = paramsSousCategories?.find(p => 
@@ -332,36 +347,45 @@ export function useBudgetRHCalculations() {
               
               // Pour chaque mois concerné
               for (let mois = debutMois; mois <= finMois; mois++) {
-                // Vérifier si le personnel est affecté à cette entité pour ce mois
-                const estAffecte = affectations.some(a => {
+                // Vérifier si le personnel est affecté à cette entité pour ce mois spécifique
+                const dateMois = new Date(year, mois, 15); // 15e jour du mois pour éviter les problèmes de fin de mois
+                
+                // Filtrer les affectations actives pour ce mois
+                const affectationsActives = affectations.filter(a => {
                   const aDebut = new Date(a.date_debut);
                   const aFin = a.date_fin ? new Date(a.date_fin) : null;
                   
-                  return (
-                    (aDebut.getFullYear() < year || 
-                     (aDebut.getFullYear() === year && aDebut.getMonth() <= mois)) &&
-                    (!aFin || aFin.getFullYear() > year || 
-                     (aFin.getFullYear() === year && aFin.getMonth() >= mois))
-                  );
+                  return aDebut <= dateMois && (!aFin || aFin >= dateMois);
                 });
                 
-                if (!estAffecte) continue;
+                // Si aucune affectation active pour ce mois, passer au mois suivant
+                if (affectationsActives.length === 0) continue;
+                
+                // Calculer le taux de présence total pour ce mois (somme des tx_presence des affectations actives)
+                const tauxPresenceTotal = affectationsActives.reduce((sum, a) => sum + (a.tx_presence || 1), 0);
+                
+                // Récupérer les paramètres RH applicables pour ce mois
+                const paramsRHMois = paramsParMois.get(mois + 1); // +1 car les mois sont indexés de 1 à 12 dans la map
+                const tauxPatronal = paramsRHMois?.taux_ss_patronale || 0;
+                const tauxSalarial = paramsRHMois?.taux_ss_salariale || 0;
                 
                 // Calculer le montant pour ce mois
                 const montantMensuel = h.montant;
+                // Appliquer le taux de présence
+                const montantAjuste = montantMensuel * tauxPresenceTotal;
                 
                 // Ajouter le montant au mois correspondant
-                sousCategoriesMap.get(sousCategorieId).montants[mois] += montantMensuel;
+                sousCategoriesMap.get(sousCategorieId).montants[mois] += montantAjuste;
                 
                 // Calculer les charges si applicable
                 if (paramSousCategorie) {
                   if (paramSousCategorie.soumis_charge_patronale) {
-                    const chargesPatronales = montantMensuel * (tauxPatronal / 100);
+                    const chargesPatronales = montantAjuste * (tauxPatronal / 100);
                     sousCategoriesMap.get(sousCategorieId).charges_patronales[mois] += chargesPatronales;
                   }
                   
                   if (paramSousCategorie.soumis_charge_salariale) {
-                    const chargesSalariales = montantMensuel * (tauxSalarial / 100);
+                    const chargesSalariales = montantAjuste * (tauxSalarial / 100);
                     sousCategoriesMap.get(sousCategorieId).charges_salariales[mois] += chargesSalariales;
                   }
                 }

@@ -163,39 +163,10 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
               };
               
               return (
-              isEntiteRow ? (
-                <tr key={getLineId(row)} className={styles.entiteRow}>
-                  <td
-                    colSpan={4}
-                    className={`${styles.cell}`}
-                    onClick={() => toggleCollapse(getLineId(row))}
-                  >
-                    <div className="flex items-center">
-                      <CollapseToggle 
-                        isExpanded={isExpanded(getLineId(row), true)} 
-                        onToggle={() => toggleCollapse(getLineId(row))} 
-                        className="mr-2"
-                      />
-                      {row.entite_libelle}
-                    </div>
-                  </td>
-                  {months.map(month => (
-                    <td key={month} className={`${styles.cell} ${styles.right}`}>
-                      {row[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month]) : '-'}
-                    </td>
-                  ))}
-                  <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
-                    {row.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row.total) : '-'}
-                  </td>
-                </tr>
-              ) : (
-                isFonctionRow ? (
-                  <tr key={getLineId(row)} className={styles.fonctionRow}>
-                    <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
-                      {showEntite() ? row.entite_libelle : ''}
-                    </td>
-                    <td 
-                      colSpan={3} 
+                isEntiteRow ? (
+                  <tr key={getLineId(row)} className={styles.entiteRow}>
+                    <td
+                      colSpan={4}
                       className={`${styles.cell}`}
                       onClick={() => toggleCollapse(getLineId(row))}
                     >
@@ -205,7 +176,7 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                           onToggle={() => toggleCollapse(getLineId(row))} 
                           className="mr-2"
                         />
-                        {row.fonction_libelle}
+                        {row.entite_libelle}
                       </div>
                     </td>
                     {months.map(month => (
@@ -218,26 +189,23 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                     </td>
                   </tr>
                 ) : (
-                  isPersonnelRow ? (
-                    <tr key={getLineId(row)} className={styles.personnelRow}>
+                  isFonctionRow ? (
+                    <tr key={getLineId(row)} className={styles.fonctionRow}>
                       <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
                         {showEntite() ? row.entite_libelle : ''}
                       </td>
-                      <td className={`${styles.cell}`} style={{ opacity: showFonction() ? 1 : 0 }}>
-                        {showFonction() ? row.fonction_libelle : ''}
-                      </td>
                       <td 
-                        colSpan={2} 
+                        colSpan={3} 
                         className={`${styles.cell}`}
                         onClick={() => toggleCollapse(getLineId(row))}
                       >
                         <div className="flex items-center">
                           <CollapseToggle 
-                            isExpanded={isExpanded(getLineId(row), false)} 
+                            isExpanded={isExpanded(getLineId(row), true)} 
                             onToggle={() => toggleCollapse(getLineId(row))} 
                             className="mr-2"
                           />
-                          {`${row.prenom || ''} ${row.nom || ''}`.trim()}
+                          {row.fonction_libelle}
                         </div>
                       </td>
                       {months.map(month => (
@@ -250,31 +218,63 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
                       </td>
                     </tr>
                   ) : (
-                    <tr key={getLineId(row)} className={styles.sousCategorieRow}>
-                      <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
-                        {showEntite() ? row.entite_libelle : ''}
-                      </td>
-                      <td className={`${styles.cell}`} style={{ opacity: showFonction() ? 1 : 0 }}>
-                        {showFonction() ? row.fonction_libelle : ''}
-                      </td>
-                      <td className={`${styles.cell}`} style={{ opacity: showPersonnel() ? 1 : 0 }}>
-                        {showPersonnel() ? `${row.prenom || ''} ${row.nom || ''}`.trim() : ''}
-                      </td>
-                      <td className={`${styles.cell}`}>
-                        {row.sous_categorie_libelle}
-                      </td>
-                      {months.map(month => (
-                        <td key={month} className={`${styles.cell} ${styles.right}`}>
-                          {row[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month]) : '-'}
+                    isPersonnelRow ? (
+                      <tr key={getLineId(row)} className={styles.personnelRow}>
+                        <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
+                          {showEntite() ? row.entite_libelle : ''}
                         </td>
-                      ))}
-                      <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
-                        {row.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row.total) : '-'}
-                      </td>
-                    </tr>
+                        <td className={`${styles.cell}`} style={{ opacity: showFonction() ? 1 : 0 }}>
+                          {showFonction() ? row.fonction_libelle : ''}
+                        </td>
+                        <td 
+                          colSpan={2} 
+                          className={`${styles.cell}`}
+                          onClick={() => toggleCollapse(getLineId(row))}
+                        >
+                          <div className="flex items-center">
+                            <CollapseToggle 
+                              isExpanded={isExpanded(getLineId(row), false)} 
+                              onToggle={() => toggleCollapse(getLineId(row))} 
+                              className="mr-2"
+                            />
+                            {`${row.prenom || ''} ${row.nom || ''}`.trim()}
+                          </div>
+                        </td>
+                        {months.map(month => (
+                          <td key={month} className={`${styles.cell} ${styles.right}`}>
+                            {row[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month]) : '-'}
+                          </td>
+                        ))}
+                        <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
+                          {row.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row.total) : '-'}
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr key={getLineId(row)} className={styles.sousCategorieRow}>
+                        <td className={`${styles.cell}`} style={{ opacity: showEntite() ? 1 : 0 }}>
+                          {showEntite() ? row.entite_libelle : ''}
+                        </td>
+                        <td className={`${styles.cell}`} style={{ opacity: showFonction() ? 1 : 0 }}>
+                          {showFonction() ? row.fonction_libelle : ''}
+                        </td>
+                        <td className={`${styles.cell}`} style={{ opacity: showPersonnel() ? 1 : 0 }}>
+                          {showPersonnel() ? `${row.prenom || ''} ${row.nom || ''}`.trim() : ''}
+                        </td>
+                        <td className={`${styles.cell}`}>
+                          {row.sous_categorie_libelle}
+                        </td>
+                        {months.map(month => (
+                          <td key={month} className={`${styles.cell} ${styles.right}`}>
+                            {row[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row[month]) : '-'}
+                          </td>
+                        ))}
+                        <td className={`${styles.cell} ${styles.right} ${styles.totalColumn}`}>
+                          {row.total ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(row.total) : '-'}
+                        </td>
+                      </tr>
+                    )
                   )
                 )
-              )
             )})}
           </tbody>
           <tfoot>
