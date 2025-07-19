@@ -281,7 +281,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       }
     };
 
-    // fetchPersonnel();
+    fetchPersonnel();
   }, [mode, personnelId, reset, addToast]);
 
   // Soumettre le formulaire
@@ -304,6 +304,8 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       
       console.log('Données du formulaire avant nettoyage:', data);
       console.log('Valeur de lien_photo avant nettoyage:', data.lien_photo);
+      console.log('Valeur de lien_photo depuis getValues:', currentPhotoPath);
+      
       // Nettoyer les données avant envoi - convertir les chaînes vides en null pour les champs optionnels
       const cleanedData = {
         ...data,
@@ -328,19 +330,11 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       
       if (mode === 'edit' && personnelId) {
         console.log('Mode édition - Mise à jour du personnel avec ID:', personnelId, 'et lien_photo:', cleanedData.lien_photo);
-        console.log('Données à envoyer pour la mise à jour:', {
-          ...cleanedData,
-          com_contrat_client_id: profil.com_contrat_client_id
-        });
         
         // Mode édition
         const { data: updatedData, error } = await supabase
           .from('rh_personnel')
-          .update(cleanedData.lien_photo === null ? {
-            ...cleanedData,
-            com_contrat_client_id: profil.com_contrat_client_id,
-            lien_photo: null
-          } : {
+          .update({
             ...cleanedData,
             com_contrat_client_id: profil.com_contrat_client_id
           })
@@ -358,20 +352,11 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         result = updatedData;
       } else {
         console.log('Mode création - Création d\'un nouveau personnel');
-        console.log('Données à envoyer pour la création:', {
-          ...cleanedData,
-          com_contrat_client_id: profil.com_contrat_client_id,
-          lien_photo: cleanedData.lien_photo
-        });
         
         // Mode création
         const { data: newData, error } = await supabase
           .from('rh_personnel')
-          .insert(cleanedData.lien_photo === null ? {
-            ...cleanedData,
-            com_contrat_client_id: profil.com_contrat_client_id,
-            lien_photo: null
-          } : {
+          .insert({
             ...cleanedData,
             com_contrat_client_id: profil.com_contrat_client_id
           })
@@ -386,6 +371,19 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         console.log('Personnel créé avec succès:', newData);
         console.log('Lien photo après création:', newData.lien_photo);
         result = newData;
+      }
+
+      // Synchroniser le formulaire avec les données confirmées par la base de données
+      if (result.lien_photo !== currentPhotoPath) {
+        console.log('Synchronisation du lien_photo avec la valeur confirmée:', result.lien_photo);
+        setValue('lien_photo', result.lien_photo, { shouldDirty: false });
+        
+        // Mettre à jour l'aperçu de la photo si nécessaire
+        if (result.lien_photo) {
+          loadPhotoPreview(result.lien_photo, setPhotoPreview);
+        } else {
+          setPhotoPreview(null);
+        }
       }
 
       addToast({
@@ -452,7 +450,13 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         <Controller
           name="lien_photo"
           control={control}
-          render={() => <input type="hidden" />}
+          render={({ field }) => (
+            <input 
+              type="hidden" 
+              {...field} 
+              value={field.value || ''} 
+            />
+          )}
         />
 
         {/* Première ligne */}
