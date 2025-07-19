@@ -281,7 +281,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       }
     };
 
-    fetchPersonnel();
+    // fetchPersonnel();
   }, [mode, personnelId, reset, addToast]);
 
   // Soumettre le formulaire
@@ -448,6 +448,13 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       />
 
       <Form size={100} columns={3} onSubmit={handleSubmit(onSubmit)}>
+        {/* Controller caché pour lien_photo pour s'assurer que react-hook-form le gère correctement */}
+        <Controller
+          name="lien_photo"
+          control={control}
+          render={() => <input type="hidden" />}
+        />
+
         {/* Première ligne */}
         <FormField
           label="Civilité"
