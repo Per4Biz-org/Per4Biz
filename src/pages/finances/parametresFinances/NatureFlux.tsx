@@ -24,6 +24,7 @@ interface NatureFlux {
     code: string;
     libelle: string;
   };
+  salarie: boolean;
 }
 
 const NatureFlux: React.FC = () => {
@@ -88,7 +89,15 @@ const NatureFlux: React.FC = () => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   };
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: {
+      code: string;
+      libelle: string;
+      description?: string;
+      id_entite: string | null;
+      actif: boolean;
+      salarie: boolean;
+    }
+  ) => {
     setIsSubmitting(true);
     try {
       if (!profil?.com_contrat_client_id) {
@@ -103,8 +112,9 @@ const NatureFlux: React.FC = () => {
           code: formData.code,
           libelle: formData.libelle,
           description: formData.description || null,
-          id_entite: formData.id_entite,
+          id_entite: formData.id_entite || null,
           actif: formData.actif,
+          salarie: formData.salarie,
           com_contrat_client_id: profil.com_contrat_client_id
         };
 
@@ -119,8 +129,9 @@ const NatureFlux: React.FC = () => {
           code: formData.code,
           libelle: formData.libelle,
           description: formData.description || null,
-          id_entite: formData.id_entite,
+          id_entite: formData.id_entite || null,
           actif: formData.actif,
+          salarie: formData.salarie,
           com_contrat_client_id: profil.com_contrat_client_id
         };
 
@@ -158,25 +169,25 @@ const NatureFlux: React.FC = () => {
   };
 
   const handleDelete = async (nature: NatureFlux) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la nature de flux "${nature.libelle}" ?`)) {
+    if (window.confirm(`Êtes-vous sûr de vouloir désactiver la nature de flux "${nature.libelle}" ?`)) {
       try {
         const { error } = await supabase
           .from('fin_flux_nature')
-          .delete()
+          .update({ actif: false })
           .eq('id', nature.id);
 
         if (error) throw error;
 
         await fetchNaturesFlux();
         addToast({
-          label: `La nature de flux "${nature.libelle}" a été supprimée avec succès`,
+          label: `La nature de flux "${nature.libelle}" a été désactivée avec succès`,
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression de la nature de flux',
+          label: 'Erreur lors de la désactivation de la nature de flux',
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -188,7 +199,7 @@ const NatureFlux: React.FC = () => {
     {
       label: 'Entité',
       accessor: 'entite',
-      render: (value) => `${value.code} - ${value.libelle}`
+      render: (value) => value ? `${value.code} - ${value.libelle}` : 'Global (toutes les entités)'
     },
     {
       label: 'Code',
@@ -204,6 +215,18 @@ const NatureFlux: React.FC = () => {
       label: 'Description',
       accessor: 'description',
       render: (value) => value || '-'
+    },
+    {
+      label: 'Salarié',
+      accessor: 'salarie',
+      align: 'center',
+      render: (value) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {value ? 'Oui' : 'Non'}
+        </span>
+      )
     },
     {
       label: 'Actif',
@@ -232,7 +255,7 @@ const NatureFlux: React.FC = () => {
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: 'Désactiver',
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -296,8 +319,9 @@ const NatureFlux: React.FC = () => {
                   code: selectedNature.code,
                   libelle: selectedNature.libelle,
                   description: selectedNature.description || '',
-                  id_entite: selectedNature.id_entite,
-                  actif: selectedNature.actif
+                  id_entite: selectedNature.id_entite || '',
+                  actif: selectedNature.actif,
+                  salarie: selectedNature.salarie || false
                 } : undefined}
                 onSubmit={handleSubmit}
                 onCancel={() => {

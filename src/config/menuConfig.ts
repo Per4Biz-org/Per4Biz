@@ -74,7 +74,7 @@ export const menuItemsGestionBancaire = [
 export const menuItemsGestionRH = [
   { icon: Home, label: 'Gestion Employés', path: '/employes' },
   { icon: CreditCard, label: 'Mes Employés', path: '/employes/mes-employes' },
-  { icon: FileText, label: 'Historique Contrat', path: '/employes/fermeture-caisse',separator: true },
+  { icon: FileText, label: 'Budget RH', path: '/employes/budget-rh',separator: true },
   { icon: FileText, label: 'Affectation Restaurant', path: '/employes/affectation-restaurant',separator: true },
   { icon: Settings, label: 'Paramètres', path: '/employes/parametres-employes', separator: true }
 ];
@@ -83,6 +83,6 @@ export const menuItemsParamGestionRH = [
   { icon: Home, label: 'Paramètres RH', path: '/employes/parametres-employes' },
   { icon: Home, label: 'Type Fonctions', path: '/employes/parametres-employes/type-fonction', separator: true},
   { icon: Home, label: 'Type Contrat', path: '/employes/parametres-employes/type-contrat' },
-  { icon: Home, label: 'Taux SS', path: '/employes/parametres-employes/taux-ss' },
+  { icon: Home, label: 'Param Catégories', path: '/employes/parametres-employes/param-categorie' },
   { icon: Home, label: 'Param Généraux', path: '/employes/parametres-employes/param-generaux', separator: true }
 ];

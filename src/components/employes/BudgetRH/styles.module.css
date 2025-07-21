@@ -1,0 +1,167 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: white;
+}
+
+.headerCell {
+  position: sticky;
+  top: 0;
+  background-color: #f9fafb;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  text-align: left;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  z-index: 10;
+}
+
+.cell {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.75rem;
+  color: #1f2937;
+}
+
+.row {
+  transition: background-color 0.2s;
+  cursor: pointer;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.row:hover {
+  background-color: #f9fafb;
+}
+
+.row:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.row:nth-child(even):hover {
+  background-color: #f3f4f6;
+}
+
+.footerRow {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.footerCell {
+  padding: 0.75rem 1rem;
+  border-top: 2px solid #e5e7eb;
+  border-bottom: none;
+  font-size: 0.75rem;
+  color: #1f2937;
+}
+
+.totalColumn {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+.left {
+  text-align: left;
+}
+
+.categoryRow {
+  background-color: #e5e7eb;
+  font-weight: 600;
+  border-top: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.entiteRow {
+  background-color: #e5e7eb !important;
+  font-weight: 700;
+  border-top: 2px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.fonctionRow {
+  background-color: #f3f4f6 !important;
+  font-weight: 500;
+}
+
+.personnelRow {
+  background-color: #f9fafb !important;
+  border-left: 2px solid transparent;
+  border-top: 1px solid #e5e7eb;
+}
+
+.sousCategorieRow {
+  background-color: #f3f4f6 !important;
+  font-style: italic;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(59, 130, 246, 0.3);
+  border-top: 1px solid #e5e7eb;
+}
+
+.exportButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.exportButton:hover {
+  opacity: 0.9;
+}
+
+.pdfButton {
+  background-color: #ef4444;
+  color: white;
+}
+
+.excelButton {
+  background-color: #16a34a;
+  color: white;
+}
+
+/* Styles pour les lignes pliables */
+.collapsible {
+  cursor: pointer;
+}
+
+.collapseIcon {
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.collapseIconExpanded {
+  transform: rotate(90deg);
+}
+
+/* Ajustement des largeurs de colonnes */
+.restaurantColumn {
+  width: 30%;
+}
+
+.fonctionColumn {
+  width: 20%;
+}
+
+.employeColumn {
+  width: 20%;
+}

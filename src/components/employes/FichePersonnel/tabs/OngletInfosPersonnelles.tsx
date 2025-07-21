@@ -7,16 +7,22 @@ import { useProfil } from '../../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../../../components/ui/form';
 import { Button } from '../../../../components/ui/button';
 import { Dropdown, DropdownOption } from '../../../../components/ui/dropdown';
-import { TiersSelector } from '../../../../components/ParametreGlobal/Tiers/TiersSelector';
-import { TiersFormModal } from '../../../../components/ParametreGlobal/Tiers/TiersFormModal';
 import { ToastData } from '../../../../components/ui/toast';
 import { User } from 'lucide-react';
+import { RHCalculMatricule } from '../../../../utils/rhUtils';
 import { ProfilePhotoUploader } from './components/ProfilePhotoUploader';
 import { personnelSchema } from './schemas/personnelSchema';
-import { usePhotoManagement } from './hooks/usePhotoManagement';
 import { useTiersManagement } from './hooks/useTiersManagement';
+import { usePhotoManagement } from './hooks/usePhotoManagement';
 
 type PersonnelFormData = z.infer<typeof personnelSchema>;
+
+interface TypeTiers {
+  id: string;
+  code: string;
+  libelle: string;
+  salarie: boolean;
+}
 
 interface OngletInfosPersonnellesProps {
   mode: 'create' | 'edit';
@@ -36,6 +42,9 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
   const { profil } = useProfil();
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [typesTiersSalarie, setTypesTiersSalarie] = useState<TypeTiers[]>([]);
+  const [initialData, setInitialData] = useState<PersonnelFormData | null>(null);
+  const [isCheckingCodeCourt, setIsCheckingCodeCourt] = useState(false);
   
   // Initialiser le formulaire avec react-hook-form AVANT les autres hooks
   const { 
@@ -44,6 +53,9 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     reset,
     getValues,
     setValue,
+    setError,
+    clearErrors,
+    setFocus,
     formState: { errors } 
   } = useForm<PersonnelFormData>({
     resolver: zodResolver(personnelSchema),
@@ -77,13 +89,150 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     loadPhotoPreview, 
     handlePhotoUpload, 
     handleRemovePhoto 
-  } = usePhotoManagement();
+  } = usePhotoManagement({
+    setValue,
+    getValues,
+    addToast
+  });
   
-  const {
-    isTiersModalOpen,
-    setIsTiersModalOpen,
-    handleTiersSubmit
-  } = useTiersManagement(setValue, addToast);
+  // Charger les types de tiers "salarié"
+  useEffect(() => {
+    const fetchTypesTiersSalarie = async () => {
+      if (!profil?.com_contrat_client_id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('com_param_type_tiers')
+          .select('id, code, libelle, salarie')
+          .eq('com_contrat_client_id', profil.com_contrat_client_id)
+          .eq('salarie', true)
+          .eq('actif', true);
+          
+        if (error) throw error;
+        setTypesTiersSalarie(data || []);
+      } catch (error) {
+        console.error('Erreur lors du chargement des types de tiers salarié:', error);
+      }
+    };
+    
+    fetchTypesTiersSalarie();
+  }, [profil?.com_contrat_client_id]);
+
+  // Gestionnaire pour la vérification du code court
+  const handleCodeCourtBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const codeCourt = e.target.value.trim();
+    if (!codeCourt || isCheckingCodeCourt) return;
+    
+    // Ne pas vérifier en mode édition sauf si le code a changé
+    if (mode === 'edit' && personnelId && codeCourt === initialData?.code_court) return;
+    
+    setIsCheckingCodeCourt(true);
+    
+    try {
+      console.log('Vérification du code court:', codeCourt);
+      
+      // Vérifier si les types de tiers "salarié" sont disponibles
+      if (typesTiersSalarie.length === 0) {
+        console.warn('Aucun type de tiers "salarié" trouvé');
+        addToast({
+          label: 'Aucun type de tiers "salarié" trouvé. Veuillez en créer un avant de continuer.',
+          icon: 'AlertTriangle',
+          color: '#f59e0b'
+        });
+        setIsCheckingCodeCourt(false);
+        return;
+      }
+      
+      // Vérifier si le code existe déjà dans la table com_tiers
+      const { data, error } = await supabase
+        .from('com_tiers')
+        .select('id, code, nom')
+        .eq('code', codeCourt)
+        .eq('com_contrat_client_id', profil?.com_contrat_client_id)
+        .eq('id_type_tiers', typesTiersSalarie[0].id);
+        
+      if (error) throw error;
+      
+      console.log('Résultat de la vérification:', data);
+      
+      if (data && data.length > 0) {
+        // Le code existe déjà
+        console.log('Code court déjà utilisé:', codeCourt);
+        setError('code_court', {
+          type: 'manual', 
+          message: 'Ce code court est déjà utilisé. Veuillez en choisir un autre.'
+        });
+        setValue('code_court', '');
+        setFocus('code_court');
+      } else {
+        // Le code n'existe pas, on peut créer un tiers automatiquement
+        if (typesTiersSalarie.length > 0) {
+          const nom = getValues('nom');
+          const prenom = getValues('prenom');
+          console.log('Création automatique de tiers avec:', { codeCourt, nom, prenom });
+          
+          if (nom && prenom) {
+            // Créer un tiers automatiquement
+            const tiersData = {
+              code: codeCourt,
+              nom: `${prenom} ${nom}`,
+              id_type_tiers: typesTiersSalarie[0].id
+            };
+            
+            const { data: newTiers, error: createError } = await supabase
+              .from('com_tiers')
+              .insert({
+                ...tiersData,
+                com_contrat_client_id: profil?.com_contrat_client_id,
+                actif: true
+              })
+              .select()
+              .single();
+              
+            if (createError) throw createError;
+            
+            // Mettre à jour le champ id_tiers avec le nouveau tiers
+            console.log('Tiers créé avec succès:', newTiers);
+            setValue('id_tiers', newTiers.id);
+            clearErrors('code_court');
+            
+            addToast({
+              label: `Tiers "${prenom} ${nom}" créé automatiquement avec le code "${codeCourt}"`,
+              icon: 'Check',
+              color: '#22c55e'
+            });
+          }
+            // Générer un matricule automatiquement si on est en mode création
+            if (mode === 'create' && profil?.com_contrat_client_id) {
+              try {
+                const matricule = await RHCalculMatricule(profil.com_contrat_client_id);
+                if (matricule) {
+                  setValue('matricule', matricule);
+                  console.log('Matricule généré automatiquement:', matricule);
+                }
+              } catch (error) {
+                console.error('Erreur lors de la génération du matricule:', error);
+              }
+            }
+        } else {
+          addToast({
+            label: 'Aucun type de tiers "salarié" trouvé. Veuillez en créer un avant de continuer.',
+            icon: 'AlertTriangle',
+            color: '#f59e0b'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification du code court:', error);
+      addToast({
+        label: 'Erreur lors de la vérification du code court',
+        icon: 'AlertTriangle',
+        color: '#ef4444'
+      });
+    } finally {
+      setIsCheckingCodeCourt(false);
+    }
+  };
 
   // Charger les données du personnel en mode édition
   useEffect(() => {
@@ -107,6 +256,9 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           if (data.date_naissance) {
             formattedData.date_naissance = new Date(data.date_naissance).toISOString().split('T')[0];
           }
+          
+          // Sauvegarder les données initiales pour les comparaisons futures
+          setInitialData(formattedData);
           
           // Mettre à jour le formulaire avec les données
           reset(formattedData);
@@ -148,25 +300,27 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
     try {
       // Récupérer la valeur la plus récente du champ lien_photo
       const currentPhotoPath = getValues('lien_photo');
-      console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath);
+      console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath, typeof currentPhotoPath);
       
       console.log('Données du formulaire avant nettoyage:', data);
       console.log('Valeur de lien_photo avant nettoyage:', data.lien_photo);
+      console.log('Valeur de lien_photo depuis getValues:', currentPhotoPath);
+      
       // Nettoyer les données avant envoi - convertir les chaînes vides en null pour les champs optionnels
       const cleanedData = {
         ...data,
-        date_naissance: data.date_naissance === '' ? null : data.date_naissance,
-        civilite: data.civilite === '' ? null : data.civilite,
-        sexe: data.sexe === '' ? null : data.sexe,
-        adresse: data.adresse === '' ? null : data.adresse,
-        code_postal: data.code_postal === '' ? null : data.code_postal,
-        ville: data.ville === '' ? null : data.ville,
-        pays: data.pays === '' ? null : data.pays,
-        numero_securite_sociale: data.numero_securite_sociale === '' ? null : data.numero_securite_sociale,
-        nif: data.nif === '' ? null : data.nif,
-        email_perso: data.email_perso === '' ? null : data.email_perso,
-        telephone: data.telephone === '' ? null : data.telephone,
-        lien_photo: currentPhotoPath === '' ? null : currentPhotoPath
+        date_naissance: !data.date_naissance || data.date_naissance === '' ? null : data.date_naissance,
+        civilite: !data.civilite || data.civilite === '' ? null : data.civilite,
+        sexe: !data.sexe || data.sexe === '' ? null : data.sexe,
+        adresse: !data.adresse || data.adresse === '' ? null : data.adresse,
+        code_postal: !data.code_postal || data.code_postal === '' ? null : data.code_postal,
+        ville: !data.ville || data.ville === '' ? null : data.ville,
+        pays: !data.pays || data.pays === '' ? null : data.pays,
+        numero_securite_sociale: !data.numero_securite_sociale || data.numero_securite_sociale === '' ? null : data.numero_securite_sociale,
+        nif: !data.nif || data.nif === '' ? null : data.nif,
+        email_perso: !data.email_perso || data.email_perso === '' ? null : data.email_perso,
+        telephone: !data.telephone || data.telephone === '' ? null : data.telephone,
+        lien_photo: !currentPhotoPath || currentPhotoPath === '' ? null : currentPhotoPath
       };
       
       console.log('Données nettoyées avant envoi:', cleanedData);
@@ -175,11 +329,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       let result;
       
       if (mode === 'edit' && personnelId) {
-        console.log('Mode édition - Mise à jour du personnel avec ID:', personnelId);
-        console.log('Données à envoyer pour la mise à jour:', {
-          ...cleanedData,
-          com_contrat_client_id: profil.com_contrat_client_id
-        });
+        console.log('Mode édition - Mise à jour du personnel avec ID:', personnelId, 'et lien_photo:', cleanedData.lien_photo);
         
         // Mode édition
         const { data: updatedData, error } = await supabase
@@ -202,10 +352,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         result = updatedData;
       } else {
         console.log('Mode création - Création d\'un nouveau personnel');
-        console.log('Données à envoyer pour la création:', {
-          ...cleanedData,
-          com_contrat_client_id: profil.com_contrat_client_id
-        });
         
         // Mode création
         const { data: newData, error } = await supabase
@@ -225,6 +371,19 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         console.log('Personnel créé avec succès:', newData);
         console.log('Lien photo après création:', newData.lien_photo);
         result = newData;
+      }
+
+      // Synchroniser le formulaire avec les données confirmées par la base de données
+      if (result.lien_photo !== currentPhotoPath) {
+        console.log('Synchronisation du lien_photo avec la valeur confirmée:', result.lien_photo);
+        setValue('lien_photo', result.lien_photo, { shouldDirty: false });
+        
+        // Mettre à jour l'aperçu de la photo si nécessaire
+        if (result.lien_photo) {
+          loadPhotoPreview(result.lien_photo, setPhotoPreview);
+        } else {
+          setPhotoPreview(null);
+        }
       }
 
       addToast({
@@ -287,6 +446,19 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       />
 
       <Form size={100} columns={3} onSubmit={handleSubmit(onSubmit)}>
+        {/* Controller caché pour lien_photo pour s'assurer que react-hook-form le gère correctement */}
+        <Controller
+          name="lien_photo"
+          control={control}
+          render={({ field }) => (
+            <input 
+              type="hidden" 
+              {...field} 
+              value={field.value || ''} 
+            />
+          )}
+        />
+
         {/* Première ligne */}
         <FormField
           label="Civilité"
@@ -343,7 +515,69 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           />
         </FormField>
 
-        {/* Deuxième ligne */}
+        {/* Deuxième ligne */}  
+       <FormField
+          label="Code court"
+          required
+          error={errors.code_court?.message}
+          description="Code unique pour identifier le salarié (max 12 caractères)"
+        >
+          <Controller
+            name="code_court"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Code court"
+                maxLength={12}
+                error={!!errors.code_court}
+                onBlur={handleCodeCourtBlur}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="Matricule"
+          required
+          error={errors.matricule?.message}
+          description="Matricule généré automatiquement à partir du code court"
+        >
+          <Controller
+            name="matricule"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Matricule"
+                maxLength={12}
+                error={!!errors.matricule}
+                disabled={true}
+              />
+            )}
+          />
+        </FormField>
+
+        <FormField
+          label="Tiers associé"
+          required
+          error={errors.id_tiers?.message}
+          description="Tiers créé automatiquement à partir du code court"
+        >
+          <Controller
+            name="id_tiers"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                {...field}
+                placeholder="Créé automatiquement"
+                disabled={true}
+              />
+            )}
+          />
+        </FormField>
+        
+        {/* Troisième ligne */}
         <FormField
           label="Sexe"
           error={errors.sexe?.message}
@@ -396,79 +630,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
             )}
           />
         </FormField>
-
-        {/* Troisième ligne */}
-                <FormField
-          label="Code court"
-          required
-          error={errors.code_court?.message}
-          description="Code unique pour identifier le salarié (max 12 caractères)"
-        >
-          <Controller
-            name="code_court"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                {...field}
-                placeholder="Code court"
-                maxLength={12}
-                error={!!errors.code_court}
-              />
-            )}
-          />
-        </FormField>
-
-        <FormField
-          label="Matricule"
-          required
-          error={errors.matricule?.message}
-          description="Matricule unique pour identifier le salarié (max 12 caractères)"
-        >
-          <Controller
-            name="matricule"
-            control={control}
-            render={({ field }) => (
-              <FormInput
-                {...field}
-                placeholder="Matricule"
-                maxLength={12}
-                error={!!errors.matricule}
-              />
-            )}
-          />
-        </FormField>
-
-        <FormField
-          label="Tiers associé"
-          required
-          error={errors.id_tiers?.message}
-          description="Tiers associé au salarié"
-        >
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <Controller
-                name="id_tiers"
-                control={control}
-                render={({ field }) => (
-                  <TiersSelector
-                    value={field.value}
-                    onChange={field.onChange}
-                    disabled={isSubmitting}
-                  />
-                )}
-              />
-            </div>
-            <Button
-              label="Nouveau tiers"
-              icon="Plus"
-              color="var(--color-primary)"
-              onClick={() => setIsTiersModalOpen(true)}
-              disabled={isSubmitting}
-              size="sm"
-            />
-          </div>
-        </FormField>
-        
 
         {/* Quatrième ligne */}
         <FormField
@@ -613,14 +774,6 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           />
         </FormActions>
       </Form>
-
-      {/* Modale pour créer un nouveau tiers */}
-      <TiersFormModal
-        isOpen={isTiersModalOpen}
-        onClose={() => setIsTiersModalOpen(false)}
-        onSubmit={handleTiersSubmit}
-        isSubmitting={false}
-      />
     </div>
   );
 };

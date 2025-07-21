@@ -43,7 +43,10 @@ const ParamGeneraux: React.FC = () => {
     taux_ss_salariale: '',
     ticket_resto_journalier: '',
     commentaire: '',
-    actif: true
+    actif: true,
+    mat_prefixe: '',
+    mat_chrono: '',
+    mat_nb_position: ''
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -123,6 +126,19 @@ const ParamGeneraux: React.FC = () => {
       errors.date_debut = 'La date de début est requise';
     }
     
+   // Validation des champs de matricule
+   if (formData.mat_prefixe && formData.mat_prefixe.length > 6) {
+     errors.mat_prefixe = 'Le préfixe ne doit pas dépasser 6 caractères';
+   }
+   
+   if (formData.mat_chrono && isNaN(parseInt(formData.mat_chrono))) {
+     errors.mat_chrono = 'Le compteur doit être un nombre entier';
+   }
+   
+   if (formData.mat_nb_position && (isNaN(parseInt(formData.mat_nb_position)) || parseInt(formData.mat_nb_position) < 1)) {
+     errors.mat_nb_position = 'Le nombre de positions doit être un entier positif';
+   }
+   
     // Validation des valeurs numériques
     if (formData.taux_ss_patronale && isNaN(parseFloat(formData.taux_ss_patronale))) {
       errors.taux_ss_patronale = 'Le taux doit être un nombre valide';
@@ -164,6 +180,9 @@ const ParamGeneraux: React.FC = () => {
         ticket_resto_journalier: formData.ticket_resto_journalier ? parseFloat(formData.ticket_resto_journalier) : null,
         commentaire: formData.commentaire || null,
         actif: formData.actif,
+       mat_prefixe: formData.mat_prefixe || null,
+       mat_chrono: formData.mat_chrono ? parseInt(formData.mat_chrono) : 1,
+       mat_nb_position: formData.mat_nb_position ? parseInt(formData.mat_nb_position) : 3,
         com_contrat_client_id: profil.com_contrat_client_id
       };
 
@@ -196,7 +215,10 @@ const ParamGeneraux: React.FC = () => {
         taux_ss_salariale: '',
         ticket_resto_journalier: '',
         commentaire: '',
-        actif: true
+        actif: true,
+        mat_prefixe: '',
+        mat_chrono: '1',
+        mat_nb_position: '3'
       });
       addToast({
         label: `Paramètre général ${selectedParam ? 'modifié' : 'créé'} avec succès`,
@@ -232,7 +254,10 @@ const ParamGeneraux: React.FC = () => {
       taux_ss_salariale: param.taux_ss_salariale?.toString() || '',
       ticket_resto_journalier: param.ticket_resto_journalier?.toString() || '',
       commentaire: param.commentaire || '',
-      actif: param.actif
+      actif: param.actif,
+      mat_prefixe: param.mat_prefixe || '',
+      mat_chrono: param.mat_chrono?.toString() || '1',
+      mat_nb_position: param.mat_nb_position?.toString() || '3'
     });
     setIsModalOpen(true);
   };
@@ -294,6 +319,23 @@ const ParamGeneraux: React.FC = () => {
       align: 'right',
       render: (value) => value ? `${value} €` : '-'
     },
+   {
+     label: 'Préfixe matricule',
+     accessor: 'mat_prefixe',
+     render: (value) => value || '-'
+   },
+   {
+     label: 'Format matricule',
+     accessor: 'mat_nb_position',
+     render: (value, row) => {
+       if (!row.mat_prefixe) return '-';
+       const prefixe = row.mat_prefixe;
+       const nbPosition = value || 3;
+       const chrono = row.mat_chrono || 1;
+       const chronoFormatted = chrono.toString().padStart(nbPosition, '0');
+       return `${prefixe}${chronoFormatted} (${nbPosition} chiffres)`;
+     }
+   },
     {
       label: 'Actif',
       accessor: 'actif',
@@ -349,7 +391,10 @@ const ParamGeneraux: React.FC = () => {
                 taux_ss_salariale: '',
                 ticket_resto_journalier: '',
                 commentaire: '',
-                actif: true
+                actif: true,
+                mat_prefixe: '',
+                mat_chrono: '1',
+                mat_nb_position: '3'
               });
               setIsModalOpen(true);
             }}
@@ -469,6 +514,69 @@ const ParamGeneraux: React.FC = () => {
               />
             </FormField>
 
+           <FormField
+             label="Préfixe matricule"
+             error={formErrors.mat_prefixe}
+             description="Préfixe utilisé pour générer les matricules (max 6 caractères)"
+             className="mb-3"
+           >
+             <FormInput
+               name="mat_prefixe"
+               value={formData.mat_prefixe}
+               onChange={handleInputChange}
+               maxLength={6}
+               placeholder="Ex: MEL"
+               disabled={isSubmitting}
+             />
+           </FormField>
+
+           <FormField
+             label="Compteur matricule"
+             error={formErrors.mat_chrono}
+             description="Valeur actuelle du compteur pour la génération de matricules"
+             className="mb-3"
+           >
+             <FormInput
+               name="mat_chrono"
+               type="number"
+               value={formData.mat_chrono}
+               onChange={handleInputChange}
+               min="1"
+               placeholder="Ex: 1"
+               disabled={isSubmitting}
+             />
+           </FormField>
+
+           <FormField
+             label="Nombre de positions"
+             error={formErrors.mat_nb_position}
+             description="Nombre de chiffres pour afficher le compteur (ex: 3 pour MEL001)"
+             className="mb-3"
+           >
+             <FormInput
+               name="mat_nb_position"
+               type="number"
+               value={formData.mat_nb_position}
+               onChange={handleInputChange}
+               min="1"
+               max="10"
+               placeholder="Ex: 3"
+               disabled={isSubmitting}
+             />
+           </FormField>
+
+           {formData.mat_prefixe && (
+             <FormField
+               label="Aperçu du prochain matricule"
+               className="mb-3"
+             >
+               <div className="p-2 bg-blue-50 border border-blue-200 rounded-md text-blue-700 font-medium">
+                 {formData.mat_prefixe}
+                 {(parseInt(formData.mat_chrono) || 1).toString().padStart(parseInt(formData.mat_nb_position) || 3, '0')}
+               </div>
+             </FormField>
+           )}
+
             <FormField
               label="Commentaire"
             >
@@ -510,7 +618,10 @@ const ParamGeneraux: React.FC = () => {
                     taux_ss_salariale: '',
                     ticket_resto_journalier: '',
                     commentaire: '',
-                    actif: true
+                    actif: true,
+                    mat_prefixe: '',
+                    mat_chrono: '1',
+                    mat_nb_position: '3'
                   });
                   setFormErrors({});
                 }}

@@ -16,13 +16,14 @@ interface NatureFluxFormData {
   code: string;
   libelle: string;
   description?: string;
-  id_entite: string;
+  id_entite: string | null;
   actif: boolean;
+  salarie: boolean;
 }
 
 interface NatureFluxFormProps {
   initialData?: NatureFluxFormData;
-  onSubmit: (data: NatureFluxFormData) => Promise<void>;
+  onSubmit: (data: NatureFluxFormData & { id_entite: string | null }) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
 }
@@ -32,8 +33,9 @@ export function NatureFluxForm({
     code: '',
     libelle: '',
     description: '',
-    id_entite: '',
-    actif: true
+    id_entite: null,
+    actif: true,
+    salarie: false
   },
   onSubmit,
   onCancel,
@@ -85,10 +87,17 @@ export function NatureFluxForm({
     }));
   };
 
+  const handleSalarieToggleChange = (checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      salarie: checked
+    }));
+  };
+
   const handleEntiteChange = (value: string) => {
     setFormData(prev => ({
       ...prev,
-      id_entite: value
+      id_entite: value === '' ? null : value
     }));
     if (errors.id_entite) {
       setErrors(prev => ({
@@ -101,9 +110,9 @@ export function NatureFluxForm({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof NatureFluxFormData, string>> = {};
 
-    if (!formData.code) newErrors.code = 'Le code est requis';
-    if (!formData.libelle) newErrors.libelle = 'Le libellé est requis';
-    if (!formData.id_entite) newErrors.id_entite = 'L\'entité est requise';
+    if (!formData.code.trim()) newErrors.code = 'Le code est requis';
+    if (!formData.libelle.trim()) newErrors.libelle = 'Le libellé est requis';
+    // id_entite peut être null pour une nature globale
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -112,25 +121,35 @@ export function NatureFluxForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    await onSubmit(formData);
+    
+    // Préparer les données en convertissant les chaînes vides en null pour les UUID
+    const submitData = {
+      ...formData,
+      id_entite: formData.id_entite === '' ? null : formData.id_entite
+    };
+    
+    await onSubmit(submitData);
   };
 
-  const entiteOptions: DropdownOption[] = entites.map(entite => ({
-    value: entite.id,
-    label: `${entite.code} - ${entite.libelle}`
-  }));
+  const entiteOptions: DropdownOption[] = [
+    { value: '', label: 'Global (toutes les entités)' },
+    ...entites.map(entite => ({
+      value: entite.id,
+      label: `${entite.code} - ${entite.libelle}`
+    }))
+  ];
 
   return (
     <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
       <FormField
         label="Entité"
-        required
         error={errors.id_entite}
+        description="Laissez vide pour une nature globale applicable à toutes les entités"
         className="mb-3"
       >
         <Dropdown
           options={entiteOptions}
-          value={formData.id_entite}
+          value={formData.id_entite || ''}
           onChange={handleEntiteChange}
           label="Sélectionner une entité"
           size="sm"
@@ -165,6 +184,20 @@ export function NatureFluxForm({
           onChange={handleInputChange}
           placeholder="Ex: Exploitation"
           className="h-9"
+        />
+      </FormField>
+
+      <FormField
+        label="Salarié"
+        description="Indique si cette nature de flux est liée aux salariés"
+        className="mb-3"
+      >
+        <Toggle
+          checked={formData.salarie}
+          onChange={handleSalarieToggleChange}
+          label={formData.salarie ? 'Oui' : 'Non'}
+          icon="Users"
+          size="sm"
         />
       </FormField>
 

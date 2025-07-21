@@ -13,7 +13,7 @@ export const personnelSchema = z.object({
   pays: z.string().nullable().optional(),
   numero_securite_sociale: z.string().nullable().optional(),
   nif: z.string().nullable().optional(),
-  email_perso: z.string().email('Email invalide').nullable().optional(),
+  email_perso: z.string().email('Email invalide').nullable().optional().or(z.literal('')),
   telephone: z.string().nullable().optional(),
   lien_photo: z.string().nullable().optional(),
   id_tiers: z.string().min(1, 'Le tiers est requis'),
