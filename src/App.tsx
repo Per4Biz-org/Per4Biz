@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import React from 'react'
 import Accueil from './pages/Accueil'
-import TestUI from './pages/TestUI'
+// import TestUI from './pages/TestUI' // Removido - página de teste
 import ParametreGlobal from './pages/ParametreGlobal/'
 import Entites from './pages/ParametreGlobal/Entites'
 import TypeTiers from './pages/ParametreGlobal/TypeTiers'
@@ -24,27 +24,22 @@ import ImportTiers from './pages/ParametreGlobal/Import/ImportTiers'
 import ImportFacture from './pages/ParametreGlobal/Import/ImportFacture'
 import ImportCADetail from './pages/ParametreGlobal/Import/ImportCADetail'
 import ImportFormat from './pages/banques/ParametresBanque/ImportFormat'
-import ImportRelevesBrut from './pages/banques/Releves/ImportRelevesBrut'
-import EcritureBancaire from './pages/banques/Releves/EcritureBancaire'
+// import ImportRelevesBrut from './pages/banques/Releves/ImportRelevesBrut' // Removido - erros tipagem
+// import EcritureBancaire from './pages/banques/Releves/EcritureBancaire' // Removido - instável
 import Profil from './pages/Profil'
 import SuiviCABudget from './pages/finances/CA/SuiviCABudget'
 import SuiviCAReel from './pages/finances/CA/SuiviCAReel'
 import FermetureCaisse from './pages/finances/caisse/FermetureCaisse'
 import Layout from './components/Layout'
-import Employes from './pages/employes'
-import ParametresEmployes from './pages/employes/ParametresEmployes'
+// import Employes from './pages/employes' // Removido - módulo RH instável
+// import ParametresEmployes from './pages/employes/ParametresEmployes' // Removido - módulo RH instável
 import { MenuProvider } from './context/MenuContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProfilProvider } from './context/ProfilContext'
 import { PrivateRoute } from './components/PrivateRoute'
 import Login from './pages/Login'
-import EditFactureAchat from './pages/finances/factures/EditFactureAchat'
-import TypeFonction from './pages/employes/ParametresEmployes/TypeFonction'
-import TypeContrat from './pages/employes/ParametresEmployes/TypeContrat'
-import MesEmployes from './pages/employes/MesEmployes'
-import ParamSousCategoriesRH from './pages/employes/ParametresEmployes/ParamSousCategoriesRH'
-import BudgetRh from './pages/employes/BudgetRh'
-import ParamGeneraux from './pages/employes/ParametresEmployes/ParamGeneraux'
+// import EditFactureAchat from './pages/finances/factures/EditFactureAchat' // Removido - não usado
+// Todos os imports do módulo RH removidos - instável
 
 // Lazy loading du composant MesFactures
 const MesFacturesLazy = React.lazy(() => import('./pages/finances/factures/MesFactures'))
@@ -64,13 +59,7 @@ function App() {
                 </Layout>
               </PrivateRoute>
             } />
-            <Route path="/testui" element={
-              <PrivateRoute>
-                <Layout>
-                  <TestUI />
-                </Layout>
-              </PrivateRoute>
-            } />
+            {/* Rota TestUI removida - página de teste */}
             <Route path="/parametres-global/entites" element={
               <PrivateRoute>
                 <Layout>
@@ -255,6 +244,7 @@ function App() {
                </Layout>
              </PrivateRoute>
            } />
+{/* PRODUÇÃO: Rotas comentadas - problemas de tipagem
           <Route path="/banques/import-releves" element={
             <PrivateRoute>
               <Layout>
@@ -269,6 +259,8 @@ function App() {
               </Layout>
             </PrivateRoute>
           } />
+*/}
+{/* PRODUÇÃO: Módulo Employés comentado - instável (erros CSS/tipagem)
           <Route path="/employes" element={
             <PrivateRoute>
               <Layout>
@@ -325,6 +317,7 @@ function App() {
               </Layout>
             </PrivateRoute>
           } />
+*/}
             <Route path="/profil" element={
               <PrivateRoute>
                 <Layout>
