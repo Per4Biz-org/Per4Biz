@@ -18,4 +18,16 @@ export const menuItemsAccueil = [
   }
 ];
 
-// Configurações de menu removidas - mantendo apenas as essenciais para produção
+// Menu para gestão financière
+export const menuItemsGestionFinanciere = [
+  { icon: Home, label: 'Accueil', path: '/' },
+  { icon: FileText, label: 'Mes Factures', path: '/finances/mes-factures' },
+  { icon: CreditCard, label: 'Fermeture Caisse', path: '/finances/fermeture-caisse', separator: true },
+  { icon: User, label: 'Mon Profil', path: '/profil', separator: true},
+  { 
+    icon: Users, 
+    label: 'Déconnexion', 
+    path: '/login',
+    onClick: handleLogout
+  }
+];

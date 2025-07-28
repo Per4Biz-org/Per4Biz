@@ -45,7 +45,6 @@ export async function parseCSVFile(
       header: true,
       skipEmptyLines: true,
       delimiter,
-      encoding: format.encodage || 'utf-8',
       transformHeader: (header) => header.trim(),
       // Désactiver la détection automatique du délimiteur
       delimitersToGuess: [],
@@ -62,7 +61,7 @@ export async function parseCSVFile(
       
       // Utiliser les noms de colonnes comme en-têtes si la première ligne ne contient pas d'en-têtes
       if (format.premiere_ligne_donnees > 1) {
-        parseOptions.header = columnNames;
+        parseOptions.header = false;
       }
     }
 
@@ -257,13 +256,13 @@ export async function parseCSVFile(
                 case 'date':
                   // Convertir en date et s'assurer que null est retourné si la conversion échoue
                   const parsedDate = parseDate(value);
-                  processedRow[columnName] = parsedDate;
+                  processedRow[columnName] = parsedDate || '';
                   console.log(`Conversion date pour ${columnName}: "${value}" → ${parsedDate}`);
                   break;
                   
                 case 'montant':
                   const numValue = parseNumericValue(value);
-                  processedRow[columnName] = numValue;
+                  processedRow[columnName] = numValue?.toString() || '';
                   console.log(`Conversion montant pour ${columnName}: "${value}" → ${numValue}`);
                   break;
                   

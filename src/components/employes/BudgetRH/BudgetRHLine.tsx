@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './styles.module.css';
 import { BudgetData } from '../../../hooks/employes/useBudgetRHCalculations';
 import { CollapseToggle } from './CollapseToggle';
@@ -88,7 +87,7 @@ export function BudgetRHLine({
       
       {months.map(month => (
         <td key={month} className={`${styles.cell} ${styles.right}`}>
-          {data[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(data[month]) : '-'}
+          {(data as any)[month] ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format((data as any)[month]) : '-'}
         </td>
       ))}
       
