@@ -17,6 +17,7 @@ interface DropdownProps {
   icon?: keyof typeof icons;
   label?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export function Dropdown({
@@ -28,6 +29,7 @@ export function Dropdown({
   icon,
   label,
   className = '',
+  disabled = false,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -67,6 +69,7 @@ export function Dropdown({
         type="button"
         className={styles.button}
         onClick={() => setIsOpen(!isOpen)}
+        disabled={disabled}
       >
         {IconComponent && (
           <IconComponent size={iconSize} className={styles.icon} />

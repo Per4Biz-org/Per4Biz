@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './styles.module.css';
 import { BudgetData } from '../../../hooks/employes/useBudgetRHCalculations';
 
@@ -8,12 +7,14 @@ interface BudgetRHFooterProps {
 }
 
 export function BudgetRHFooter({ data, months }: BudgetRHFooterProps) {
-  // Calculer les totaux
-  const totals = {
-    ...months.reduce((acc, month) => ({
-      ...acc,
-      [month]: data.reduce((sum, row) => sum + (row[month] || 0), 0)
-    }), {}),
+  // Calculer les totaux par mois
+  const monthlyTotals: { [key: string]: number } = {};
+  months.forEach(month => {
+    monthlyTotals[month] = data.reduce((sum, row) => sum + ((row as any)[month] || 0), 0);
+  });
+  
+  const totals: { [key: string]: number } = {
+    ...monthlyTotals,
     total: data.reduce((sum, row) => sum + (row.total || 0), 0)
   };
 

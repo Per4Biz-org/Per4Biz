@@ -1,4 +1,3 @@
-import React from 'react';
 import { FileText, FileSpreadsheet } from 'lucide-react';
 import styles from './styles.module.css';
 import { BudgetData } from '../../../hooks/employes/useBudgetRHCalculations';
@@ -11,11 +10,6 @@ interface BudgetRHExportButtonsProps {
 }
 
 export function BudgetRHExportButtons({ data, year, entiteName }: BudgetRHExportButtonsProps) {
-  // Mois de l'année
-  const months = [
-    'janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin',
-    'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'
-  ];
 
   // Exporter en Excel
   const handleExportExcel = () => {

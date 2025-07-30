@@ -7,7 +7,7 @@ import { Paperclip, ExternalLink } from 'lucide-react';
 import { useMenu } from '../../../context/MenuContext';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
-import { menuItemsGestionFinanciere } from '../../../config/menuConfig';
+import { menuItemsAccueil, menuItemsGestionFinanciere } from '../../../config/menuConfig';
 import { PageSection } from '../../../components/ui/page-section';
 import { DataTable, Column } from '../../../components/ui/data-table';
 import { Button } from '../../../components/ui/button';
