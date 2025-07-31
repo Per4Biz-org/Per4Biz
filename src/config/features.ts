@@ -1,57 +1,59 @@
 export const FEATURES = {
-  // 🏠 Pages principais (fallback padrão)
-  ENABLE_ACCUEIL: true, // ✅ Accueil
-  ENABLE_PROFIL: true, // ✅ Mon Profil
+  // 🏠 Pages principales
+  ENABLE_ACCUEIL: true,
+  ENABLE_PROFIL: true,
   ENABLE_TEST_UI: false,
   
-  // ⚙️ Paramètres Globaux (desativados)
-  ENABLE_PARAMETRES_GLOBAL: false,
-  ENABLE_ENTITES: false,
-  ENABLE_TIERS: false,
-  ENABLE_TYPE_TIERS: false,
-  ENABLE_TYPE_FACTURE: false,
-  ENABLE_IMPORT_CA_DETAIL: false,
-  ENABLE_IMPORT_FACTURE: false,
-  ENABLE_IMPORT_TIERS: false,
-  ENABLE_IMPORT_GLOBAL: false,
+  // ⚙️ Paramètres Globaux
+
+
+  ENABLE_PARAMETRES_GLOBAL: true,
+  ENABLE_ENTITES: true,
+  ENABLE_TIERS: true,
+  ENABLE_TYPE_TIERS: true,
+  ENABLE_TYPE_FACTURE: true,
+  ENABLE_IMPORT_CA_DETAIL: true,
+  ENABLE_IMPORT_FACTURE: true,
+  ENABLE_IMPORT_TIERS: true,
+  ENABLE_IMPORT_GLOBAL: true,
   
-  // 🏦 Module Banques (desativados)
-  ENABLE_BANQUES: false,
-  ENABLE_PARAMETRES_BANQUE: false,
-  ENABLE_COMPTES_BANCAIRE: false,
-  ENABLE_MODE_PAIEMENT: false,
-  ENABLE_IMPORT_FORMAT: false,
-  ENABLE_IMPORT_RELEVES_BRUT: false,
-  ENABLE_ECRITURE_BANCAIRE: false,
+  // 🏦 Module Banques
+  ENABLE_BANQUES: true,
+  ENABLE_PARAMETRES_BANQUE: true,
+  ENABLE_COMPTES_BANCAIRE: true,
+  ENABLE_MODE_PAIEMENT: true,
+  ENABLE_IMPORT_FORMAT: true,
+  ENABLE_IMPORT_RELEVES_BRUT: true,
+  ENABLE_ECRITURE_BANCAIRE: true,
   
-  // 👥 Module Employés (desativados)
-  ENABLE_EMPLOYES: false,
-  ENABLE_PARAMETRES_EMPLOYES: false,
-  ENABLE_BUDGET_RH: false,
-  ENABLE_FICHE_PERSONNEL: false,
-  ENABLE_MES_EMPLOYES: false,
-  ENABLE_PARAM_GENERAUX: false,
-  ENABLE_PARAM_SOUS_CATEGORIES_RH: false,
-  ENABLE_TYPE_CONTRAT: false,
-  ENABLE_TYPE_FONCTION: false,
+  // 👥 Module Employés
+  ENABLE_EMPLOYES: true,
+  ENABLE_PARAMETRES_EMPLOYES: true,
+  ENABLE_BUDGET_RH: true,
+  ENABLE_FICHE_PERSONNEL: true,
+  ENABLE_MES_EMPLOYES: true,
+  ENABLE_PARAM_GENERAUX: true,
+  ENABLE_PARAM_SOUS_CATEGORIES_RH: true,
+  ENABLE_TYPE_CONTRAT: true,
+  ENABLE_TYPE_FONCTION: true,
   
-  // 💰 Module Finances (apenas essenciais)
-  ENABLE_FINANCES: false,
-  ENABLE_PARAMETRES_FINANCES: false,
-  ENABLE_SAISIE_BUDGET_ANNUEL: false,
-  ENABLE_SUIVI_CA_REEL: false,
-  ENABLE_SUIVI_CA_BUDGET: false,
+  // 💰 Module Finances
+  ENABLE_FINANCES: true,
+  ENABLE_PARAMETRES_FINANCES: true,
+  ENABLE_SAISIE_BUDGET_ANNUEL: true,
+  ENABLE_SUIVI_CA_REEL: true,
+  ENABLE_SUIVI_CA_BUDGET: true,
   ENABLE_TEST_DATA_TABLE_FULL: false,
-  ENABLE_EDIT_FACTURE_ACHAT: false,
-  ENABLE_MES_FACTURES: true, // ✅ Mes Factures
-  ENABLE_FERMETURE_CAISSE: true, // ✅ Fermeture Caisse
-  ENABLE_CA_TYPE_SERVICE: false,
-  ENABLE_SOUS_CATEGORIE_FLUX: false,
-  ENABLE_NATURE_FLUX: false,
-  ENABLE_PARAM_JOURS: false,
-  ENABLE_CATEGORIE_FLUX: false,
+  ENABLE_EDIT_FACTURE_ACHAT: true,
+  ENABLE_MES_FACTURES: true,
+  ENABLE_FERMETURE_CAISSE: true,
+  ENABLE_CA_TYPE_SERVICE: true,
+  ENABLE_SOUS_CATEGORIE_FLUX: true,
+  ENABLE_NATURE_FLUX: true,
+  ENABLE_PARAM_JOURS: true,
+  ENABLE_CATEGORIE_FLUX: true,
   
-  // 🧪 Features avancées (desativadas)
+  // 🧪 Features avancées
   ENABLE_TRANSLATION: false,
   SHOW_ADVANCED_MENU: false,
   ENABLE_STATS_PAGE: false,
