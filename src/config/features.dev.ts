@@ -1,0 +1,5 @@
+export const FEATURES = {
+  ENABLE_TRANSLATION: true,
+  SHOW_ADVANCED_MENU: true,
+  ENABLE_STATS_PAGE: true,
+}
