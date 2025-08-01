@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../context/MenuContext';
 import { useProfil } from '../../context/ProfilContext';
 import { supabase } from '../../lib/supabase';
@@ -32,6 +33,7 @@ interface Personnel {
 }
 
 const MesEmployes: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [personnel, setPersonnel] = useState<Personnel[]>([]);
@@ -74,7 +76,7 @@ const MesEmployes: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération du personnel:', error);
       addToast({
-        label: 'Erreur lors de la récupération du personnel',
+        label: t('messages.errorLoadingEmployees', 'Erreur lors de la récupération du personnel'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -116,7 +118,7 @@ const MesEmployes: React.FC = () => {
   };
 
   const handleDelete = async (personne: Personnel) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir désactiver ${personne.prenom} ${personne.nom} ?`)) {
+    if (window.confirm(t('messages.confirmDeleteEmployee', `Êtes-vous sûr de vouloir désactiver {{name}} ?`, { name: `${personne.prenom} ${personne.nom}` }))) {
       try {
         // Supprimer d'abord les pièces jointes
         const { error: piecesJointesError } = await supabase
@@ -190,7 +192,7 @@ const MesEmployes: React.FC = () => {
 
         await fetchPersonnel();
         addToast({
-          label: `${personne.prenom} ${personne.nom} a été supprimé avec succès`,
+          label: t('messages.employeeDeletedSuccess', `{{name}} a été supprimé avec succès`, { name: `${personne.prenom} ${personne.nom}` }),
           icon: 'Check',
           color: '#22c55e'
         });
@@ -228,50 +230,50 @@ const MesEmployes: React.FC = () => {
 
   const columns: Column<Personnel>[] = [
     {
-      label: 'Code',
+      label: t('table.code', 'Code'),
       accessor: 'code_court',
       sortable: true
     },
     {
-      label: 'Matricule',
+      label: t('employee.matricule', 'Matricule'),
       accessor: 'matricule',
       sortable: true
     },
     {
-      label: 'Nom',
+      label: t('table.name', 'Nom'),
       accessor: 'nom',
       sortable: true,
       render: (value, row) => `${row.prenom} ${value}`
     },
     {
-      label: 'Civilité',
+      label: t('employee.civility', 'Civilité'),
       accessor: 'civilite',
       render: (value) => value || '-'
     },
     {
-      label: 'Email',
+      label: t('table.email', 'Email'),
       accessor: 'email_perso',
       render: (value) => value || '-'
     },
     {
-      label: 'Téléphone',
+      label: t('table.phone', 'Téléphone'),
       accessor: 'telephone',
       render: (value) => value || '-'
     },
     {
-      label: 'Actif',
+      label: t('table.active', 'Actif'),
       accessor: 'actif',
       align: 'center',
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('common.yes', 'Oui') : t('common.no', 'Non')}
         </span>
       )
     },
     {
-      label: 'Date de création',
+      label: t('table.creationDate', 'Date de création'),
       accessor: 'created_at',
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
     }
@@ -279,13 +281,13 @@ const MesEmployes: React.FC = () => {
 
   const actions = [
     {
-      label: 'Éditer',
+      label: t('table.edit', 'Éditer'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: t('table.delete', 'Supprimer'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -295,13 +297,13 @@ const MesEmployes: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Mes Employés"}
-        description="Gérez les employés de votre organisation. La suppression est définitive et supprime toutes les données associées."
+        title={loading || profilLoading ? t('common.loading', 'Chargement...') : t('pages.employees.myEmployees', 'Mes Employés')}
+        description={t('pages.employees.myEmployeesSubtitle', 'Gérez les employés de votre organisation. La suppression est définitive et supprime toutes les données associées.')}
         className={styles.header}
       >
         <div className="mb-6">
           <Button
-            label="Ajouter un employé"
+            label={t('pages.employees.addEmployee', 'Ajouter un employé')}
             icon="UserPlus"
             color="var(--color-primary)" 
             onClick={handleCreate}
@@ -310,7 +312,7 @@ const MesEmployes: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des employés...</p>
+            <p className="text-gray-500">{t('messages.loadingEmployees', 'Chargement des employés...')}</p>
           </div>
         ) : (
           <DataTable
@@ -319,8 +321,8 @@ const MesEmployes: React.FC = () => {
             onRowClick={handleEdit}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucun employé"
-            emptyMessage="Aucun employé n'a été créé pour le moment."
+            emptyTitle={t('messages.noEmployees', 'Aucun employé')}
+            emptyMessage={t('messages.noEmployeesCreated', 'Aucun employé n\'a été créé pour le moment.')}
           />
         )}
 

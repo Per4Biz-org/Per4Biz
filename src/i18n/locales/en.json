@@ -73,7 +73,28 @@
       "phone": "Phone",
       "memberSince": "Member since",
       "notSpecified": "Not specified",
-      "profileUpdated": "Profile updated successfully"
+      "profileUpdated": "Profile updated successfully",
+      "saving": "Saving...",
+      "form": {
+        "firstName": "First name",
+        "lastName": "Last name",
+        "userCodeDescription": "Unique code in your organization",
+        "userCodePlaceholder": "Ex: JSMITH, USER001",
+        "firstNamePlaceholder": "John",
+        "lastNamePlaceholder": "Smith",
+        "phonePlaceholder": "+1 555 123 4567"
+      },
+      "validation": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "userCodeRequired": "User code is required",
+        "userCodeMinLength": "User code must contain at least 3 characters",
+        "phoneInvalid": "Invalid phone format"
+      },
+      "errors": {
+        "updateFailed": "Error updating profile",
+        "userCodeExists": "This user code is already used in your organization"
+      }
     },
     "finances": {
       "title": "Financial Management",

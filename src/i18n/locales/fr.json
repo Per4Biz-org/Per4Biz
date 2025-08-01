@@ -73,7 +73,28 @@
       "phone": "Téléphone",
       "memberSince": "Membre depuis",
       "notSpecified": "Non renseigné",
-      "profileUpdated": "Profil mis à jour avec succès"
+      "profileUpdated": "Profil mis à jour avec succès",
+      "saving": "Enregistrement...",
+      "form": {
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "userCodeDescription": "Code unique dans votre organisation",
+        "userCodePlaceholder": "Ex: JDUPONT, USER001",
+        "firstNamePlaceholder": "Jean",
+        "lastNamePlaceholder": "Dupont",
+        "phonePlaceholder": "+33 6 12 34 56 78"
+      },
+      "validation": {
+        "firstNameRequired": "Le prénom est requis",
+        "lastNameRequired": "Le nom est requis",
+        "userCodeRequired": "Le code utilisateur est requis",
+        "userCodeMinLength": "Le code utilisateur doit contenir au moins 3 caractères",
+        "phoneInvalid": "Format de téléphone invalide"
+      },
+      "errors": {
+        "updateFailed": "Erreur lors de la mise à jour du profil",
+        "userCodeExists": "Ce code utilisateur est déjà utilisé dans votre organisation"
+      }
     },
     "finances": {
       "title": "Gestion Financière",

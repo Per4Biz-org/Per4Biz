@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { startOfMonth, endOfMonth, subMonths } from 'date-fns';
@@ -47,6 +48,7 @@ interface Entite {
 }
 
 const MesFactures: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const navigate = useNavigate();
@@ -378,7 +380,7 @@ const MesFactures: React.FC = () => {
   const filterConfigs = [
     {
       name: 'entite',
-      label: 'Entité',
+      label: t('forms.entity', 'Entité'),
       type: 'select' as const,
       options: entites.map(entite => ({
         id: entite.id,
@@ -390,13 +392,13 @@ const MesFactures: React.FC = () => {
     },
     {
       name: 'dateDebut',
-      label: 'Date de début',
+      label: t('forms.startDate', 'Date de début'),
       type: 'date' as const,
       width: '160px'
     },
     {
       name: 'dateFin',
-      label: 'Date de fin',
+      label: t('forms.endDate', 'Date de fin'),
       type: 'date' as const,
       width: '160px'
     }
@@ -404,46 +406,46 @@ const MesFactures: React.FC = () => {
 
   const columns: Column<FactureAchat>[] = [
     {
-      label: 'N° Document',
+      label: t('financial.documentNumber', 'N° Document'),
       accessor: 'num_document',
       sortable: true,
       render: (value) => value || '-'
     },
     {
-      label: 'Date',
+      label: t('financial.date', 'Date'),
       accessor: 'date_facture',
       sortable: true,
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
     },
     {
-      label: 'Entité',
+      label: t('forms.entity', 'Entité'),
       accessor: 'entite',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Tiers',
+      label: t('financial.thirdParty', 'Tiers'),
       accessor: 'tiers',
       render: (value) => `${value.code} - ${value.nom}`
     },
     {
-      label: 'Mode Paiement',
+      label: t('financial.paymentMode', 'Mode Paiement'),
       accessor: 'mode_paiement',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Montant HT',
+      label: t('financial.amountExVat', 'Montant HT'),
       accessor: 'montant_ht',
       align: 'right',
       render: (value) => `${Number(value).toFixed(2)} €`
     },
     {
-      label: 'Montant TVA',
+      label: t('financial.vatAmount', 'Montant TVA'),
       accessor: 'montant_tva',
       align: 'right',
       render: (value) => value ? `${Number(value).toFixed(2)} €` : '-'
     },
     {
-      label: 'Montant TTC',
+      label: t('financial.amountIncVat', 'Montant TTC'),
       accessor: 'montant_ttc',
       align: 'right',
       render: (value) => `${Number(value).toFixed(2)} €`
@@ -485,7 +487,7 @@ const MesFactures: React.FC = () => {
       }
     },
     {
-      label: 'Date de création',
+      label: t('table.creationDate', 'Date de création'),
       accessor: 'created_at',
       render: (value) => format(new Date(value), 'dd/MM/yyyy HH:mm', { locale: fr })
     }
@@ -493,13 +495,13 @@ const MesFactures: React.FC = () => {
 
   const actions = [
     {
-      label: 'Éditer',
+      label: t('table.edit', 'Éditer'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: t('table.delete', 'Supprimer'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -509,8 +511,8 @@ const MesFactures: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Mes Factures"} 
-        description="Consultez et gérez vos factures d'achat"
+        title={loading || profilLoading ? t('common.loading', 'Chargement...') : t('pages.finances.myInvoices', 'Mes Factures')} 
+        description={t('pages.finances.invoicesSubtitle', 'Consultez et gérez vos factures d\'achat')}
         className={styles.header}>
         <div className="mb-6">
           <div className="flex items-end gap-4">
@@ -523,7 +525,7 @@ const MesFactures: React.FC = () => {
             />
             
             <Button
-              label={isSearching ? "Recherche en cours..." : "Afficher les Factures"}
+              label={isSearching ? t('table.searchInProgress', 'Recherche en cours...') : t('common.showInvoices', 'Afficher les Factures')}
               icon="Search"
               color="var(--color-primary)"
               onClick={handleSearch}
@@ -544,7 +546,7 @@ const MesFactures: React.FC = () => {
 
         <div className="mb-6">
           <Button
-            label="Nouvelle facture"
+            label={t('pages.finances.newInvoice', 'Nouvelle facture')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => {
@@ -581,8 +583,8 @@ const MesFactures: React.FC = () => {
             data={filteredFactures}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucune facture"
-            emptyMessage="Aucune facture d'achat n'a été créée pour le moment."
+            emptyTitle={t('messages.noInvoices', 'Aucune facture')}
+            emptyMessage={t('messages.noInvoicesCreated', 'Aucune facture d\'achat n\'a été créée pour le moment.')}
           />
         )}
 

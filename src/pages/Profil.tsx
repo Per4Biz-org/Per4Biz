@@ -269,24 +269,24 @@ const Profil: React.FC = () => {
             ) : (
               <Form size={100} onSubmit={handleSubmit}>
                 <FormField
-                  label="Code utilisateur"
+                  label={t('pages.profile.userCode')}
                   required
                   error={formErrors.code_user}
-                  description="Code unique dans votre organisation"
+                  description={t('pages.profile.form.userCodeDescription')}
                   className="mb-4"
                 >
                   <FormInput
                     name="code_user"
                     value={formData.code_user}
                     onChange={handleInputChange}
-                    placeholder="Ex: JDUPONT, USER001"
+                    placeholder={t('pages.profile.form.userCodePlaceholder')}
                     disabled={isSubmitting}
                     error={!!formErrors.code_user}
                   />
                 </FormField>
 
                 <FormField
-                  label="Prénom"
+                  label={t('pages.profile.form.firstName')}
                   required
                   error={formErrors.prenom}
                   className="mb-4"
@@ -295,14 +295,14 @@ const Profil: React.FC = () => {
                     name="prenom"
                     value={formData.prenom}
                     onChange={handleInputChange}
-                    placeholder="Jean"
+                    placeholder={t('pages.profile.form.firstNamePlaceholder')}
                     disabled={isSubmitting}
                     error={!!formErrors.prenom}
                   />
                 </FormField>
 
                 <FormField
-                  label="Nom"
+                  label={t('pages.profile.form.lastName')}
                   required
                   error={formErrors.nom}
                   className="mb-4"
@@ -311,14 +311,14 @@ const Profil: React.FC = () => {
                     name="nom"
                     value={formData.nom}
                     onChange={handleInputChange}
-                    placeholder="Dupont"
+                    placeholder={t('pages.profile.form.lastNamePlaceholder')}
                     disabled={isSubmitting}
                     error={!!formErrors.nom}
                   />
                 </FormField>
 
                 <FormField
-                  label="Téléphone"
+                  label={t('pages.profile.phone')}
                   error={formErrors.telephone}
                   className="mb-6"
                 >
@@ -327,7 +327,7 @@ const Profil: React.FC = () => {
                     type="tel"
                     value={formData.telephone}
                     onChange={handleInputChange}
-                    placeholder="+33 6 12 34 56 78"
+                    placeholder={t('pages.profile.form.phonePlaceholder')}
                     disabled={isSubmitting}
                     error={!!formErrors.telephone}
                   />

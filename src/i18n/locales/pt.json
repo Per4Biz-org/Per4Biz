@@ -73,7 +73,28 @@
       "phone": "Telefone",
       "memberSince": "Membro desde",
       "notSpecified": "Não especificado",
-      "profileUpdated": "Perfil atualizado com sucesso"
+      "profileUpdated": "Perfil atualizado com sucesso",
+      "saving": "Salvando...",
+      "form": {
+        "firstName": "Nome",
+        "lastName": "Sobrenome",
+        "userCodeDescription": "Código único na sua organização",
+        "userCodePlaceholder": "Ex: JSILVA, USER001",
+        "firstNamePlaceholder": "João",
+        "lastNamePlaceholder": "Silva",
+        "phonePlaceholder": "+55 11 99999-9999"
+      },
+      "validation": {
+        "firstNameRequired": "O nome é obrigatório",
+        "lastNameRequired": "O sobrenome é obrigatório",
+        "userCodeRequired": "O código do usuário é obrigatório",
+        "userCodeMinLength": "O código do usuário deve conter pelo menos 3 caracteres",
+        "phoneInvalid": "Formato de telefone inválido"
+      },
+      "errors": {
+        "updateFailed": "Erro ao atualizar perfil",
+        "userCodeExists": "Este código de usuário já está sendo usado na sua organização"
+      }
     },
     "finances": {
       "title": "Gestão Financeira",
