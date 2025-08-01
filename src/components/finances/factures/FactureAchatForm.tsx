@@ -152,7 +152,7 @@ export function FactureAchatForm({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const updatedFacture = { ...facture, [name]: value };
+    let updatedFacture = { ...facture };
 
     // Gestion spéciale pour les champs de montants
     if (name === 'montant_ht') {
@@ -161,19 +161,33 @@ export function FactureAchatForm({
       const tva = parseFloat(montantTVA) || 0;
       const ht = parseFloat(value) || 0;
       setMontantTTC((ht + tva).toString());
-      updatedFacture.montant_ht = ht;
-      updatedFacture.montant_ttc = ht + tva;
+      updatedFacture = {
+        ...updatedFacture,
+        [name]: value,
+        montant_ht: ht,
+        montant_ttc: ht + tva
+      };
     } else if (name === 'montant_tva') {
       setMontantTVA(value);
       // Recalculer le TTC
       const ht = parseFloat(montantHT) || 0;
       const tva = parseFloat(value) || 0;
       setMontantTTC((ht + tva).toString());
-      updatedFacture.montant_tva = tva;
-      updatedFacture.montant_ttc = ht + tva;
+      updatedFacture = {
+        ...updatedFacture,
+        [name]: value,
+        montant_tva: tva,
+        montant_ttc: ht + tva
+      };
     } else if (name === 'montant_ttc') {
       setMontantTTC(value);
-      updatedFacture.montant_ttc = parseFloat(value) || 0;
+      updatedFacture = {
+        ...updatedFacture,
+        [name]: value,
+        montant_ttc: parseFloat(value) || 0
+      };
+    } else {
+      updatedFacture = { ...updatedFacture, [name]: value };
     }
     
     // Notifier le parent des changements
@@ -234,15 +248,18 @@ export function FactureAchatForm({
       newErrors.date_facture = "La date de facture est requise";
     }
     
-    if (!facture.montant_ht || facture.montant_ht <= 0) {
+    const currentMontantHT = parseFloat(montantHT) || 0;
+    if (currentMontantHT <= 0) {
       newErrors.montant_ht = "Le montant HT doit être supérieur à 0";
     }
     
-    if (facture.montant_tva === null || facture.montant_tva === undefined) { 
+    const currentMontantTVA = parseFloat(montantTVA);
+    if (isNaN(currentMontantTVA)) { 
       newErrors.montant_tva = "Le montant TVA est requis";
     }
     
-    if (!facture.montant_ttc || facture.montant_ttc <= 0) {
+    const currentMontantTTC = parseFloat(montantTTC) || 0;
+    if (currentMontantTTC <= 0) {
       newErrors.montant_ttc = "Le montant TTC doit être supérieur à 0";
     }
 
