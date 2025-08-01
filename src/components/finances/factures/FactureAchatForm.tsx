@@ -160,25 +160,37 @@ export function FactureAchatForm({
       // Recalculer le TTC si la TVA est déjà définie
       const tva = parseFloat(montantTVA) || 0;
       const ht = parseFloat(value) || 0;
-      setMontantTTC((ht + tva).toString());
+      const newTTC = ht + tva;
+      setMontantTTC(newTTC.toString());
       updatedFacture = {
         ...updatedFacture,
         [name]: value,
         montant_ht: ht,
-        montant_ttc: ht + tva
+        montant_ttc: newTTC
       };
+      
+      // Effacer l'erreur du TTC si le nouveau montant est valide
+      if (newTTC > 0 && errors.montant_ttc) {
+        setErrors(prev => ({ ...prev, montant_ttc: '' }));
+      }
     } else if (name === 'montant_tva') {
       setMontantTVA(value);
       // Recalculer le TTC
       const ht = parseFloat(montantHT) || 0;
       const tva = parseFloat(value) || 0;
-      setMontantTTC((ht + tva).toString());
+      const newTTC = ht + tva;
+      setMontantTTC(newTTC.toString());
       updatedFacture = {
         ...updatedFacture,
         [name]: value,
         montant_tva: tva,
-        montant_ttc: ht + tva
+        montant_ttc: newTTC
       };
+      
+      // Effacer l'erreur du TTC si le nouveau montant est valide
+      if (newTTC > 0 && errors.montant_ttc) {
+        setErrors(prev => ({ ...prev, montant_ttc: '' }));
+      }
     } else if (name === 'montant_ttc') {
       setMontantTTC(value);
       updatedFacture = {
