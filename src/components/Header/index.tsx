@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../context/MenuContext';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import LanguageSwitch from '../LanguageSwitch';
 
 interface HeaderProps {
   onExpandChange?: (expanded: boolean) => void;
@@ -16,6 +18,7 @@ interface MenuItem {
 }
 
 const Header: React.FC<HeaderProps> = ({ onExpandChange }) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
   const { menuItems } = useMenu();
   const navigate = useNavigate();
@@ -52,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ onExpandChange }) => {
         </button>
         {isExpanded && (
           <Link to="/" className="ml-4 text-xl font-semibold whitespace-nowrap hover:text-gray-100 hover:bg-[rgba(255,255,255,0.1)] transition-all px-3 py-1 rounded-lg">
-            Finance-Resto
+            {t('navigation.appName')}
           </Link>
         )}
       </div>
@@ -85,6 +88,10 @@ const Header: React.FC<HeaderProps> = ({ onExpandChange }) => {
             </div>
           </React.Fragment>
         ))}
+      </div>
+      
+      <div className="px-4 mt-4 border-t border-[rgba(255,255,255,0.2)] pt-4">
+        <LanguageSwitch />
       </div>
     </nav>
   );

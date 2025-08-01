@@ -1,0 +1,203 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "email": "Email",
+    "password": "Password",
+    "required": "Required",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "actions": "Actions",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "loginButton": "Sign in",
+    "loggingIn": "Logging in...",
+    "welcomeMessage": "Sign in to access your account",
+    "invalidCredentials": "Invalid credentials",
+    "emailPlaceholder": "your@email.com",
+    "passwordPlaceholder": "••••••••"
+  },
+  "home": {
+    "welcome": "Welcome to Per4Biz",
+    "welcomeUser": "Welcome {{name}} to Per4Biz",
+    "subtitle": "Your complete solution for financial and administrative management of your establishment",
+    "financial": {
+      "title": "Financial Tracking",
+      "description": "Track your financial performance in real time. Analyze your revenues, expenses and margins to make informed decisions.",
+      "link": "Access financial module →"
+    },
+    "banking": {
+      "title": "Banking Management",
+      "description": "Manage your bank accounts, track your transactions and import your statements for simplified reconciliation.",
+      "link": "Access banking module →"
+    },
+    "hr": {
+      "title": "Personnel Management",
+      "description": "Efficiently manage your staff, contracts, assignments and track costs associated with each employee.",
+      "link": "Access HR module →"
+    },
+    "settings": {
+      "title": "Global Settings",
+      "description": "Configure your application settings, manage entities, third parties and customize your experience.",
+      "link": "Access settings →"
+    },
+    "help": {
+      "title": "Need help?",
+      "description": "Our support team is available to assist you in using Per4Biz. Don't hesitate to contact us for any questions."
+    }
+  },
+  "navigation": {
+    "appName": "Finance-Resto",
+    "home": "Home",
+    "finances": "Finances",
+    "banking": "Banking",
+    "employees": "Employees",
+    "globalSettings": "Global Settings",
+    "profile": "Profile"
+  },
+  "pages": {
+    "profile": {
+      "title": "My Profile",
+      "subtitle": "View and modify your personal information",
+      "editProfile": "Edit profile",
+      "personalInfo": "Personal information",
+      "userCode": "User code",
+      "fullName": "Full name",
+      "phone": "Phone",
+      "memberSince": "Member since",
+      "notSpecified": "Not specified",
+      "profileUpdated": "Profile updated successfully"
+    },
+    "finances": {
+      "title": "Financial Management",
+      "subtitle": "Manage your finances, invoices and track your revenue",
+      "budget": "Budget",
+      "invoices": "Invoices",
+      "myInvoices": "My Invoices",
+      "invoicesSubtitle": "View and manage your purchase invoices",
+      "newInvoice": "New invoice",
+      "cashRegister": "Cash Register",
+      "revenue": "Revenue",
+      "budgetTracking": "Budget Revenue Tracking",
+      "budgetTrackingSubtitle": "Track and analyze your revenue budgets by entity and period",
+      "settings": "Finance Settings"
+    },
+    "banking": {
+      "title": "Banking Management",
+      "subtitle": "Manage your bank accounts and track your transactions",
+      "accounts": "Bank Accounts",
+      "statements": "Statements",
+      "bankMovements": "Bank Movements",
+      "bankMovementsSubtitle": "View and manage your bank entries",
+      "settings": "Banking Settings"
+    },
+    "employees": {
+      "title": "Employee Management",
+      "subtitle": "Manage your employees, contracts and assignments",
+      "myEmployees": "My Employees",
+      "myEmployeesSubtitle": "Manage your organization's employees. Deletion is permanent and removes all associated data.",
+      "addEmployee": "Add employee",
+      "hrBudget": "HR Budget Forecast",
+      "hrBudgetSubtitle": "View the HR budget forecast calculated in real time from existing data",
+      "personnelFile": "Personnel File",
+      "settings": "Employee Settings"
+    },
+    "globalSettings": {
+      "title": "Global Settings",
+      "subtitle": "General configuration of your establishment",
+      "entities": "Entity Management",
+      "entitiesSubtitle": "Manage the different entities of your organization",
+      "createEntity": "Create entity",
+      "editEntity": "Edit entity",
+      "thirdParties": "Third Parties",
+      "thirdPartiesSubtitle": "Manage your organization's third parties",
+      "addThirdParty": "Add third party",
+      "allThirdPartyTypes": "All third party types",
+      "invoiceTypes": "Invoice Types",
+      "import": "Import"
+    }
+  },
+  "table": {
+    "code": "Code",
+    "label": "Label",
+    "name": "Name",
+    "active": "Active",
+    "email": "Email",
+    "phone": "Phone",
+    "city": "City",
+    "type": "Type",
+    "creationDate": "Creation date",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "noData": "No data",
+    "loading": "Loading...",
+    "searchInProgress": "Search in progress...",
+    "showData": "Show data",
+    "calculating": "Calculating..."
+  },
+  "forms": {
+    "establishmentName": "Establishment name",
+    "contactEmail": "Contact email",
+    "address": "Address",
+    "entity": "Entity",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "year": "Year",
+    "month": "Month",
+    "bankAccount": "Bank account",
+    "allRestaurants": "All restaurants",
+    "filters": "Filters",
+    "displayBudget": "Display Budget",
+    "addBudgetLine": "Add budget line",
+    "addLine": "Add line",
+    "enterInline": "Enter inline"
+  },
+  "financial": {
+    "documentNumber": "Document No.",
+    "date": "Date",
+    "thirdParty": "Third Party",
+    "paymentMode": "Payment Mode",
+    "amountExVat": "Amount Ex. VAT",
+    "vatAmount": "VAT Amount",
+    "amountIncVat": "Amount Inc. VAT",
+    "operationDate": "Operation date",
+    "valueDate": "Value date",
+    "description": "Description",
+    "amount": "Amount",
+    "balance": "Balance",
+    "reference": "Reference"
+  },
+  "employee": {
+    "matricule": "Employee ID",
+    "civility": "Title",
+    "userCode": "User code",
+    "fullName": "Full name"
+  },
+  "messages": {
+    "loadingEntities": "Loading entities...",
+    "noEntities": "No entities",
+    "loadingThirdParties": "Loading third parties...",
+    "noThirdParties": "No third parties",
+    "loadingEmployees": "Loading employees...",
+    "noEmployees": "No employees",
+    "loadingInvoices": "Loading invoices...",
+    "noInvoices": "No invoices",
+    "loadingBudgets": "Loading budgets...",
+    "noBudgets": "No budgets",
+    "loadingBankEntries": "Loading entries...",
+    "noBankEntries": "No bank entries",
+    "errorCalculatingBudget": "Error calculating budget",
+    "noBudgetData": "No budget data available",
+    "budgetCalculatedRealTime": "HR budget calculated in real time",
+    "deletionPermanent": "Deletion is permanent"
+  }
+}

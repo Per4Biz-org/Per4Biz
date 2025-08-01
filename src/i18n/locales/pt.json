@@ -1,0 +1,203 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "email": "Email",
+    "password": "Senha",
+    "required": "Obrigatório",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "add": "Adicionar",
+    "search": "Pesquisar",
+    "actions": "Ações",
+    "confirm": "Confirmar",
+    "close": "Fechar"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Sair",
+    "loginButton": "Entrar",
+    "loggingIn": "Entrando...",
+    "welcomeMessage": "Faça login para acessar sua conta",
+    "invalidCredentials": "Credenciais inválidas",
+    "emailPlaceholder": "seu@email.com",
+    "passwordPlaceholder": "••••••••"
+  },
+  "home": {
+    "welcome": "Bem-vindo ao Per4Biz",
+    "welcomeUser": "Bem-vindo {{name}} ao Per4Biz",
+    "subtitle": "Sua solução completa para gestão financeira e administrativa do seu estabelecimento",
+    "financial": {
+      "title": "Acompanhamento Financeiro",
+      "description": "Acompanhe seu desempenho financeiro em tempo real. Analise suas receitas, despesas e margens para tomar decisões informadas.",
+      "link": "Acessar módulo financeiro →"
+    },
+    "banking": {
+      "title": "Gestão Bancária",
+      "description": "Gerencie suas contas bancárias, acompanhe seus movimentos e importe seus extratos para uma reconciliação simplificada.",
+      "link": "Acessar módulo bancário →"
+    },
+    "hr": {
+      "title": "Gestão de Pessoal",
+      "description": "Gerencie eficientemente seu pessoal, contratos, atribuições e acompanhe os custos associados a cada funcionário.",
+      "link": "Acessar módulo RH →"
+    },
+    "settings": {
+      "title": "Configurações Globais",
+      "description": "Configure as configurações de sua aplicação, gerencie entidades, terceiros e personalize sua experiência.",
+      "link": "Acessar configurações →"
+    },
+    "help": {
+      "title": "Precisa de ajuda?",
+      "description": "Nossa equipe de suporte está disponível para ajudá-lo no uso do Per4Biz. Não hesite em nos contatar para qualquer dúvida."
+    }
+  },
+  "navigation": {
+    "appName": "Finance-Resto",
+    "home": "Início",
+    "finances": "Finanças",
+    "banking": "Bancos",
+    "employees": "Funcionários",
+    "globalSettings": "Configurações Globais",
+    "profile": "Perfil"
+  },
+  "pages": {
+    "profile": {
+      "title": "Meu Perfil",
+      "subtitle": "Visualize e modifique suas informações pessoais",
+      "editProfile": "Editar perfil",
+      "personalInfo": "Informações pessoais",
+      "userCode": "Código do usuário",
+      "fullName": "Nome completo",
+      "phone": "Telefone",
+      "memberSince": "Membro desde",
+      "notSpecified": "Não especificado",
+      "profileUpdated": "Perfil atualizado com sucesso"
+    },
+    "finances": {
+      "title": "Gestão Financeira",
+      "subtitle": "Gerencie suas finanças, faturas e acompanhe sua receita",
+      "budget": "Orçamento",
+      "invoices": "Faturas",
+      "myInvoices": "Minhas Faturas",
+      "invoicesSubtitle": "Visualize e gerencie suas faturas de compra",
+      "newInvoice": "Nova fatura",
+      "cashRegister": "Caixa",
+      "revenue": "Faturamento",
+      "budgetTracking": "Acompanhamento Orçamento Receita",
+      "budgetTrackingSubtitle": "Acompanhe e analise seus orçamentos de receita por entidade e período",
+      "settings": "Configurações de Finanças"
+    },
+    "banking": {
+      "title": "Gestão Bancária",
+      "subtitle": "Gerencie suas contas bancárias e acompanhe suas transações",
+      "accounts": "Contas Bancárias",
+      "statements": "Extratos",
+      "bankMovements": "Movimentos Bancários",
+      "bankMovementsSubtitle": "Visualize e gerencie seus lançamentos bancários",
+      "settings": "Configurações Bancárias"
+    },
+    "employees": {
+      "title": "Gestão de Funcionários",
+      "subtitle": "Gerencie seus funcionários, contratos e atribuições",
+      "myEmployees": "Meus Funcionários",
+      "myEmployeesSubtitle": "Gerencie os funcionários de sua organização. A exclusão é permanente e remove todos os dados associados.",
+      "addEmployee": "Adicionar funcionário",
+      "hrBudget": "Previsão Orçamento RH",
+      "hrBudgetSubtitle": "Visualize a previsão do orçamento de RH calculada em tempo real a partir dos dados existentes",
+      "personnelFile": "Ficha de Pessoal",
+      "settings": "Configurações de Funcionários"
+    },
+    "globalSettings": {
+      "title": "Configurações Globais",
+      "subtitle": "Configuração geral do seu estabelecimento",
+      "entities": "Gestão de Entidades",
+      "entitiesSubtitle": "Gerencie as diferentes entidades de sua organização",
+      "createEntity": "Criar entidade",
+      "editEntity": "Editar entidade",
+      "thirdParties": "Terceiros",
+      "thirdPartiesSubtitle": "Gerencie os terceiros de sua organização",
+      "addThirdParty": "Adicionar terceiro",
+      "allThirdPartyTypes": "Todos os tipos de terceiros",
+      "invoiceTypes": "Tipos de Fatura",
+      "import": "Importar"
+    }
+  },
+  "table": {
+    "code": "Código",
+    "label": "Rótulo",
+    "name": "Nome",
+    "active": "Ativo",
+    "email": "Email",
+    "phone": "Telefone",
+    "city": "Cidade",
+    "type": "Tipo",
+    "creationDate": "Data de criação",
+    "actions": "Ações",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "view": "Visualizar",
+    "noData": "Nenhum dado",
+    "loading": "Carregando...",
+    "searchInProgress": "Pesquisa em andamento...",
+    "showData": "Mostrar dados",
+    "calculating": "Calculando..."
+  },
+  "forms": {
+    "establishmentName": "Nome do estabelecimento",
+    "contactEmail": "Email de contato",
+    "address": "Endereço",
+    "entity": "Entidade",
+    "startDate": "Data de início",
+    "endDate": "Data de fim",
+    "year": "Ano",
+    "month": "Mês",
+    "bankAccount": "Conta bancária",
+    "allRestaurants": "Todos os restaurantes",
+    "filters": "Filtros",
+    "displayBudget": "Exibir Orçamento",
+    "addBudgetLine": "Adicionar linha de orçamento",
+    "addLine": "Adicionar linha",
+    "enterInline": "Inserir em linha"
+  },
+  "financial": {
+    "documentNumber": "Nº do Documento",
+    "date": "Data",
+    "thirdParty": "Terceiro",
+    "paymentMode": "Forma de Pagamento",
+    "amountExVat": "Valor s/ IVA",
+    "vatAmount": "Valor IVA",
+    "amountIncVat": "Valor c/ IVA",
+    "operationDate": "Data da operação",
+    "valueDate": "Data valor",
+    "description": "Descrição",
+    "amount": "Valor",
+    "balance": "Saldo",
+    "reference": "Referência"
+  },
+  "employee": {
+    "matricule": "Matrícula",
+    "civility": "Título",
+    "userCode": "Código do usuário",
+    "fullName": "Nome completo"
+  },
+  "messages": {
+    "loadingEntities": "Carregando entidades...",
+    "noEntities": "Nenhuma entidade",
+    "loadingThirdParties": "Carregando terceiros...",
+    "noThirdParties": "Nenhum terceiro",
+    "loadingEmployees": "Carregando funcionários...",
+    "noEmployees": "Nenhum funcionário",
+    "loadingInvoices": "Carregando faturas...",
+    "noInvoices": "Nenhuma fatura",
+    "loadingBudgets": "Carregando orçamentos...",
+    "noBudgets": "Nenhum orçamento",
+    "loadingBankEntries": "Carregando lançamentos...",
+    "noBankEntries": "Nenhum lançamento bancário",
+    "errorCalculatingBudget": "Erro ao calcular orçamento",
+    "noBudgetData": "Nenhum dado de orçamento disponível",
+    "budgetCalculatedRealTime": "Orçamento RH calculado em tempo real",
+    "deletionPermanent": "A exclusão é permanente"
+  }
+}

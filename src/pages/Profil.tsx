@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../context/MenuContext';
 import { menuItemsAccueil } from '../config/menuConfig';
 import { PageSection } from '../components/ui/page-section';
@@ -12,6 +13,7 @@ import { fr } from 'date-fns/locale';
 import { supabase } from '../lib/supabase';
 
 const Profil: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading, error, updateProfil } = useProfil();
   const [isEditing, setIsEditing] = useState(false);
@@ -71,24 +73,24 @@ const Profil: React.FC = () => {
     const errors: Record<string, string> = {};
 
     if (!formData.nom.trim()) {
-      errors.nom = 'Le nom est requis';
+      errors.nom = t('pages.profile.validation.lastNameRequired');
     }
 
     if (!formData.prenom.trim()) {
-      errors.prenom = 'Le prénom est requis';
+      errors.prenom = t('pages.profile.validation.firstNameRequired');
     }
 
     if (!formData.code_user.trim()) {
-      errors.code_user = 'Le code utilisateur est requis';
+      errors.code_user = t('pages.profile.validation.userCodeRequired');
     } else if (formData.code_user.length < 3) {
-      errors.code_user = 'Le code utilisateur doit contenir au moins 3 caractères';
+      errors.code_user = t('pages.profile.validation.userCodeMinLength');
     }
 
     // Validation du téléphone si fourni
     if (formData.telephone && formData.telephone.trim()) {
       const phoneRegex = /^[\+]?[0-9\s\-\(\)\.]{10,}$/;
       if (!phoneRegex.test(formData.telephone.trim())) {
-        errors.telephone = 'Format de téléphone invalide';
+        errors.telephone = t('pages.profile.validation.phoneInvalid');
       }
     }
 
@@ -111,7 +113,7 @@ const Profil: React.FC = () => {
 
       setIsEditing(false);
       addToast({
-        label: 'Profil mis à jour avec succès',
+        label: t('pages.profile.profileUpdated'),
         icon: 'Check',
         color: '#22c55e'
       });
@@ -119,9 +121,9 @@ const Profil: React.FC = () => {
       console.error('Erreur lors de la mise à jour:', error);
       
       // Gestion des erreurs spécifiques
-      let errorMessage = 'Erreur lors de la mise à jour du profil';
+      let errorMessage = t('pages.profile.errors.updateFailed');
       if (error.message?.includes('duplicate key') || error.message?.includes('unique')) {
-        errorMessage = 'Ce code utilisateur est déjà utilisé dans votre organisation';
+        errorMessage = t('pages.profile.errors.userCodeExists');
       }
       
       addToast({
@@ -152,7 +154,7 @@ const Profil: React.FC = () => {
       <div className="max-w-6xl mx-auto p-8">
         <PageSection>
           <div className="flex items-center justify-center h-64">
-            <p className="text-lg text-gray-600">Chargement...</p>
+            <p className="text-lg text-gray-600">{t('common.loading')}</p>
           </div>
         </PageSection>
       </div>
@@ -174,9 +176,9 @@ const Profil: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-8">
       <PageSection>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Mon Profil</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('pages.profile.title')}</h1>
         <p className="text-lg text-gray-600 mb-12">
-          Consultez et modifiez vos informations personnelles
+          {t('pages.profile.subtitle')}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -191,7 +193,7 @@ const Profil: React.FC = () => {
             
             {!isEditing ? (
               <Button
-                label="Modifier le profil"
+                label={t('pages.profile.editProfile')}
                 icon="Edit"
                 color="var(--color-primary)"
                 className="w-full"
@@ -200,7 +202,7 @@ const Profil: React.FC = () => {
             ) : (
               <div className="flex gap-2 w-full">
                 <Button
-                  label="Annuler"
+                  label={t('common.cancel')}
                   icon="X"
                   color="#6b7280"
                   className="flex-1"
@@ -208,7 +210,7 @@ const Profil: React.FC = () => {
                   disabled={isSubmitting}
                 />
                 <Button
-                  label={isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+                  label={isSubmitting ? t('pages.profile.saving') : t('common.save')}
                   icon="Save"
                   color="var(--color-primary)"
                   className="flex-1"
@@ -223,7 +225,7 @@ const Profil: React.FC = () => {
           <div className="bg-white rounded-xl shadow-sm p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
               <User className="text-blue-500" />
-              Informations personnelles
+              {t('pages.profile.personalInfo')}
             </h2>
 
             {!isEditing ? (
@@ -231,7 +233,7 @@ const Profil: React.FC = () => {
                 <div className="flex items-start gap-4">
                   <Hash className="w-6 h-6 text-gray-400 mt-1" />
                   <div>
-                    <p className="text-gray-600">Code utilisateur</p>
+                    <p className="text-gray-600">{t('pages.profile.userCode')}</p>
                     <p className="text-lg font-medium">{profil?.code_user}</p>
                   </div>
                 </div>
@@ -239,7 +241,7 @@ const Profil: React.FC = () => {
                 <div className="flex items-start gap-4">
                   <User className="w-6 h-6 text-gray-400 mt-1" />
                   <div>
-                    <p className="text-gray-600">Nom complet</p>
+                    <p className="text-gray-600">{t('pages.profile.fullName')}</p>
                     <p className="text-lg font-medium">{profil?.prenom} {profil?.nom}</p>
                   </div>
                 </div>
@@ -247,15 +249,15 @@ const Profil: React.FC = () => {
                 <div className="flex items-start gap-4">
                   <Phone className="w-6 h-6 text-gray-400 mt-1" />
                   <div>
-                    <p className="text-gray-600">Téléphone</p>
-                    <p className="text-lg font-medium">{profil?.telephone || 'Non renseigné'}</p>
+                    <p className="text-gray-600">{t('pages.profile.phone')}</p>
+                    <p className="text-lg font-medium">{profil?.telephone || t('pages.profile.notSpecified')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
                   <Calendar className="w-6 h-6 text-gray-400 mt-1" />
                   <div>
-                    <p className="text-gray-600">Membre depuis</p>
+                    <p className="text-gray-600">{t('pages.profile.memberSince')}</p>
                     <p className="text-lg font-medium">
                       {profil?.created_at && format(new Date(profil.created_at), 
                         'd MMMM yyyy', 

@@ -1,0 +1,203 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "email": "Email",
+    "password": "Mot de passe",
+    "required": "Requis",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "actions": "Actions",
+    "confirm": "Confirmer",
+    "close": "Fermer"
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "loginButton": "Se connecter",
+    "loggingIn": "Connexion...",
+    "welcomeMessage": "Connectez-vous pour accéder à votre compte",
+    "invalidCredentials": "Identifiants invalides",
+    "emailPlaceholder": "votre@email.com",
+    "passwordPlaceholder": "••••••••"
+  },
+  "home": {
+    "welcome": "Bienvenue sur Per4Biz",
+    "welcomeUser": "Bienvenue {{name}} sur Per4Biz",
+    "subtitle": "Votre solution complète pour la gestion financière et administrative de votre établissement",
+    "financial": {
+      "title": "Suivi financier",
+      "description": "Suivez vos performances financières en temps réel. Analysez vos revenus, dépenses et marges pour prendre des décisions éclairées.",
+      "link": "Accéder au module financier →"
+    },
+    "banking": {
+      "title": "Gestion bancaire",
+      "description": "Gérez vos comptes bancaires, suivez vos mouvements et importez vos relevés pour une réconciliation simplifiée.",
+      "link": "Accéder au module bancaire →"
+    },
+    "hr": {
+      "title": "Gestion du personnel",
+      "description": "Gérez efficacement votre personnel, les contrats, les affectations et suivez les coûts associés à chaque employé.",
+      "link": "Accéder au module RH →"
+    },
+    "settings": {
+      "title": "Paramètres globaux",
+      "description": "Configurez les paramètres de votre application, gérez les entités, les tiers et personnalisez votre expérience.",
+      "link": "Accéder aux paramètres →"
+    },
+    "help": {
+      "title": "Besoin d'aide ?",
+      "description": "Notre équipe de support est disponible pour vous accompagner dans l'utilisation de Per4Biz. N'hésitez pas à nous contacter pour toute question."
+    }
+  },
+  "navigation": {
+    "appName": "Finance-Resto",
+    "home": "Accueil",
+    "finances": "Finances",
+    "banking": "Banques",
+    "employees": "Employés",
+    "globalSettings": "Paramètres globaux",
+    "profile": "Profil"
+  },
+  "pages": {
+    "profile": {
+      "title": "Mon Profil",
+      "subtitle": "Consultez et modifiez vos informations personnelles",
+      "editProfile": "Modifier le profil",
+      "personalInfo": "Informations personnelles",
+      "userCode": "Code utilisateur",
+      "fullName": "Nom complet",
+      "phone": "Téléphone",
+      "memberSince": "Membre depuis",
+      "notSpecified": "Non renseigné",
+      "profileUpdated": "Profil mis à jour avec succès"
+    },
+    "finances": {
+      "title": "Gestion Financière",
+      "subtitle": "Gérez vos finances, factures et suivez votre chiffre d'affaires",
+      "budget": "Budget",
+      "invoices": "Factures",
+      "myInvoices": "Mes Factures",
+      "invoicesSubtitle": "Consultez et gérez vos factures d'achat",
+      "newInvoice": "Nouvelle facture",
+      "cashRegister": "Caisse",
+      "revenue": "Chiffre d'affaires",
+      "budgetTracking": "Suivi CA Budget",
+      "budgetTrackingSubtitle": "Suivez et analysez vos budgets de chiffre d'affaires par entité et période",
+      "settings": "Paramètres finances"
+    },
+    "banking": {
+      "title": "Gestion Bancaire",
+      "subtitle": "Gérez vos comptes bancaires et suivez vos mouvements",
+      "accounts": "Comptes bancaires",
+      "statements": "Relevés",
+      "bankMovements": "Mouvements Bancaires",
+      "bankMovementsSubtitle": "Consultez et gérez vos écritures bancaires",
+      "settings": "Paramètres banque"
+    },
+    "employees": {
+      "title": "Gestion des Employés",
+      "subtitle": "Gérez vos employés, contrats et affectations",
+      "myEmployees": "Mes Employés",
+      "myEmployeesSubtitle": "Gérez les employés de votre organisation. La suppression est définitive et supprime toutes les données associées.",
+      "addEmployee": "Ajouter un employé",
+      "hrBudget": "Budget Prévisionnel RH",
+      "hrBudgetSubtitle": "Visualisez le budget prévisionnel RH calculé en temps réel à partir des données existantes",
+      "personnelFile": "Fiche personnel",
+      "settings": "Paramètres employés"
+    },
+    "globalSettings": {
+      "title": "Paramètres Globaux",
+      "subtitle": "Configuration générale de votre établissement",
+      "entities": "Gestion des Entités",
+      "entitiesSubtitle": "Gérez les différentes entités de votre organisation",
+      "createEntity": "Créer une entité",
+      "editEntity": "Modifier une entité",
+      "thirdParties": "Tiers",
+      "thirdPartiesSubtitle": "Gérez les tiers de votre organisation",
+      "addThirdParty": "Ajouter un tiers",
+      "allThirdPartyTypes": "Tous les types de tiers",
+      "invoiceTypes": "Types de facture",
+      "import": "Import"
+    }
+  },
+  "table": {
+    "code": "Code",
+    "label": "Libellé",
+    "name": "Nom",
+    "active": "Actif",
+    "email": "Email",
+    "phone": "Téléphone",
+    "city": "Ville",
+    "type": "Type",
+    "creationDate": "Date de création",
+    "actions": "Actions",
+    "edit": "Éditer",
+    "delete": "Supprimer",
+    "view": "Voir",
+    "noData": "Aucune donnée",
+    "loading": "Chargement...",
+    "searchInProgress": "Recherche en cours...",
+    "showData": "Afficher les données",
+    "calculating": "Calcul en cours..."
+  },
+  "forms": {
+    "establishmentName": "Nom de l'établissement",
+    "contactEmail": "Email de contact",
+    "address": "Adresse",
+    "entity": "Entité",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "year": "Année",
+    "month": "Mois",
+    "bankAccount": "Compte bancaire",
+    "allRestaurants": "Tous les restaurants",
+    "filters": "Filtres",
+    "displayBudget": "Afficher le Budget",
+    "addBudgetLine": "Ajouter une ligne de budget",
+    "addLine": "Ajouter une ligne",
+    "enterInline": "Saisir en ligne"
+  },
+  "financial": {
+    "documentNumber": "N° Document",
+    "date": "Date",
+    "thirdParty": "Tiers",
+    "paymentMode": "Mode Paiement",
+    "amountExVat": "Montant HT",
+    "vatAmount": "Montant TVA",
+    "amountIncVat": "Montant TTC",
+    "operationDate": "Date opération",
+    "valueDate": "Date valeur",
+    "description": "Description",
+    "amount": "Montant",
+    "balance": "Solde",
+    "reference": "Référence"
+  },
+  "employee": {
+    "matricule": "Matricule",
+    "civility": "Civilité",
+    "userCode": "Code utilisateur",
+    "fullName": "Nom complet"
+  },
+  "messages": {
+    "loadingEntities": "Chargement des entités...",
+    "noEntities": "Aucune entité",
+    "loadingThirdParties": "Chargement des tiers...",
+    "noThirdParties": "Aucun tiers",
+    "loadingEmployees": "Chargement des employés...",
+    "noEmployees": "Aucun employé",
+    "loadingInvoices": "Chargement des factures...",
+    "noInvoices": "Aucune facture",
+    "loadingBudgets": "Chargement des budgets...",
+    "noBudgets": "Aucun budget",
+    "loadingBankEntries": "Chargement des écritures...",
+    "noBankEntries": "Aucune écriture bancaire",
+    "errorCalculatingBudget": "Erreur lors du calcul du budget",
+    "noBudgetData": "Aucune donnée de budget disponible",
+    "budgetCalculatedRealTime": "Budget RH calculé en temps réel",
+    "deletionPermanent": "La suppression est définitive"
+  }
+}
