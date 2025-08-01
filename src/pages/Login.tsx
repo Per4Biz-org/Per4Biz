@@ -38,9 +38,9 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-400 to-blue-600 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
-        <PageSection>
+        <PageSection className="bg-yellow-50 border border-yellow-200 shadow-xl">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold">Connexion</h1>
             <p className="mt-2 text-gray-600">
