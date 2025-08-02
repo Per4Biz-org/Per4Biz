@@ -13,7 +13,6 @@ import { FactureLignesSection } from '../../../components/finances/factures/Fact
 import { FactureLigneForm } from '../../../components/finances/factures/FactureLigneForm';
 import { FactureTotals } from '../../../components/finances/factures/FactureTotals';
 import { FactureFileUpload } from '../../../components/finances/factures/FactureFileUpload';
-import { supabase } from '../../../lib/supabase';
 
 interface FactureAchat {
   id?: string;

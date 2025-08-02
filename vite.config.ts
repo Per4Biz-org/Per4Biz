@@ -1,8 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    }
+  },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -28,4 +34,4 @@ export default defineConfig({
     port: 4173,
     open: true
   }
-})
+}))
