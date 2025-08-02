@@ -1,7 +1,7 @@
 export const FEATURES = {
   // 🏠 Pages principales (desenvolvimento - todas ativas)
   ENABLE_ACCUEIL: true,
-  ENABLE_PROFIL: true, 
+  ENABLE_PROFIL: false, 
   ENABLE_TEST_UI: true,
   
   // ⚙️ Paramètres Globaux
