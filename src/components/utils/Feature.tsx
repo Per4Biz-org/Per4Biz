@@ -1,5 +1,4 @@
-// src/components/utils/Feature.tsx
-import { FEATURES } from "@/config/features.prod"
+import { FEATURES } from "@/config/features"
 
 type FeatureProps = {
   name: keyof typeof FEATURES

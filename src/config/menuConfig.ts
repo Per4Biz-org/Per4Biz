@@ -1,6 +1,6 @@
 import { Home, User, Settings, Mail, FileText, Users, CreditCard, Landmark } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { FEATURES } from './features';
+import { FEATURES } from '@/config/features';
 
 interface MenuItem {
   icon: any;
