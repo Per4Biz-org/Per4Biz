@@ -7,9 +7,6 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@/config/features': mode === 'production' 
-        ? path.resolve(__dirname, './src/config/features.prod')
-        : path.resolve(__dirname, './src/config/features.dev')
     }
   },
   build: {
