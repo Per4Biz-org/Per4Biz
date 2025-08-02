@@ -36,7 +36,7 @@ export const FEATURES = {
   ENABLE_TYPE_FONCTION: false,
   
   // 💰 Module Finances (apenas essenciais)
-  ENABLE_FINANCES: false, // Página principal desativada
+  ENABLE_FINANCES: true, // Página principal desativada
   ENABLE_PARAMETRES_FINANCES: false,
   ENABLE_SAISIE_BUDGET_ANNUEL: false,
   ENABLE_SUIVI_CA_REEL: false,
