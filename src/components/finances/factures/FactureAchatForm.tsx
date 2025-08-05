@@ -225,15 +225,15 @@ export function FactureAchatForm({
     const newErrors: Record<string, string> = {};
 
     if (!facture.id_entite) { 
-      newErrors.id_entite = "L'entité est requise";
+      newErrors.id_entite = t('invoices.validation.entityRequired');
     }
     
     if (!facture.id_tiers) {
-      newErrors.id_tiers = "Le tiers est requis";
+      newErrors.id_tiers = t('invoices.validation.thirdPartyRequired');
     }
     
     if (!facture.date_facture) {
-      newErrors.date_facture = "La date de facture est requise";
+      newErrors.date_facture = t('invoices.validation.invoiceDateRequired');
     }
     
     if (!facture.montant_ht || facture.montant_ht <= 0) {
@@ -241,7 +241,7 @@ export function FactureAchatForm({
     }
     
     if (facture.montant_tva === null || facture.montant_tva === undefined) { 
-      newErrors.montant_tva = "Le montant TVA est requis";
+      newErrors.montant_tva = t('invoices.validation.vatAmountRequired');
     }
     
     if (!facture.montant_ttc || facture.montant_ttc <= 0) {
@@ -249,7 +249,7 @@ export function FactureAchatForm({
     }
 
     if (!selectedModePaiement) {
-      newErrors.id_mode_paiement = "Le mode de paiement est requis";
+      newErrors.id_mode_paiement = t('invoices.validation.paymentModeRequired');
     }
 
     setErrors(newErrors);

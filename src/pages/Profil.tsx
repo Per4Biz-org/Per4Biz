@@ -11,6 +11,9 @@ import { User, Mail, Calendar, Phone, Hash, Edit, Save, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { supabase } from '../lib/supabase';
+import PTFlag from 'country-flag-icons/react/3x2/PT';
+import GBFlag from 'country-flag-icons/react/3x2/GB';
+import FRFlag from 'country-flag-icons/react/3x2/FR';
 
 const Profil: React.FC = () => {
   const { t } = useTranslation();
@@ -176,37 +179,93 @@ const Profil: React.FC = () => {
   // Lógica para as bandeiras
   const { i18n } = useTranslation();
   const languages = [
-    { code: 'pt', flag: '🇵🇹' },
-    { code: 'en', flag: '🇺🇸' },
-    { code: 'fr', flag: '🇫🇷' }
+    { code: 'pt', component: PTFlag, name: 'Português' },
+    { code: 'en', component: GBFlag, name: 'English' },
+    { code: 'fr', component: FRFlag, name: 'Français' }
   ];
+
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 
   const changeLanguage = (languageCode: string) => {
     i18n.changeLanguage(languageCode);
+    setShowLanguageMenu(false); // Fecha o menu após selecionar
   };
+
+  // Encontra o idioma atual
+  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+
+  // Fecha o menu quando clica fora
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showLanguageMenu && !target.closest('.language-dropdown')) {
+        setShowLanguageMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showLanguageMenu]);
+
 
   return (
     <div className="max-w-6xl mx-auto p-8">
       <PageSection>
-        <div className="flex items-center gap-8 mb-2">
+        <div className="flex items-center gap-4 mb-2">
           <h1 className="text-4xl font-bold text-gray-900">{t('pages.profile.title')}</h1>
           
-          {/* Seletor de idiomas - apenas bandeiras */}
-          <div className="flex gap-4">
-            {languages.map((language) => (
-              <span
-                key={language.code}
-                onClick={() => changeLanguage(language.code)}
-                className="cursor-pointer hover:scale-125 transition-all duration-200 text-2xl"
-                style={{
-                  opacity: i18n.language === language.code ? 1 : 0.4,
-                  filter: i18n.language === language.code ? 'none' : 'grayscale(0.5)'
-                }}
-                title={`${language.code.toUpperCase()}`}
-              >
-                {language.flag}
-              </span>
-            ))}
+          {/* Seletor de idiomas - dropdown com bandeira */}
+          <div className="relative language-dropdown">
+            {/* Bandeira atual - clicável */}
+            <div
+              onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+              className="cursor-pointer transition-all duration-300 hover:scale-105 flex items-center"
+              style={{
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+              }}
+              title={`${currentLanguage.name} - Clique para trocar idioma`}
+            >
+              <currentLanguage.component 
+                style={{ 
+                  width: '28px', 
+                  height: '21px',
+                  borderRadius: '4px'
+                }} 
+              />
+            </div>
+
+            {/* Menu dropdown */}
+            {showLanguageMenu && (
+              <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 min-w-[120px]">
+                {languages.map((language) => {
+                  const FlagComponent = language.component;
+                  return (
+                    <div
+                      key={language.code}
+                      onClick={() => changeLanguage(language.code)}
+                      className={`
+                        flex items-center gap-3 px-3 py-2 cursor-pointer transition-all duration-200
+                        hover:bg-blue-50 hover:scale-105
+                        ${i18n.language === language.code ? 'bg-blue-100' : ''}
+                      `}
+                      title={language.name}
+                    >
+                      <FlagComponent 
+                        style={{ 
+                          width: '20px', 
+                          height: '15px',
+                          borderRadius: '2px',
+                          border: '1px solid rgba(0,0,0,0.1)'
+                        }} 
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        {language.name}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
         <p className="text-lg text-gray-600 mb-12">

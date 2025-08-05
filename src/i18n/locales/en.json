@@ -281,6 +281,15 @@
       "commentPlaceholder": "Optional comment",
       "cancel": "Cancel",
       "save": "Save"
+    },
+    "validation": {
+      "entityRequired": "Entity is required",
+      "thirdPartyRequired": "Third party is required",
+      "invoiceDateRequired": "Invoice date is required",
+      "vatAmountRequired": "VAT amount is required",
+      "paymentModeRequired": "Payment mode is required",
+      "categoryRequired": "Category is required",
+      "subcategoryRequired": "Subcategory is required"
     }
   },
   "cashRegister": {

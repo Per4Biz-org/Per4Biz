@@ -281,6 +281,15 @@
       "commentPlaceholder": "Comentário opcional",
       "cancel": "Cancelar",
       "save": "Salvar"
+    },
+    "validation": {
+      "entityRequired": "A entidade é obrigatória",
+      "thirdPartyRequired": "O terceiro é obrigatório",
+      "invoiceDateRequired": "A data da fatura é obrigatória",
+      "vatAmountRequired": "O valor do IVA é obrigatório",
+      "paymentModeRequired": "A forma de pagamento é obrigatória",
+      "categoryRequired": "A categoria é obrigatória",
+      "subcategoryRequired": "A subcategoria é obrigatória"
     }
   },
   "cashRegister": {

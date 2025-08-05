@@ -224,11 +224,11 @@ export function FactureLigneForm({
     const newErrors: Record<string, string> = {};
     
     if (!formData.id_categorie_flux) {
-      newErrors.id_categorie_flux = 'La catégorie est requise';
+      newErrors.id_categorie_flux = t('invoices.validation.categoryRequired');
     }
     
     if (!formData.id_sous_categorie_flux) {
-      newErrors.id_sous_categorie_flux = 'La sous-catégorie est requise';
+      newErrors.id_sous_categorie_flux = t('invoices.validation.subcategoryRequired');
     }
     
     if (formData.montant_ht <= 0) {

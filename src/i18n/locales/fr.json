@@ -281,6 +281,15 @@
       "commentPlaceholder": "Commentaire optionnel",
       "cancel": "Annuler",
       "save": "Enregistrer"
+    },
+    "validation": {
+      "entityRequired": "L'entité est requise",
+      "thirdPartyRequired": "Le tiers est requis",
+      "invoiceDateRequired": "La date de facture est requise",
+      "vatAmountRequired": "Le montant TVA est requis",
+      "paymentModeRequired": "Le mode de paiement est requis",
+      "categoryRequired": "La catégorie est requise",
+      "subcategoryRequired": "La sous-catégorie est requise"
     }
   },
   "cashRegister": {
