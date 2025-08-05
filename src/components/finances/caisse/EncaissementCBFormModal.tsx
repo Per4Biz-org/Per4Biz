@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
 import { Button } from '../../ui/button';
@@ -17,6 +18,8 @@ export function EncaissementCBFormModal({
   onSave,
   initialData
 }: EncaissementCBFormModalProps) {
+  const { t } = useTranslation();
+  
   const [formData, setFormData] = useState<EncaissementCB>({
     periode: '',
     montant_brut: 0,
@@ -96,7 +99,7 @@ export function EncaissementCBFormModal({
       <div className="bg-white rounded-lg w-full max-w-md">
         <div className="flex justify-between items-center p-4 border-b border-gray-200">
           <h3 className="text-lg font-medium">
-            {initialData ? 'Modifier l\'encaissement' : 'Nouvel encaissement'}
+            {initialData ? t('cashRegister.closure.cardPaymentModal.editCardPayment') : t('cashRegister.closure.cardPaymentModal.newCardPayment')}
           </h3>
           <button
             onClick={onClose}
@@ -109,21 +112,21 @@ export function EncaissementCBFormModal({
         <div className="p-4">
           <Form size={100} onSubmit={handleSubmit}>
             <FormField
-              label="Période"
+              label={t('cashRegister.closure.cardPaymentModal.period')}
               required
               error={formErrors.periode}
-              description="Ex: TPE 1, SumUp, etc."
+              description={t('cashRegister.closure.cardPaymentModal.periodDescription')}
             >
               <FormInput
                 name="periode"
                 value={formData.periode}
                 onChange={handleInputChange}
-                placeholder="Ex: TPE 1"
+                placeholder={t('cashRegister.closure.cardPaymentModal.periodPlaceholder')}
               />
             </FormField>
             
             <FormField
-              label="Montant brut"
+              label={t('cashRegister.closure.cardPaymentModal.grossAmount')}
               required
               error={formErrors.montant_brut}
             >
@@ -138,7 +141,7 @@ export function EncaissementCBFormModal({
             </FormField>
             
             <FormField
-              label="Montant réel"
+              label={t('cashRegister.closure.cardPaymentModal.realAmount')}
               required
               error={formErrors.montant_reel}
             >
@@ -153,7 +156,7 @@ export function EncaissementCBFormModal({
             </FormField>
             
             <FormField
-              label="Commentaire"
+              label={t('cashRegister.closure.cardPaymentModal.comment')}
             >
               <textarea
                 name="commentaire"
@@ -161,19 +164,19 @@ export function EncaissementCBFormModal({
                 onChange={handleInputChange}
                 className="w-full p-2 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
                 rows={2}
-                placeholder="Commentaire optionnel"
+                placeholder={t('cashRegister.closure.cardPaymentModal.commentPlaceholder')}
               />
             </FormField>
             
             <FormActions>
               <Button
-                label="Annuler"
+                label={t('cashRegister.closure.cardPaymentModal.cancel')}
                 color="#6B7280"
                 onClick={onClose}
                 type="button"
               />
               <Button
-                label="Enregistrer"
+                label={t('cashRegister.closure.cardPaymentModal.save')}
                 icon="Save"
                 color="var(--color-primary)"
                 type="submit"

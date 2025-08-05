@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertTriangle, AlertCircle } from 'lucide-react';
 
 interface FactureTotalsProps {
@@ -16,14 +17,16 @@ export function FactureTotals({
   totalLignesHT,
   isTotalMismatch
 }: FactureTotalsProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="mt-4 flex flex-col gap-4">
       <div className="flex justify-between">
         {/* Total des lignes analytiques */}
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 w-64 flex flex-col">
-          <div className="text-sm font-medium text-gray-700 mb-2">Total des lignes analytiques :</div>
+          <div className="text-sm font-medium text-gray-700 mb-2">{t('invoices.form.analyticalLinesTotal')}</div>
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-500">Total HT:</span>
+            <span className="text-sm font-medium text-gray-500">{t('invoices.form.totalHT')}</span>
             <span className="text-sm font-bold">
               {totalLignesHT.toFixed(2)} €
             </span>
@@ -32,19 +35,19 @@ export function FactureTotals({
         
         {/* Totaux de la facture */}
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 w-64">
-          <div className="text-sm font-medium text-gray-700 mb-2">Totaux de la facture :</div>
+          <div className="text-sm font-medium text-gray-700 mb-2">{t('invoices.form.invoiceTotals')}</div>
           <div className="grid grid-cols-2 gap-2">
-            <div className="text-sm font-medium text-gray-500">Total HT:</div>
+            <div className="text-sm font-medium text-gray-500">{t('invoices.form.totalHT')}</div>
             <div className="text-sm text-right font-bold">
               {montantHT.toFixed(2)} €
             </div>
             
-            <div className="text-sm font-medium text-gray-500">Total TVA:</div>
+            <div className="text-sm font-medium text-gray-500">{t('invoices.form.totalVAT')}</div>
             <div className="text-sm text-right font-bold">
               {montantTVA.toFixed(2)} €
             </div>
             
-            <div className="text-sm font-medium text-gray-500 border-t pt-1">Total TTC:</div>
+            <div className="text-sm font-medium text-gray-500 border-t pt-1">{t('invoices.form.totalTTC')}</div>
             <div className="text-sm text-right font-bold border-t pt-1">
               {montantTTC.toFixed(2)} €
             </div>

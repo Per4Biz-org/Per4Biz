@@ -3,7 +3,6 @@ import { Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../context/MenuContext';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import LanguageSwitch from '../LanguageSwitch';
 
 interface HeaderProps {
   onExpandChange?: (expanded: boolean) => void;
@@ -88,10 +87,6 @@ const Header: React.FC<HeaderProps> = ({ onExpandChange }) => {
             </div>
           </React.Fragment>
         ))}
-      </div>
-      
-      <div className="px-4 mt-4 border-t border-[rgba(255,255,255,0.2)] pt-4">
-        <LanguageSwitch />
       </div>
     </nav>
   );

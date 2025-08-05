@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
@@ -37,6 +38,7 @@ export function FactureLigneForm({
   entiteId, 
   onAddLigne = () => {}
 }: FactureLigneFormProps) {
+  const { t } = useTranslation();
   const { profil } = useProfil();
   // Stocker l'entité ID dans une référence pour éviter sa perte lors des re-rendus
   const currentEntiteIdRef = React.useRef<string>(entiteId);
@@ -272,7 +274,7 @@ export function FactureLigneForm({
       <div className="bg-white rounded-lg p-6 w-full max-w-lg">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">
-            {initialData ? 'Modifier une ligne' : 'Ajouter une ligne'}
+            {initialData ? t('invoices.lineModal.editLine') : t('invoices.lineModal.addLine')}
           </h2>
           <button
             onClick={onClose}
@@ -284,7 +286,7 @@ export function FactureLigneForm({
         
         <Form size={100} onSubmit={handleSubmit}>
           <FormField
-            label="Catégorie de flux"
+            label={t('invoices.lineModal.flowCategory')}
             required
             error={errors.id_categorie_flux}
           >
@@ -292,13 +294,13 @@ export function FactureLigneForm({
               options={categorieOptions}
               value={formData.id_categorie_flux}
               onChange={handleCategorieChange}
-              label="Sélectionner une catégorie"
+              label={t('invoices.lineModal.selectCategory')}
               disabled={loading}
             />
           </FormField>
           
           <FormField
-            label="Sous-catégorie de flux"
+            label={t('invoices.lineModal.flowSubcategory')}
             required
             error={errors.id_sous_categorie_flux}
           >
@@ -306,13 +308,13 @@ export function FactureLigneForm({
               options={sousCategorieOptions}
               value={formData.id_sous_categorie_flux}
               onChange={handleSousCategorieChange}
-              label={formData.id_categorie_flux ? "Sélectionner une sous-catégorie" : "Sélectionner d'abord une catégorie"}
+              label={formData.id_categorie_flux ? t('invoices.lineModal.selectSubcategory') : t('invoices.lineModal.selectCategoryFirst')}
               disabled={loading || !formData.id_categorie_flux}
             />
           </FormField>
           
           <FormField
-            label="Montant HT"
+            label={t('invoices.lineModal.amountExVat')}
             required
             error={errors.montant_ht}
           >
@@ -327,7 +329,7 @@ export function FactureLigneForm({
           </FormField>
           
           <FormField
-            label="Montant TVA"
+            label={t('invoices.lineModal.vatAmount')}
           >
             <FormInput
               type="number"
@@ -340,7 +342,7 @@ export function FactureLigneForm({
           </FormField>
           
           <FormField
-            label="Commentaire"
+            label={t('invoices.lineModal.comment')}
           >
             <textarea
               name="commentaire"
@@ -348,19 +350,19 @@ export function FactureLigneForm({
               onChange={handleInputChange}
               className="w-full p-2 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
               rows={2}
-              placeholder="Commentaire optionnel"
+              placeholder={t('invoices.lineModal.commentPlaceholder')}
             />
           </FormField>
           
           <FormActions>
             <Button
-              label="Annuler"
+              label={t('invoices.lineModal.cancel')}
               color="#6B7280"
               onClick={onClose}
               type="button"
             />
             <Button
-              label="Enregistrer"
+              label={t('invoices.lineModal.save')}
               icon="Save"
               color="var(--color-primary)"
               type="submit"

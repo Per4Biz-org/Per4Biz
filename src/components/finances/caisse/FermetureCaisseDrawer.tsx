@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
@@ -83,6 +84,7 @@ export function FermetureCaisseDrawer({
   onSuccess,
   addToast
 }: FermetureCaisseDrawerProps) {
+  const { t } = useTranslation();
   const { profil } = useProfil();
   
   const {
@@ -141,7 +143,7 @@ export function FermetureCaisseDrawer({
       <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold">
-            {fermeture.id ? 'Modifier la fermeture de caisse' : 'Nouvelle fermeture de caisse'}
+            {fermeture.id ? t('cashRegister.closure.modal.editClosure') : t('cashRegister.closure.modal.newClosure')}
           </h2>
           <button
             onClick={onClose}
@@ -171,9 +173,9 @@ export function FermetureCaisseDrawer({
             {/* Section 2: Encaissements CB */}
             <div className="col-span-2">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Encaissements CB</h3>
+                <h3 className="text-lg font-medium">{t('cashRegister.closure.form.cardPayments')}</h3>
                 <Button
-                  label="Ajouter un encaissement"
+                  label={t('cashRegister.closure.form.addCardPayment')}
                   icon="Plus"
                   color="var(--color-primary)"
                   onClick={openEncaissementModal}
@@ -191,9 +193,9 @@ export function FermetureCaisseDrawer({
               
               <div className="flex justify-end mt-2 text-sm">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                  <div className="text-right font-medium">Total brut:</div>
+                  <div className="text-right font-medium">{t('cashRegister.closure.form.grossTotal')}</div>
                   <div className="text-right">{fermeture.total_cb_brut?.toFixed(2) || '0.00'} €</div>
-                  <div className="text-right font-medium">Total réel:</div>
+                  <div className="text-right font-medium">{t('cashRegister.closure.form.realTotal')}</div>
                   <div className="text-right">{fermeture.total_cb_reel?.toFixed(2) || '0.00'} €</div>
                 </div>
               </div>
@@ -206,9 +208,9 @@ export function FermetureCaisseDrawer({
             {/* Section 3: Factures de dépense */}
             <div className="col-span-2">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Factures de dépense</h3>
+                <h3 className="text-lg font-medium">{t('cashRegister.closure.form.expenseInvoices')}</h3>
                 <Button
-                  label="Ajouter une facture"
+                  label={t('cashRegister.closure.form.addExpenseInvoice')}
                   icon="Plus"
                   color="var(--color-primary)"
                   onClick={openFactureModal}
@@ -225,7 +227,7 @@ export function FermetureCaisseDrawer({
               
               <div className="flex justify-end mt-2 text-sm">
                 <div className="grid grid-cols-2 gap-x-4">
-                  <div className="text-right font-medium">Total factures:</div>
+                  <div className="text-right font-medium">{t('cashRegister.closure.form.totalInvoices')}</div>
                   <div className="text-right">{fermeture.total_facture_depenses_ttc?.toFixed(2) || '0.00'} €</div>
                 </div>
               </div>
@@ -247,7 +249,7 @@ export function FermetureCaisseDrawer({
             {/* Section 5: Boutons de bas de page */}
             <FormActions>
               <Button
-                label="Annuler"
+                label={t('cashRegister.closure.modal.cancel')}
                 color="#6B7280"
                 onClick={onClose}
                 type="button"
@@ -256,7 +258,7 @@ export function FermetureCaisseDrawer({
               
               <div className="flex gap-2">
                 <Button
-                  label="Enregistrer"
+                  label={t('cashRegister.closure.modal.save')}
                   icon="Save"
                   color="var(--color-primary)"
                   onClick={() => handleSubmit(false)}
@@ -265,7 +267,7 @@ export function FermetureCaisseDrawer({
                 />
                 
                 <Button
-                  label="Valider"
+                  label={t('cashRegister.closure.modal.validate')}
                   icon="CheckSquare"
                   color="#22c55e"
                   onClick={() => handleSubmit(true)}

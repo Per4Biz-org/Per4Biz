@@ -173,10 +173,42 @@ const Profil: React.FC = () => {
     );
   }
 
+  // Lógica para as bandeiras
+  const { i18n } = useTranslation();
+  const languages = [
+    { code: 'pt', flag: '🇵🇹' },
+    { code: 'en', flag: '🇺🇸' },
+    { code: 'fr', flag: '🇫🇷' }
+  ];
+
+  const changeLanguage = (languageCode: string) => {
+    i18n.changeLanguage(languageCode);
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-8">
       <PageSection>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('pages.profile.title')}</h1>
+        <div className="flex items-center gap-8 mb-2">
+          <h1 className="text-4xl font-bold text-gray-900">{t('pages.profile.title')}</h1>
+          
+          {/* Seletor de idiomas - apenas bandeiras */}
+          <div className="flex gap-4">
+            {languages.map((language) => (
+              <span
+                key={language.code}
+                onClick={() => changeLanguage(language.code)}
+                className="cursor-pointer hover:scale-125 transition-all duration-200 text-2xl"
+                style={{
+                  opacity: i18n.language === language.code ? 1 : 0.4,
+                  filter: i18n.language === language.code ? 'none' : 'grayscale(0.5)'
+                }}
+                title={`${language.code.toUpperCase()}`}
+              >
+                {language.flag}
+              </span>
+            ))}
+          </div>
+        </div>
         <p className="text-lg text-gray-600 mb-12">
           {t('pages.profile.subtitle')}
         </p>

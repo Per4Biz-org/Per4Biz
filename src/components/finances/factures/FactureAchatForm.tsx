@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
@@ -65,6 +66,7 @@ export function FactureAchatForm({
   entiteId,
   onFormChange
 }: FactureAchatFormProps) {
+  const { t } = useTranslation();
   const { profil } = useProfil();
   const navigate = useNavigate();
   const [tiers, setTiers] = useState<Tiers[]>([]);
@@ -297,9 +299,9 @@ export function FactureAchatForm({
     <Form size={100} columns={3} onSubmit={handleSubmit} className="text-sm">
       {/* Première ligne: Entité, Tiers, Mode de paiement */}
       <FormField
-        label="Entité"
+        label={t('invoices.form.entity')}
         required
-        description={entiteId ? "Entité verrouillée selon la sélection précédente" : ""}
+        description={entiteId ? t('invoices.form.entityLockedMessage') : ""}
         error={errors.id_entite}
       >
         {entiteId ? (
@@ -308,7 +310,7 @@ export function FactureAchatForm({
               {entiteOptions.find(opt => opt.value === selectedEntite)?.label || 'Entité sélectionnée'}
             </span>
             <span className="ml-2 text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
-              Verrouillé
+              {t('invoices.form.entityLocked')}
             </span>
           </div>
         ) : (
@@ -323,7 +325,7 @@ export function FactureAchatForm({
       </FormField>
 
       <FormField
-        label="Tiers"
+        label={t('invoices.form.thirdParty')}
         required
         error={errors.id_tiers}
       >
@@ -335,7 +337,7 @@ export function FactureAchatForm({
       </FormField>
       
       <FormField
-        label="Mode de paiement"
+        label={t('invoices.form.paymentMode')}
         required
         error={errors.id_mode_paiement} 
       >
@@ -343,14 +345,14 @@ export function FactureAchatForm({
           options={modePaiementOptions}
           value={selectedModePaiement}
           onChange={handleDropdownChange('id_mode_paiement')}
-          label="Sélectionner un mode de paiement"
+          label={t('invoices.form.selectPaymentMode')}
           disabled={isSaving}
         />
       </FormField>
       
       {/* Deuxième ligne: Date de facture, N° Document, Commentaire */}
       <FormField
-        label="Date de facture"
+        label={t('invoices.form.invoiceDate')}
         required
         error={errors.date_facture}
       >
@@ -364,20 +366,20 @@ export function FactureAchatForm({
       </FormField>
 
       <FormField
-        label="N° Document"
+        label={t('invoices.form.documentNumber')}
         error={errors.num_document}
       >
         <FormInput
           name="num_document"
           value={facture.num_document || ''}
           onChange={handleInputChange}
-          placeholder="Numéro de facture (optionnel)"
+          placeholder={t('invoices.form.documentNumberPlaceholder')}
           disabled={isSaving}
         />
       </FormField>
       
       <FormField
-        label="Commentaire" 
+        label={t('invoices.form.comment')} 
         className=""
       >
         <textarea
@@ -386,13 +388,13 @@ export function FactureAchatForm({
           onChange={handleInputChange}
           className="w-full p-2 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
           rows={2}
-          placeholder="Commentaire optionnel"
+          placeholder={t('invoices.form.commentPlaceholder')}
           disabled={isSaving}
         />
       </FormField>
       
       <FormField
-        label="Montant HT"
+        label={t('invoices.form.amountExVat')}
         required
         error={errors.montant_ht}
       >
@@ -403,13 +405,13 @@ export function FactureAchatForm({
           onChange={handleInputChange}
           step="0.01"
           min="0"
-          placeholder="Montant HT"
+          placeholder={t('invoices.form.amountExVat')}
           disabled={isSaving}
         />
       </FormField>
       
       <FormField
-        label="Montant TVA"
+        label={t('invoices.form.vatAmount')}
         required
         error={errors.montant_tva}
       >
@@ -420,13 +422,13 @@ export function FactureAchatForm({
           onChange={handleInputChange}
           step="0.01"
           min="0"
-          placeholder="Montant TVA"
+          placeholder={t('invoices.form.vatAmount')}
           disabled={isSaving}
         />
       </FormField>
       
       <FormField
-        label="Montant TTC"
+        label={t('invoices.form.amountIncVat')}
         required
         error={errors.montant_ttc}
       >
@@ -437,14 +439,14 @@ export function FactureAchatForm({
           onChange={handleInputChange}
           step="0.01"
           min="0"
-          placeholder="Montant TTC"
+          placeholder={t('invoices.form.amountIncVat')}
           disabled={isSaving}
         />
       </FormField>
 
       {/* Quatrième ligne: Type de facture et Pièce jointe */}
       <FormField
-        label="Type de facture"
+        label={t('invoices.form.invoiceType')}
         className="col-span-1"
       >
         <div className="flex items-center p-2 border-2 border-gray-300 bg-gray-100 rounded-md">
@@ -456,7 +458,7 @@ export function FactureAchatForm({
       </FormField>
       
       <FormField
-        label="Pièce jointe"
+        label={t('invoices.form.attachment')}
         className="col-span-2"
       >
         <FactureFileUpload

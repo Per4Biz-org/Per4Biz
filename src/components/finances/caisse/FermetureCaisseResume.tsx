@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FormField, FormInput } from '../../ui/form';
 import { Calculator } from 'lucide-react';
 import { FermetureCaisse } from './FermetureCaisseDrawer';
@@ -21,17 +22,19 @@ export function FermetureCaisseResume({
   isSubmitting,
   handleInputChange
 }: FermetureCaisseResumeProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="col-span-2 bg-blue-50 p-4 rounded-lg mb-4">
       <div className="flex items-center mb-3">
         <Calculator className="text-blue-600 mr-2" size={20} />
-        <h3 className="text-lg font-medium text-blue-800">Résumé calculé</h3>
+        <h3 className="text-lg font-medium text-blue-800">{t('cashRegister.closure.form.calculatedSummary')}</h3>
       </div>
       
       <div className="grid grid-cols-2 gap-4">
         <FormField
-          label="Dépôt en banque théorique"
-          description="CA TTC - Total CB brut - Total factures"
+          label={t('cashRegister.closure.form.theoreticalBankDeposit')}
+          description={t('cashRegister.closure.form.calculationFormula')}
         >
           <FormInput
             type="number"
@@ -42,7 +45,7 @@ export function FermetureCaisseResume({
         </FormField>
         
         <FormField
-          label="Dépôt en banque réel"
+          label={t('cashRegister.closure.form.realBankDeposit')}
           required
           error={formErrors.depot_banque_reel}
         >
@@ -58,8 +61,8 @@ export function FermetureCaisseResume({
         </FormField>
         
         <FormField
-          label="Garde en caisse"
-          description="Différence entre théorique et réel"
+          label={t('cashRegister.closure.form.cashKeeping')}
+          description={t('cashRegister.closure.form.theoreticalRealDifference')}
         >
           <FormInput
             type="number"
@@ -70,7 +73,7 @@ export function FermetureCaisseResume({
         </FormField>
         
         <FormField
-          label="Fond de caisse début"
+          label={t('cashRegister.closure.form.startingCashFund')}
           required
           error={formErrors.fond_caisse_espece_debut}
         >
@@ -86,8 +89,8 @@ export function FermetureCaisseResume({
         </FormField>
         
         <FormField
-          label="Fond de caisse fin"
-          description="Fond début + Garde en caisse"
+          label={t('cashRegister.closure.form.endingCashFund')}
+          description={t('cashRegister.closure.form.cashFundFormula')}
         >
           <FormInput
             type="number"
@@ -98,7 +101,7 @@ export function FermetureCaisseResume({
         </FormField>
         
         <FormField
-          label="Commentaire"
+          label={t('cashRegister.closure.form.comment')}
           className="col-span-2"
         >
           <textarea

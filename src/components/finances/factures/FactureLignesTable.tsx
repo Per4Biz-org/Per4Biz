@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 
 interface FactureLigne {
@@ -32,10 +33,12 @@ export function FactureLignesTable({
   onDelete,
   disabled = false
 }: FactureLignesTableProps) {
+  const { t } = useTranslation();
+  
   if (lignes.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center text-gray-500">
-        Aucune ligne de facture. Cliquez sur "Ajouter une ligne" pour commencer.
+        {t('invoices.form.noLines')}
       </div>
     );
   }

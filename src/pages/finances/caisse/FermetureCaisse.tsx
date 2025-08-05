@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale'; 
+import { fr } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next'; 
 import { startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { useMenu } from '../../../context/MenuContext';
 import { useProfil } from '../../../context/ProfilContext';
@@ -28,6 +29,7 @@ interface FermetureCaisseData extends FermetureCaisseType {
 }
 
 const FermetureCaisse: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [entites, setEntites] = useState<Entite[]>([]);
@@ -104,7 +106,7 @@ const FermetureCaisse: React.FC = () => {
       } catch (error) {
         console.error('Erreur lors de la récupération des entités:', error);
         addToast({
-          label: 'Erreur lors de la récupération des entités',
+          label: t('messages.errorLoadingEntities'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -162,7 +164,7 @@ const FermetureCaisse: React.FC = () => {
   const fetchFermetures = async () => {
     if (!profil?.com_contrat_client_id) {
       addToast({
-        label: 'Profil utilisateur incomplet',
+        label: t('messages.incompleteUserProfile'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -172,7 +174,7 @@ const FermetureCaisse: React.FC = () => {
     // Vérifier que les filtres obligatoires sont renseignés
     if (!filters.entite) {
       addToast({ 
-        label: 'Veuillez sélectionner une entité avant de rechercher', 
+        label: t('messages.selectEntityBeforeSearch'), 
         icon: 'AlertTriangle', 
         color: '#f59e0b' 
       });
@@ -182,7 +184,7 @@ const FermetureCaisse: React.FC = () => {
     // Vérifier que les dates sont valides
     if (new Date(filters.dateDebut) > new Date(filters.dateFin)) {
       addToast({ 
-        label: 'La date de début doit être antérieure à la date de fin', 
+        label: t('messages.startDateMustBeBeforeEndDate'), 
         icon: 'AlertTriangle', 
         color: '#f59e0b' 
       });
@@ -234,7 +236,7 @@ const FermetureCaisse: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors du chargement des fermetures de caisse:', error);
       addToast({
-        label: 'Erreur lors du chargement des fermetures de caisse',
+        label: t('messages.errorLoadingCashClosures'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -263,7 +265,7 @@ const FermetureCaisse: React.FC = () => {
     const selectedEntityId = getSelectedEntityId();
     if (!selectedEntityId) {
       addToast({
-        label: 'Veuillez sélectionner une entité avant de créer une fermeture de caisse',
+        label: t('messages.selectEntityBeforeCashClosure'),
         icon: 'AlertTriangle',
         color: '#f59e0b'
       });
@@ -284,14 +286,14 @@ const FermetureCaisse: React.FC = () => {
     
     if (fermeture.est_valide) {
       addToast({
-        label: 'Impossible de supprimer une fermeture validée',
+        label: t('messages.cannotDeleteValidatedClosure'),
         icon: 'AlertTriangle',
         color: '#f59e0b'
       });
       return;
     }
 
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la fermeture de caisse du ${format(new Date(fermeture.date_fermeture), 'dd/MM/yyyy', { locale: fr })} ?`)) {
+    if (window.confirm(t('messages.confirmDeleteCashClosure', { date: format(new Date(fermeture.date_fermeture), 'dd/MM/yyyy', { locale: fr }) }))) {
       try {
         const { error } = await supabase
           .from('fin_ferm_caisse')
@@ -301,7 +303,7 @@ const FermetureCaisse: React.FC = () => {
         if (error) throw error;
 
         addToast({
-          label: 'Fermeture de caisse supprimée avec succès',
+          label: t('messages.cashClosureDeletedSuccess'),
           icon: 'Check',
           color: '#22c55e'
         });
@@ -310,7 +312,7 @@ const FermetureCaisse: React.FC = () => {
       } catch (error) {
         console.error('Erreur lors de la suppression de la fermeture de caisse:', error);
         addToast({
-          label: 'Erreur lors de la suppression de la fermeture de caisse',
+          label: t('messages.errorDeletingCashClosure'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -322,7 +324,7 @@ const FermetureCaisse: React.FC = () => {
   const filterConfigs = [
     {
       name: 'entite',
-      label: 'Restaurant',
+      label: t('cashRegister.closure.columns.restaurant'),
       type: 'select' as const,
       options: entites.map(entite => ({
         id: entite.id,
@@ -334,13 +336,13 @@ const FermetureCaisse: React.FC = () => {
     },
     {
       name: 'dateDebut',
-      label: 'Date de début',
+      label: t('forms.startDate'),
       type: 'date' as const,
       width: '160px'
     },
     {
       name: 'dateFin',
-      label: 'Date de fin',
+      label: t('forms.endDate'),
       type: 'date' as const,
       width: '160px'
     }
@@ -349,55 +351,55 @@ const FermetureCaisse: React.FC = () => {
   // Configuration des colonnes du tableau
   const columns: Column<FermetureCaisseData>[] = [
     {
-      label: 'Restaurant',
+      label: t('cashRegister.closure.columns.restaurant'),
       accessor: 'entite',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Date',
+      label: t('cashRegister.closure.columns.date'),
       accessor: 'date_fermeture',
       sortable: true,
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
     },
     {
-      label: 'CA TTC',
+      label: t('cashRegister.closure.columns.totalRevenue'),
       accessor: 'ca_ttc',
       align: 'right',
       render: (value) => value ? `${value.toFixed(2)} €` : '-'
     },
     {
-      label: 'Total CB',
+      label: t('cashRegister.closure.columns.totalCB'),
       accessor: 'total_cb_brut',
       align: 'right',
       render: (value) => value ? `${value.toFixed(2)} €` : '-'
     },
     {
-      label: 'Total Factures',
+      label: t('cashRegister.closure.columns.totalInvoices'),
       accessor: 'total_facture_depenses_ttc',
       align: 'right',
       render: (value) => value ? `${value.toFixed(2)} €` : '-'
     },
     {
-      label: 'Dépôt Théorique',
+      label: t('cashRegister.closure.columns.theoreticalDeposit'),
       accessor: 'depot_banque_theorique',
       align: 'right',
       render: (value) => value ? `${value.toFixed(2)} €` : '-'
     },
     {
-      label: 'Dépôt Réel',
+      label: t('cashRegister.closure.columns.realDeposit'),
       accessor: 'depot_banque_reel',
       align: 'right',
       render: (value) => value ? `${value.toFixed(2)} €` : '-'
     },
     {
-      label: 'Statut',
+      label: t('cashRegister.closure.columns.status'),
       accessor: 'est_valide',
       align: 'center',
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
         }`}>
-          {value ? 'Validé' : 'Brouillon'}
+          {value ? t('cashRegister.closure.columns.validated') : t('cashRegister.closure.columns.draft')}
         </span>
       )
     }
@@ -406,13 +408,13 @@ const FermetureCaisse: React.FC = () => {
   // Configuration des actions du tableau
   const actions = [
     {
-      label: 'Modifier',
+      label: t('cashRegister.closure.actions.edit'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEditFermeture
     },
     {
-      label: 'Supprimer',
+      label: t('cashRegister.closure.actions.delete'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDeleteFermeture
@@ -422,8 +424,8 @@ const FermetureCaisse: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title="Fermeture de Caisse"
-        description="Gérez les fermetures de caisse de votre établissement"
+        title={t('cashRegister.closure.title')}
+        description={t('cashRegister.closure.description')}
         className={styles.header}
       >
         <div className="mb-6">
@@ -437,7 +439,7 @@ const FermetureCaisse: React.FC = () => {
             />
             
             <Button
-              label={isSearching ? "Recherche en cours..." : "Afficher les Fermetures"}
+              label={isSearching ? t('table.searchInProgress') : t('cashRegister.closure.showClosures')}
               icon="Search"
               color="var(--color-primary)"
               onClick={fetchFermetures}
@@ -447,18 +449,18 @@ const FermetureCaisse: React.FC = () => {
 
           <div className="mt-2 text-sm text-gray-600">
             {searchPerformed && fermetures.length > 0 ? (
-              <span>{filteredFermetures.length} fermeture(s) trouvée(s)</span>
+              <span>{t('messages.closuresFound', { count: filteredFermetures.length })}</span>
             ) : searchPerformed ? (
-              <span>Aucune fermeture trouvée</span>
+              <span>{t('messages.noClosuresFound')}</span>
             ) : (
-              <span>Utilisez les filtres ci-dessus et cliquez sur "Afficher les Fermetures"</span>
+              <span>{t('messages.useFiltersAndShowClosures')}</span>
             )}
           </div>
         </div>
 
         <div className="mb-6">
           <Button
-            label="Ajouter une fermeture de caisse"
+            label={t('cashRegister.closure.addClosure')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={handleAddFermeture}
@@ -468,13 +470,13 @@ const FermetureCaisse: React.FC = () => {
 
         {loading && !searchPerformed ? (
           <div className="flex justify-center items-center h-64"> 
-            <p className="text-gray-500">Chargement des fermetures...</p>
+            <p className="text-gray-500">{t('messages.loadingClosures')}</p>
           </div>
         ) : !searchPerformed ? (
           <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg border border-gray-200">
             <div className="text-center p-6">
-              <p className="text-gray-500 mb-2">Sélectionnez une entité et cliquez sur "Afficher les Fermetures"</p>
-              <p className="text-gray-400 text-sm">Aucune recherche n'a encore été effectuée</p>
+              <p className="text-gray-500 mb-2">{t('messages.selectEntityAndShowClosures')}</p>
+              <p className="text-gray-400 text-sm">{t('messages.noSearchPerformed')}</p>
             </div>
           </div>
         ) : (
@@ -483,8 +485,8 @@ const FermetureCaisse: React.FC = () => {
             data={filteredFermetures}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucune fermeture de caisse"
-            emptyMessage="Aucune fermeture de caisse n'a été enregistrée pour les critères sélectionnés."
+            emptyTitle={t('cashRegister.closure.noClosure')}
+            emptyMessage={t('cashRegister.closure.noClosureMessage')}
           />
         )}
         

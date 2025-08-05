@@ -160,7 +160,7 @@ const MesFactures: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des factures:', error);
       addToast({
-        label: 'Erreur lors de la récupération des factures',
+        label: t('messages.errorLoadingInvoices'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -292,7 +292,7 @@ const MesFactures: React.FC = () => {
   };
 
   const handleDelete = async (facture: FactureAchat) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${facture.num_document || 'sans numéro'} ?`)) {
+    if (window.confirm(t('messages.confirmDeleteInvoice', { number: facture.num_document || 'sans numéro' }))) {
       try {
         const { error } = await supabase
           .from('fin_facture_achat')
@@ -303,14 +303,14 @@ const MesFactures: React.FC = () => {
 
         await fetchFactures();
         addToast({
-          label: `La facture a été supprimée avec succès`,
+          label: t('messages.invoiceDeletedSuccess'),
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression de la facture',
+          label: t('messages.errorDeletingInvoice'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -338,7 +338,7 @@ const MesFactures: React.FC = () => {
   // Validation des dates
   const validateDates = (): boolean => {
     if (new Date(filters.dateDebut) > new Date(filters.dateFin)) {
-      addToast({ label: 'La date de début doit être antérieure à la date de fin', icon: 'AlertTriangle', color: '#f59e0b' });
+      addToast({ label: t('messages.startDateMustBeBeforeEndDate'), icon: 'AlertTriangle', color: '#f59e0b' });
       return false;
     }
     return true;
@@ -350,7 +350,7 @@ const MesFactures: React.FC = () => {
     
     if (!filters.entite) {
       addToast({ 
-        label: 'Veuillez sélectionner une entité avant de rechercher', 
+        label: t('messages.selectEntityBeforeSearch'), 
         icon: 'AlertTriangle', 
         color: '#f59e0b' 
       });
@@ -371,7 +371,7 @@ const MesFactures: React.FC = () => {
     console.log('handleEditFactureSuccess appelé avec factureId:', factureId);
     fetchFactures();
     addToast({
-      label: `Facture ${selectedFactureId ? 'modifiée' : 'créée'} avec succès`,
+      label: t('messages.invoiceSuccess', `Facture ${selectedFactureId ? 'modifiée' : 'créée'} avec succès`),
       icon: 'Check',
       color: '#22c55e'
     });
@@ -451,7 +451,7 @@ const MesFactures: React.FC = () => {
       render: (value) => `${Number(value).toFixed(2)} €`
     },
     {
-      label: 'PJ',
+      label: t('invoices.attachment'),
       accessor: 'lien_piece_jointe',
       align: 'center',
       width: '60px',
@@ -475,11 +475,11 @@ const MesFactures: React.FC = () => {
                 window.open(data.signedUrl, '_blank');
               } catch (error) {
                 console.error('Erreur lors de la génération de l\'URL signée:', error);
-                alert('Erreur lors de l\'accès à la pièce jointe');
+                alert(t('messages.errorAccessingAttachment', 'Erreur lors de l\'accès à la pièce jointe'));
               }
             }}
             className="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-blue-100 transition-colors cursor-pointer"
-            title="Ouvrir la pièce jointe"
+            title={t('messages.openAttachment')}
           >
             <Paperclip size={18} className="text-blue-600" />
           </button>
@@ -525,7 +525,7 @@ const MesFactures: React.FC = () => {
             />
             
             <Button
-              label={isSearching ? t('table.searchInProgress', 'Recherche en cours...') : t('common.showInvoices', 'Afficher les Factures')}
+              label={isSearching ? t('table.searchInProgress', 'Recherche en cours...') : t('invoices.showInvoices')}
               icon="Search"
               color="var(--color-primary)"
               onClick={handleSearch}
@@ -535,11 +535,11 @@ const MesFactures: React.FC = () => {
 
           <div className="mt-2 text-sm text-gray-600">
             {searchPerformed && factures.length > 0 ? (
-              <span>{filteredFactures.length} facture(s) trouvée(s)</span>
+              <span>{t('messages.invoicesFound', { count: filteredFactures.length })}</span>
             ) : searchPerformed ? (
-              <span>Aucune facture trouvée</span>
+              <span>{t('messages.noInvoicesFound')}</span>
             ) : (
-              <span>Utilisez les filtres ci-dessus et cliquez sur "Afficher les Factures"</span>
+              <span>{t('messages.useFiltersAbove')}</span>
             )}
           </div>
         </div>
@@ -556,7 +556,7 @@ const MesFactures: React.FC = () => {
                 setIsEditModalOpen(true);
               } else {
                 addToast({
-                  label: 'Veuillez sélectionner une entité avant de créer une facture',
+                  label: t('messages.selectEntityBeforeCreate'),
                   icon: 'AlertTriangle',
                   color: '#f59e0b'
                 });
@@ -568,13 +568,13 @@ const MesFactures: React.FC = () => {
 
         {loading && !searchPerformed ? (
           <div className="flex justify-center items-center h-64"> 
-            <p className="text-gray-500">Chargement des factures...</p>
+            <p className="text-gray-500">{t('messages.loadingInvoices')}</p>
           </div>
         ) : !searchPerformed ? (
           <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg border border-gray-200">
             <div className="text-center p-6">
-              <p className="text-gray-500 mb-2">Sélectionnez une entité et cliquez sur "Afficher les Factures"</p>
-              <p className="text-gray-400 text-sm">Aucune recherche n'a encore été effectuée</p>
+              <p className="text-gray-500 mb-2">{t('messages.selectEntityAndSearch')}</p>
+              <p className="text-gray-400 text-sm">{t('messages.noSearchPerformed')}</p>
             </div>
           </div>
         ) : (

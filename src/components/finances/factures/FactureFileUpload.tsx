@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FileUp, Upload, X, ExternalLink } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { Button } from '../../ui/button';
@@ -21,6 +22,7 @@ export function FactureFileUpload({
   disabled = false,
   currentFile = null
 }: FactureFileUploadProps) {
+  const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
@@ -143,7 +145,7 @@ export function FactureFileUpload({
       {!currentFile ? (
         <>
           <Button
-            label={selectedFile ? selectedFile.name : "Sélectionner un fichier"}
+            label={selectedFile ? selectedFile.name : t('invoices.form.selectFile')}
             icon="FileUp"
             color="var(--color-primary)"
             onClick={() => document.getElementById('file-upload')?.click()}

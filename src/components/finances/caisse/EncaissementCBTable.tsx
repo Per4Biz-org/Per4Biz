@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { EncaissementCB } from './FermetureCaisseDrawer';
 
@@ -15,10 +16,12 @@ export function EncaissementCBTable({
   onDelete,
   disabled = false
 }: EncaissementCBTableProps) {
+  const { t } = useTranslation();
+  
   if (encaissements.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center text-gray-500">
-        Aucun encaissement CB enregistré
+        {t('cashRegister.closure.form.noCardPayments')}
       </div>
     );
   }
