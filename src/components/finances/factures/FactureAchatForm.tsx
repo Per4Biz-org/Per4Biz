@@ -237,7 +237,7 @@ export function FactureAchatForm({
     }
     
     if (!facture.montant_ht || facture.montant_ht <= 0) {
-      newErrors.montant_ht = "Le montant HT doit être supérieur à 0";
+      newErrors.montant_ht = t('invoices.validation.amountExVatRequired');
     }
     
     if (facture.montant_tva === null || facture.montant_tva === undefined) { 
@@ -245,7 +245,7 @@ export function FactureAchatForm({
     }
     
     if (!facture.montant_ttc || facture.montant_ttc <= 0) {
-      newErrors.montant_ttc = "Le montant TTC doit être supérieur à 0";
+      newErrors.montant_ttc = t('invoices.validation.amountIncVatRequired');
     }
 
     if (!selectedModePaiement) {

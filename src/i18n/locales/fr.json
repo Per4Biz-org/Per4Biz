@@ -286,7 +286,9 @@
       "entityRequired": "L'entité est requise",
       "thirdPartyRequired": "Le tiers est requis",
       "invoiceDateRequired": "La date de facture est requise",
+      "amountExVatRequired": "Le montant HT doit être supérieur à 0",
       "vatAmountRequired": "Le montant TVA est requis",
+      "amountIncVatRequired": "Le montant TTC doit être supérieur à 0",
       "paymentModeRequired": "Le mode de paiement est requis",
       "categoryRequired": "La catégorie est requise",
       "subcategoryRequired": "La sous-catégorie est requise"

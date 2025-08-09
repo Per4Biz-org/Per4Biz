@@ -286,7 +286,9 @@
       "entityRequired": "A entidade é obrigatória",
       "thirdPartyRequired": "O terceiro é obrigatório",
       "invoiceDateRequired": "A data da fatura é obrigatória",
+      "amountExVatRequired": "O valor sem IVA deve ser superior a 0",
       "vatAmountRequired": "O valor do IVA é obrigatório",
+      "amountIncVatRequired": "O valor com IVA deve ser superior a 0",
       "paymentModeRequired": "A forma de pagamento é obrigatória",
       "categoryRequired": "A categoria é obrigatória",
       "subcategoryRequired": "A subcategoria é obrigatória"

@@ -286,7 +286,9 @@
       "entityRequired": "Entity is required",
       "thirdPartyRequired": "Third party is required",
       "invoiceDateRequired": "Invoice date is required",
+      "amountExVatRequired": "Amount Ex. VAT must be greater than 0",
       "vatAmountRequired": "VAT amount is required",
+      "amountIncVatRequired": "Amount Inc. VAT must be greater than 0",
       "paymentModeRequired": "Payment mode is required",
       "categoryRequired": "Category is required",
       "subcategoryRequired": "Subcategory is required"
