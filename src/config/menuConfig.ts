@@ -59,11 +59,11 @@ export const menuItemsGestionFinanciere = [
 
 export const menuItemsParamGestionFinanciere = [
   { icon: Home, label: 'Paramètres GF', path: '/finances/parametres-finances', featureFlag: 'ENABLE_PARAMETRES_FINANCES' },
-  { icon: Home, label: 'Nature Flux', path: '/finances/parametres-finances/nature-flux', separator: true, featureFlag: 'ENABLE_NATURE_FLUX'},
-  { icon: Home, label: 'Catégorie Flux', path: '/finances/parametres-finances/categorie-flux', featureFlag: 'ENABLE_CATEGORIE_FLUX' },
-  { icon: Home, label: 'Sous Catégorie Flux', path: '/finances/parametres-finances/sous-categorie-flux', featureFlag: 'ENABLE_SOUS_CATEGORIE_FLUX' },
-  { icon: CreditCard, label: 'Type Services CA', path: '/finances/parametres-finances/ca-type-service', separator: true, featureFlag: 'ENABLE_CA_TYPE_SERVICE' },
-  { icon: CreditCard, label: 'Paramètre Jours', path: '/finances/parametres-finances/param-jours', featureFlag: 'ENABLE_PARAM_JOURS' }
+  { icon: Home, label: 'Nature Flux', path: '/finances/nature-flux', separator: true, featureFlag: 'ENABLE_NATURE_FLUX'},
+  { icon: Home, label: 'Catégorie Flux', path: '/finances/categorie-flux', featureFlag: 'ENABLE_CATEGORIE_FLUX' },
+  { icon: Home, label: 'Sous Catégorie Flux', path: '/finances/sous-categorie-flux', featureFlag: 'ENABLE_SOUS_CATEGORIE_FLUX' },
+  { icon: CreditCard, label: 'Type Services CA', path: '/finances/ca-type-service', separator: true, featureFlag: 'ENABLE_CA_TYPE_SERVICE' },
+  { icon: CreditCard, label: 'Paramètre Jours', path: '/finances/param-jours', featureFlag: 'ENABLE_PARAM_JOURS' }
 ];
 
 export const menuItemsGestionBancaire = [
