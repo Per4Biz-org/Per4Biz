@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { startOfMonth, endOfMonth, subMonths } from 'date-fns';
@@ -47,6 +48,7 @@ interface Entite {
 }
 
 const MesFactures: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const navigate = useNavigate();
@@ -158,7 +160,7 @@ const MesFactures: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des factures:', error);
       addToast({
-        label: 'Erreur lors de la récupération des factures',
+        label: t('messages.errorLoadingInvoices'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -290,7 +292,7 @@ const MesFactures: React.FC = () => {
   };
 
   const handleDelete = async (facture: FactureAchat) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la facture ${facture.num_document || 'sans numéro'} ?`)) {
+    if (window.confirm(t('messages.confirmDeleteInvoice', { number: facture.num_document || 'sans numéro' }))) {
       try {
         const { error } = await supabase
           .from('fin_facture_achat')
@@ -301,14 +303,14 @@ const MesFactures: React.FC = () => {
 
         await fetchFactures();
         addToast({
-          label: `La facture a été supprimée avec succès`,
+          label: t('messages.invoiceDeletedSuccess'),
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression de la facture',
+          label: t('messages.errorDeletingInvoice'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -336,7 +338,7 @@ const MesFactures: React.FC = () => {
   // Validation des dates
   const validateDates = (): boolean => {
     if (new Date(filters.dateDebut) > new Date(filters.dateFin)) {
-      addToast({ label: 'La date de début doit être antérieure à la date de fin', icon: 'AlertTriangle', color: '#f59e0b' });
+      addToast({ label: t('messages.startDateMustBeBeforeEndDate'), icon: 'AlertTriangle', color: '#f59e0b' });
       return false;
     }
     return true;
@@ -348,7 +350,7 @@ const MesFactures: React.FC = () => {
     
     if (!filters.entite) {
       addToast({ 
-        label: 'Veuillez sélectionner une entité avant de rechercher', 
+        label: t('messages.selectEntityBeforeSearch'), 
         icon: 'AlertTriangle', 
         color: '#f59e0b' 
       });
@@ -369,7 +371,7 @@ const MesFactures: React.FC = () => {
     console.log('handleEditFactureSuccess appelé avec factureId:', factureId);
     fetchFactures();
     addToast({
-      label: `Facture ${selectedFactureId ? 'modifiée' : 'créée'} avec succès`,
+      label: t('messages.invoiceSuccess', `Facture ${selectedFactureId ? 'modifiée' : 'créée'} avec succès`),
       icon: 'Check',
       color: '#22c55e'
     });
@@ -378,7 +380,7 @@ const MesFactures: React.FC = () => {
   const filterConfigs = [
     {
       name: 'entite',
-      label: 'Entité',
+      label: t('forms.entity', 'Entité'),
       type: 'select' as const,
       options: entites.map(entite => ({
         id: entite.id,
@@ -390,13 +392,13 @@ const MesFactures: React.FC = () => {
     },
     {
       name: 'dateDebut',
-      label: 'Date de début',
+      label: t('forms.startDate', 'Date de début'),
       type: 'date' as const,
       width: '160px'
     },
     {
       name: 'dateFin',
-      label: 'Date de fin',
+      label: t('forms.endDate', 'Date de fin'),
       type: 'date' as const,
       width: '160px'
     }
@@ -404,52 +406,52 @@ const MesFactures: React.FC = () => {
 
   const columns: Column<FactureAchat>[] = [
     {
-      label: 'N° Document',
+      label: t('financial.documentNumber', 'N° Document'),
       accessor: 'num_document',
       sortable: true,
       render: (value) => value || '-'
     },
     {
-      label: 'Date',
+      label: t('financial.date', 'Date'),
       accessor: 'date_facture',
       sortable: true,
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
     },
     {
-      label: 'Entité',
+      label: t('forms.entity', 'Entité'),
       accessor: 'entite',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Tiers',
+      label: t('financial.thirdParty', 'Tiers'),
       accessor: 'tiers',
       render: (value) => `${value.code} - ${value.nom}`
     },
     {
-      label: 'Mode Paiement',
+      label: t('financial.paymentMode', 'Mode Paiement'),
       accessor: 'mode_paiement',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Montant HT',
+      label: t('financial.amountExVat', 'Montant HT'),
       accessor: 'montant_ht',
       align: 'right',
       render: (value) => `${Number(value).toFixed(2)} €`
     },
     {
-      label: 'Montant TVA',
+      label: t('financial.vatAmount', 'Montant TVA'),
       accessor: 'montant_tva',
       align: 'right',
       render: (value) => value ? `${Number(value).toFixed(2)} €` : '-'
     },
     {
-      label: 'Montant TTC',
+      label: t('financial.amountIncVat', 'Montant TTC'),
       accessor: 'montant_ttc',
       align: 'right',
       render: (value) => `${Number(value).toFixed(2)} €`
     },
     {
-      label: 'PJ',
+      label: t('invoices.attachment'),
       accessor: 'lien_piece_jointe',
       align: 'center',
       width: '60px',
@@ -473,11 +475,11 @@ const MesFactures: React.FC = () => {
                 window.open(data.signedUrl, '_blank');
               } catch (error) {
                 console.error('Erreur lors de la génération de l\'URL signée:', error);
-                alert('Erreur lors de l\'accès à la pièce jointe');
+                alert(t('messages.errorAccessingAttachment', 'Erreur lors de l\'accès à la pièce jointe'));
               }
             }}
             className="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-blue-100 transition-colors cursor-pointer"
-            title="Ouvrir la pièce jointe"
+            title={t('messages.openAttachment')}
           >
             <Paperclip size={18} className="text-blue-600" />
           </button>
@@ -485,7 +487,7 @@ const MesFactures: React.FC = () => {
       }
     },
     {
-      label: 'Date de création',
+      label: t('table.creationDate', 'Date de création'),
       accessor: 'created_at',
       render: (value) => format(new Date(value), 'dd/MM/yyyy HH:mm', { locale: fr })
     }
@@ -493,13 +495,13 @@ const MesFactures: React.FC = () => {
 
   const actions = [
     {
-      label: 'Éditer',
+      label: t('table.edit', 'Éditer'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: t('table.delete', 'Supprimer'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -509,8 +511,8 @@ const MesFactures: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Mes Factures"} 
-        description="Consultez et gérez vos factures d'achat"
+        title={loading || profilLoading ? t('common.loading', 'Chargement...') : t('pages.finances.myInvoices', 'Mes Factures')} 
+        description={t('pages.finances.invoicesSubtitle', 'Consultez et gérez vos factures d\'achat')}
         className={styles.header}>
         <div className="mb-6">
           <div className="flex items-end gap-4">
@@ -523,7 +525,7 @@ const MesFactures: React.FC = () => {
             />
             
             <Button
-              label={isSearching ? "Recherche en cours..." : "Afficher les Factures"}
+              label={isSearching ? t('table.searchInProgress', 'Recherche en cours...') : t('invoices.showInvoices')}
               icon="Search"
               color="var(--color-primary)"
               onClick={handleSearch}
@@ -533,18 +535,18 @@ const MesFactures: React.FC = () => {
 
           <div className="mt-2 text-sm text-gray-600">
             {searchPerformed && factures.length > 0 ? (
-              <span>{filteredFactures.length} facture(s) trouvée(s)</span>
+              <span>{t('messages.invoicesFound', { count: filteredFactures.length })}</span>
             ) : searchPerformed ? (
-              <span>Aucune facture trouvée</span>
+              <span>{t('messages.noInvoicesFound')}</span>
             ) : (
-              <span>Utilisez les filtres ci-dessus et cliquez sur "Afficher les Factures"</span>
+              <span>{t('messages.useFiltersAbove')}</span>
             )}
           </div>
         </div>
 
         <div className="mb-6">
           <Button
-            label="Nouvelle facture"
+            label={t('pages.finances.newInvoice', 'Nouvelle facture')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => {
@@ -554,7 +556,7 @@ const MesFactures: React.FC = () => {
                 setIsEditModalOpen(true);
               } else {
                 addToast({
-                  label: 'Veuillez sélectionner une entité avant de créer une facture',
+                  label: t('messages.selectEntityBeforeCreate'),
                   icon: 'AlertTriangle',
                   color: '#f59e0b'
                 });
@@ -566,13 +568,13 @@ const MesFactures: React.FC = () => {
 
         {loading && !searchPerformed ? (
           <div className="flex justify-center items-center h-64"> 
-            <p className="text-gray-500">Chargement des factures...</p>
+            <p className="text-gray-500">{t('messages.loadingInvoices')}</p>
           </div>
         ) : !searchPerformed ? (
           <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg border border-gray-200">
             <div className="text-center p-6">
-              <p className="text-gray-500 mb-2">Sélectionnez une entité et cliquez sur "Afficher les Factures"</p>
-              <p className="text-gray-400 text-sm">Aucune recherche n'a encore été effectuée</p>
+              <p className="text-gray-500 mb-2">{t('messages.selectEntityAndSearch')}</p>
+              <p className="text-gray-400 text-sm">{t('messages.noSearchPerformed')}</p>
             </div>
           </div>
         ) : (
@@ -581,8 +583,8 @@ const MesFactures: React.FC = () => {
             data={filteredFactures}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucune facture"
-            emptyMessage="Aucune facture d'achat n'a été créée pour le moment."
+            emptyTitle={t('messages.noInvoices', 'Aucune facture')}
+            emptyMessage={t('messages.noInvoicesCreated', 'Aucune facture d\'achat n\'a été créée pour le moment.')}
           />
         )}
 

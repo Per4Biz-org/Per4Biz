@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../context/MenuContext';
 import { useProfil } from '../context/ProfilContext';
 import { menuItemsAccueil } from '../config/menuConfig';
 import { BarChart as ChartBar, Wallet, Users, Calendar } from 'lucide-react';
 
 const Accueil: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading } = useProfil();
 
@@ -16,10 +18,10 @@ const Accueil: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center">
-          {loading ? 'Bienvenue sur Per4Biz' : `Bienvenue ${profil?.prenom || ''} sur Per4Biz`}
+          {loading ? t('home.welcome') : t('home.welcomeUser', { name: profil?.prenom || '' })}
         </h1>
         <p className="text-xl text-gray-600 leading-relaxed text-center mb-12">
-          Votre solution complète pour la gestion financière et administrative de votre établissement
+          {t('home.subtitle')}
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
@@ -28,15 +30,14 @@ const Accueil: React.FC = () => {
               <div className="p-3 bg-blue-100 rounded-lg mr-4">
                 <ChartBar className="w-8 h-8 text-blue-600" />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-800">Suivi financier</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">{t('home.financial.title')}</h2>
             </div>
             <p className="text-gray-600">
-              Suivez vos performances financières en temps réel. Analysez vos revenus, 
-              dépenses et marges pour prendre des décisions éclairées.
+              {t('home.financial.description')}
             </p>
             <div className="mt-4">
               <a href="/finances" className="text-blue-600 hover:text-blue-800 font-medium">
-                Accéder au module financier →
+                {t('home.financial.link')}
               </a>
             </div>
           </div>
@@ -46,15 +47,14 @@ const Accueil: React.FC = () => {
               <div className="p-3 bg-green-100 rounded-lg mr-4">
                 <Wallet className="w-8 h-8 text-green-600" />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-800">Gestion bancaire</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">{t('home.banking.title')}</h2>
             </div>
             <p className="text-gray-600">
-              Gérez vos comptes bancaires, suivez vos mouvements et importez vos relevés 
-              pour une réconciliation simplifiée.
+              {t('home.banking.description')}
             </p>
             <div className="mt-4">
               <a href="/banques" className="text-green-600 hover:text-green-800 font-medium">
-                Accéder au module bancaire →
+                {t('home.banking.link')}
               </a>
             </div>
           </div>
@@ -64,15 +64,14 @@ const Accueil: React.FC = () => {
               <div className="p-3 bg-purple-100 rounded-lg mr-4">
                 <Users className="w-8 h-8 text-purple-600" />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-800">Gestion du personnel</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">{t('home.hr.title')}</h2>
             </div>
             <p className="text-gray-600">
-              Gérez efficacement votre personnel, les contrats, les affectations et 
-              suivez les coûts associés à chaque employé.
+              {t('home.hr.description')}
             </p>
             <div className="mt-4">
               <a href="/employes" className="text-purple-600 hover:text-purple-800 font-medium">
-                Accéder au module RH →
+                {t('home.hr.link')}
               </a>
             </div>
           </div>
@@ -82,25 +81,23 @@ const Accueil: React.FC = () => {
               <div className="p-3 bg-amber-100 rounded-lg mr-4">
                 <Calendar className="w-8 h-8 text-amber-600" />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-800">Paramètres globaux</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">{t('home.settings.title')}</h2>
             </div>
             <p className="text-gray-600">
-              Configurez les paramètres de votre application, gérez les entités, les tiers
-              et personnalisez votre expérience.
+              {t('home.settings.description')}
             </p>
             <div className="mt-4">
               <a href="/parametres-global" className="text-amber-600 hover:text-amber-800 font-medium">
-                Accéder aux paramètres →
+                {t('home.settings.link')}
               </a>
             </div>
           </div>
         </div>
         
         <div className="mt-12 bg-blue-50 p-6 rounded-lg border border-blue-200">
-          <h3 className="text-lg font-semibold text-blue-800 mb-2">Besoin d'aide ?</h3>
+          <h3 className="text-lg font-semibold text-blue-800 mb-2">{t('home.help.title')}</h3>
           <p className="text-blue-700">
-            Notre équipe de support est disponible pour vous accompagner dans l'utilisation
-            de Per4Biz. N'hésitez pas à nous contacter pour toute question.
+            {t('home.help.description')}
           </p>
         </div>
       </div>

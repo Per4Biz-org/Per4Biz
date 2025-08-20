@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
 import { ToastData } from '../../ui/toast';
@@ -50,6 +51,7 @@ const EditFactureAchatModal: React.FC<EditFactureAchatModalProps> = ({
   factureId,
   fermetureCaisseId
 }) => {
+  const { t } = useTranslation();
   const { profil } = useProfil();
   
   // États principaux
@@ -518,7 +520,7 @@ const EditFactureAchatModal: React.FC<EditFactureAchatModalProps> = ({
       <div className="bg-white rounded-lg p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">
-            {factureId ? "Modifier une facture d'achat" : "Nouvelle facture d'achat"}
+            {factureId ? t('invoices.modal.editInvoice') : t('invoices.modal.newInvoice')}
           </h2>
           <button
             onClick={onClose}
@@ -572,19 +574,19 @@ const EditFactureAchatModal: React.FC<EditFactureAchatModalProps> = ({
             <div className="flex justify-end mt-8 pt-4 border-t">
               <div className="flex gap-3">
                 <Button
-                  label="Annuler"
+                  label={t('invoices.modal.cancel')}
                   color="#6B7280" 
                   onClick={onClose}
                   disabled={saving}
                 />
                 <Button
-                  label="Enregistrer"
+                  label={t('invoices.modal.save')}
                   icon="Save"
                   color="var(--color-primary)"
                   onClick={() => handleSaveFacture(facture)}
                   disabled={saving || isTotalMismatch() || lignes.length === 0}
                   className={isTotalMismatch() ? "opacity-50 cursor-not-allowed" : ""}
-                  title={isTotalMismatch() ? "Le montant HT de la facture doit être égal au total des lignes analytiques" : ""}
+                  title={isTotalMismatch() ? t('invoices.modal.totalMismatchTooltip') : ""}
                 />
               </div>
             </div>

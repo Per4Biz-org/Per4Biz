@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FormField, FormInput } from '../../ui/form';
 import { Dropdown, DropdownOption } from '../../ui/dropdown';
 import { FermetureCaisse } from './FermetureCaisseDrawer';
@@ -30,6 +31,8 @@ export function FermetureCaisseInfosGenerales({
   handleInputChange,
   handleEntiteChange
 }: FermetureCaisseInfosGeneralesProps) {
+  const { t } = useTranslation();
+  
   const entiteOptions: DropdownOption[] = entites.map(entite => ({
     value: entite.id,
     label: `${entite.code} - ${entite.libelle}`
@@ -46,7 +49,7 @@ export function FermetureCaisseInfosGenerales({
   return (
     <>
       <FormField
-        label="Restaurant"
+        label={t('cashRegister.closure.form.restaurant')}
         required
         error={formErrors.id_entite}
       >
@@ -56,7 +59,7 @@ export function FermetureCaisseInfosGenerales({
               {selectedEntiteLabel}
             </span>
             <span className="ml-2 text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
-              Verrouillé
+              {t('cashRegister.closure.form.restaurantLocked')}
             </span>
           </div>
         ) : (
@@ -71,7 +74,7 @@ export function FermetureCaisseInfosGenerales({
       </FormField>
       
       <FormField
-        label="Date de fermeture"
+        label={t('cashRegister.closure.form.closureDate')}
         required
         error={formErrors.date_fermeture}
       >
@@ -85,7 +88,7 @@ export function FermetureCaisseInfosGenerales({
       </FormField>
       
       <FormField
-        label="CA HT"
+        label={t('cashRegister.closure.form.revenueExVat')}
         error={formErrors.ca_ht}
       >
         <FormInput
@@ -100,7 +103,7 @@ export function FermetureCaisseInfosGenerales({
       </FormField>
       
       <FormField
-        label="CA TTC"
+        label={t('cashRegister.closure.form.revenueIncVat')}
         required
         error={formErrors.ca_ttc}
       >

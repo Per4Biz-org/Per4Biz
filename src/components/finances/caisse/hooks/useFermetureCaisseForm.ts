@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { supabase } from '../../../../lib/supabase';
 import { FermetureCaisse, EncaissementCB, FactureDepense } from '../FermetureCaisseDrawer';
@@ -32,6 +33,7 @@ export function useFermetureCaisseForm({
   profil,
   selectedEntityId
 }: UseFermetureCaisseFormProps) {
+  const { t } = useTranslation();
   // États
   const [entites, setEntites] = useState<Entite[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,7 +90,7 @@ export function useFermetureCaisseForm({
       } catch (error) {
         console.error('Erreur lors du chargement des entités:', error);
         addToast({
-          label: 'Erreur lors du chargement des entités',
+          label: t('messages.errorLoadingEntities'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -133,7 +135,7 @@ export function useFermetureCaisseForm({
       } catch (error) {
         console.error('Erreur lors du chargement des détails de la fermeture:', error);
         addToast({
-          label: 'Erreur lors du chargement des détails de la fermeture',
+          label: t('messages.errorLoadingClosureDetails'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -249,14 +251,14 @@ export function useFermetureCaisseForm({
       
       setEncaissementsCB(prev => prev.filter(item => item.id !== encaissement.id));
       addToast({
-        label: 'Encaissement supprimé avec succès',
+        label: t('messages.cardPaymentDeletedSuccess'),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error) {
       console.error('Erreur lors de la suppression de l\'encaissement:', error);
       addToast({
-        label: 'Erreur lors de la suppression de l\'encaissement',
+        label: t('messages.errorDeletingCardPayment'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -300,14 +302,14 @@ export function useFermetureCaisseForm({
       
       setFacturesDepense(prev => prev.filter(item => item.id !== facture.id));
       addToast({
-        label: 'Facture supprimée avec succès',
+        label: t('messages.expenseInvoiceDeletedSuccess'),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error) {
       console.error('Erreur lors de la suppression de la facture:', error);
       addToast({
-        label: 'Erreur lors de la suppression de la facture',
+        label: t('messages.errorDeletingExpenseInvoice'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -432,7 +434,7 @@ export function useFermetureCaisseForm({
     if (!validateForm()) return;
     if (!profil?.com_contrat_client_id) {
       addToast({
-        label: 'Erreur: Profil utilisateur incomplet',
+        label: t('messages.incompleteUserProfile'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -459,7 +461,7 @@ export function useFermetureCaisseForm({
       await saveFacturesDepense(facturesDepense, fermetureId, profil.com_contrat_client_id);
       
       addToast({
-        label: valider ? 'Fermeture de caisse validée avec succès' : 'Fermeture de caisse enregistrée avec succès',
+        label: valider ? t('messages.closureValidatedSuccess') : t('messages.closureSavedSuccess'),
         icon: 'Check',
         color: '#22c55e'
       });
@@ -469,7 +471,7 @@ export function useFermetureCaisseForm({
     } catch (error) {
       console.error('Erreur lors de l\'enregistrement de la fermeture de caisse:', error);
       addToast({
-        label: 'Erreur lors de l\'enregistrement de la fermeture de caisse',
+        label: t('messages.errorSavingClosure'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });

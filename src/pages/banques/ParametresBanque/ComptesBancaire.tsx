@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import { useProfil } from '../../../context/ProfilContext';
 import { useMenu } from '../../../context/MenuContext';
 import { supabase } from '../../../lib/supabase';
@@ -30,6 +31,7 @@ interface CompteBancaire {
 }
 
 const ComptesBancaire: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [comptes, setComptes] = useState<CompteBancaire[]>([]);
@@ -62,7 +64,7 @@ const ComptesBancaire: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des comptes:', error);
       addToast({
-        label: 'Erreur lors de la récupération des comptes bancaires',
+        label: t('messages.errorLoadingBankAccounts'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -94,7 +96,7 @@ const ComptesBancaire: React.FC = () => {
     setIsSubmitting(true);
     try {
       if (!profil?.com_contrat_client_id) {
-        throw new Error('Aucun contrat client associé au profil');
+        throw new Error(t('messages.noClientContract'));
       }
 
       let error;
@@ -134,14 +136,18 @@ const ComptesBancaire: React.FC = () => {
       setIsModalOpen(false);
       setSelectedCompte(null);
       addToast({
-        label: `Compte bancaire ${selectedCompte ? 'modifié' : 'créé'} avec succès`,
+        label: t('messages.bankAccountSavedSuccess', { 
+          action: selectedCompte ? t('messages.bankAccountModified') : t('messages.bankAccountCreated') 
+        }),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       addToast({
-        label: `Erreur lors de la ${selectedCompte ? 'modification' : 'création'} du compte bancaire`,
+        label: t('messages.errorSavingBankAccount', { 
+          action: selectedCompte ? t('messages.modification') : t('messages.creation') 
+        }),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -156,7 +162,7 @@ const ComptesBancaire: React.FC = () => {
   };
 
   const handleDelete = async (compte: CompteBancaire) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le compte "${compte.nom}" ?`)) {
+    if (window.confirm(t('messages.confirmDeleteBankAccount', { name: compte.nom }))) {
       try {
         const { error } = await supabase
           .from('bq_compte_bancaire')
@@ -167,14 +173,14 @@ const ComptesBancaire: React.FC = () => {
 
         await fetchComptes();
         addToast({
-          label: `Le compte "${compte.nom}" a été supprimé avec succès`,
+          label: t('messages.bankAccountDeletedSuccess', { name: compte.nom }),
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression du compte bancaire',
+          label: t('messages.errorDeletingBankAccount'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -184,43 +190,43 @@ const ComptesBancaire: React.FC = () => {
 
   const columns: Column<CompteBancaire>[] = [
     {
-      label: 'Entité',
+      label: t('banking.bankAccounts.columns.entity'),
       accessor: 'entite',
       render: (value) => value.code
     },
     {
-      label: 'Code',
+      label: t('banking.bankAccounts.columns.code'),
       accessor: 'code',
       sortable: true
     },
     {
-      label: 'Nom',
+      label: t('banking.bankAccounts.columns.name'),
       accessor: 'nom',
       sortable: true
     },
     {
-      label: 'Banque',
+      label: t('banking.bankAccounts.columns.bank'),
       accessor: 'banque',
       sortable: true
     },
     {
-      label: 'IBAN',
+      label: t('banking.bankAccounts.columns.iban'),
       accessor: 'iban'
     },
     {
-      label: 'Actif',
+      label: t('banking.bankAccounts.columns.active'),
       accessor: 'actif',
       align: 'center',
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('banking.bankAccounts.columns.yes') : t('banking.bankAccounts.columns.no')}
         </span>
       )
     },
     {
-      label: 'Date de création',
+      label: t('banking.bankAccounts.columns.creationDate'),
       accessor: 'created_at',
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
     }
@@ -228,13 +234,13 @@ const ComptesBancaire: React.FC = () => {
 
   const actions = [
     {
-      label: 'Éditer',
+      label: t('banking.bankAccounts.actions.edit'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: t('banking.bankAccounts.actions.delete'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -244,13 +250,13 @@ const ComptesBancaire: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Comptes Bancaires"}
-        description="Gérez les comptes bancaires de votre organisation"
+        title={loading || profilLoading ? t('common.loading') : t('banking.bankAccounts.title')}
+        description={t('banking.bankAccounts.description')}
         className={styles.header}
       >
         <div className="mb-6">
           <Button
-            label="Créer un compte bancaire"
+            label={t('banking.bankAccounts.createAccount')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
@@ -259,7 +265,7 @@ const ComptesBancaire: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des comptes bancaires...</p>
+            <p className="text-gray-500">{t('messages.loadingBankAccounts')}</p>
           </div>
         ) : (
           <DataTable
@@ -267,8 +273,8 @@ const ComptesBancaire: React.FC = () => {
             data={comptes}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucun compte bancaire"
-            emptyMessage="Aucun compte bancaire n'a été créé pour le moment."
+            emptyTitle={t('banking.bankAccounts.noBankAccounts')}
+            emptyMessage={t('banking.bankAccounts.noBankAccountsMessage')}
           />
         )}
 
@@ -279,7 +285,7 @@ const ComptesBancaire: React.FC = () => {
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">
-                  {selectedCompte ? 'Modifier un compte bancaire' : 'Créer un compte bancaire'}
+                  {selectedCompte ? t('banking.bankAccounts.editAccount') : t('banking.bankAccounts.createAccount')}
                 </h2>
                 <button
                   onClick={() => {
