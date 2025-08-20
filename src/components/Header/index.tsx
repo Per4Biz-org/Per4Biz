@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../context/MenuContext';
+import { filterMenuItemsByFeatures } from '../../config/menuConfig';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
@@ -22,6 +23,9 @@ const Header: React.FC<HeaderProps> = ({ onExpandChange }) => {
   const { menuItems } = useMenu();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Filtrer les éléments de menu selon les feature flags
+  const filteredMenuItems = filterMenuItemsByFeatures(menuItems);
   
   useEffect(() => {
     onExpandChange?.(isExpanded);
@@ -60,7 +64,7 @@ const Header: React.FC<HeaderProps> = ({ onExpandChange }) => {
       </div>
 
       <div className="px-4">
-        {menuItems.map((item, index) => (
+        {filteredMenuItems.map((item, index) => (
           <React.Fragment key={item.label}>
             {item.separator && index > 0 && (
               <div className="mx-3 my-2 border-t border-[rgba(255,255,255,0.5)]" />

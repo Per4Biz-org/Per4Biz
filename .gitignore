@@ -34,5 +34,3 @@ Thumbs.db
 
 # Ignore coverage reports
 coverage/
-
-# Ignore temp fold
