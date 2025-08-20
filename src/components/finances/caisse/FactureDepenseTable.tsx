@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Trash2 } from 'lucide-react';
@@ -15,10 +16,12 @@ export function FactureDepenseTable({
   onDelete,
   disabled = false
 }: FactureDepenseTableProps) {
+  const { t } = useTranslation();
+  
   if (factures.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center text-gray-500">
-        Aucune facture de dépense enregistrée
+        {t('cashRegister.closure.form.noExpenseInvoices')}
       </div>
     );
   }

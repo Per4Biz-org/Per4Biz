@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../context/MenuContext';
 import { menuItemsAccueil } from '../config/menuConfig';
 import { PageSection } from '../components/ui/page-section';
@@ -10,8 +11,12 @@ import { User, Mail, Calendar, Phone, Hash, Edit, Save, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { supabase } from '../lib/supabase';
+import PTFlag from 'country-flag-icons/react/3x2/PT';
+import GBFlag from 'country-flag-icons/react/3x2/GB';
+import FRFlag from 'country-flag-icons/react/3x2/FR';
 
 const Profil: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading, error, updateProfil } = useProfil();
   const [isEditing, setIsEditing] = useState(false);
@@ -71,24 +76,24 @@ const Profil: React.FC = () => {
     const errors: Record<string, string> = {};
 
     if (!formData.nom.trim()) {
-      errors.nom = 'Le nom est requis';
+      errors.nom = t('pages.profile.validation.lastNameRequired');
     }
 
     if (!formData.prenom.trim()) {
-      errors.prenom = 'Le prénom est requis';
+      errors.prenom = t('pages.profile.validation.firstNameRequired');
     }
 
     if (!formData.code_user.trim()) {
-      errors.code_user = 'Le code utilisateur est requis';
+      errors.code_user = t('pages.profile.validation.userCodeRequired');
     } else if (formData.code_user.length < 3) {
-      errors.code_user = 'Le code utilisateur doit contenir au moins 3 caractères';
+      errors.code_user = t('pages.profile.validation.userCodeMinLength');
     }
 
     // Validation du téléphone si fourni
     if (formData.telephone && formData.telephone.trim()) {
       const phoneRegex = /^[\+]?[0-9\s\-\(\)\.]{10,}$/;
       if (!phoneRegex.test(formData.telephone.trim())) {
-        errors.telephone = 'Format de téléphone invalide';
+        errors.telephone = t('pages.profile.validation.phoneInvalid');
       }
     }
 
@@ -111,7 +116,7 @@ const Profil: React.FC = () => {
 
       setIsEditing(false);
       addToast({
-        label: 'Profil mis à jour avec succès',
+        label: t('pages.profile.profileUpdated'),
         icon: 'Check',
         color: '#22c55e'
       });
@@ -119,9 +124,9 @@ const Profil: React.FC = () => {
       console.error('Erreur lors de la mise à jour:', error);
       
       // Gestion des erreurs spécifiques
-      let errorMessage = 'Erreur lors de la mise à jour du profil';
+      let errorMessage = t('pages.profile.errors.updateFailed');
       if (error.message?.includes('duplicate key') || error.message?.includes('unique')) {
-        errorMessage = 'Ce code utilisateur est déjà utilisé dans votre organisation';
+        errorMessage = t('pages.profile.errors.userCodeExists');
       }
       
       addToast({
@@ -152,7 +157,7 @@ const Profil: React.FC = () => {
       <div className="max-w-6xl mx-auto p-8">
         <PageSection>
           <div className="flex items-center justify-center h-64">
-            <p className="text-lg text-gray-600">Chargement...</p>
+            <p className="text-lg text-gray-600">{t('common.loading')}</p>
           </div>
         </PageSection>
       </div>
@@ -171,12 +176,100 @@ const Profil: React.FC = () => {
     );
   }
 
+  // Lógica para as bandeiras
+  const { i18n } = useTranslation();
+  const languages = [
+    { code: 'pt', component: PTFlag, name: 'Português' },
+    { code: 'en', component: GBFlag, name: 'English' },
+    { code: 'fr', component: FRFlag, name: 'Français' }
+  ];
+
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+
+  const changeLanguage = (languageCode: string) => {
+    i18n.changeLanguage(languageCode);
+    setShowLanguageMenu(false); // Fecha o menu após selecionar
+  };
+
+  // Encontra o idioma atual
+  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+
+  // Fecha o menu quando clica fora
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showLanguageMenu && !target.closest('.language-dropdown')) {
+        setShowLanguageMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showLanguageMenu]);
+
+
   return (
     <div className="max-w-6xl mx-auto p-8">
       <PageSection>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Mon Profil</h1>
+        <div className="flex items-center gap-4 mb-2">
+          <h1 className="text-4xl font-bold text-gray-900">{t('pages.profile.title')}</h1>
+          
+          {/* Seletor de idiomas - dropdown com bandeira */}
+          <div className="relative language-dropdown">
+            {/* Bandeira atual - clicável */}
+            <div
+              onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+              className="cursor-pointer transition-all duration-300 hover:scale-105 flex items-center"
+              style={{
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+              }}
+              title={`${currentLanguage.name} - Clique para trocar idioma`}
+            >
+              <currentLanguage.component 
+                style={{ 
+                  width: '28px', 
+                  height: '21px',
+                  borderRadius: '4px'
+                }} 
+              />
+            </div>
+
+            {/* Menu dropdown */}
+            {showLanguageMenu && (
+              <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 min-w-[120px]">
+                {languages.map((language) => {
+                  const FlagComponent = language.component;
+                  return (
+                    <div
+                      key={language.code}
+                      onClick={() => changeLanguage(language.code)}
+                      className={`
+                        flex items-center gap-3 px-3 py-2 cursor-pointer transition-all duration-200
+                        hover:bg-blue-50 hover:scale-105
+                        ${i18n.language === language.code ? 'bg-blue-100' : ''}
+                      `}
+                      title={language.name}
+                    >
+                      <FlagComponent 
+                        style={{ 
+                          width: '20px', 
+                          height: '15px',
+                          borderRadius: '2px',
+                          border: '1px solid rgba(0,0,0,0.1)'
+                        }} 
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        {language.name}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
         <p className="text-lg text-gray-600 mb-12">
-          Consultez et modifiez vos informations personnelles
+          {t('pages.profile.subtitle')}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -191,7 +284,7 @@ const Profil: React.FC = () => {
             
             {!isEditing ? (
               <Button
-                label="Modifier le profil"
+                label={t('pages.profile.editProfile')}
                 icon="Edit"
                 color="var(--color-primary)"
                 className="w-full"
@@ -200,7 +293,7 @@ const Profil: React.FC = () => {
             ) : (
               <div className="flex gap-2 w-full">
                 <Button
-                  label="Annuler"
+                  label={t('common.cancel')}
                   icon="X"
                   color="#6b7280"
                   className="flex-1"
@@ -208,7 +301,7 @@ const Profil: React.FC = () => {
                   disabled={isSubmitting}
                 />
                 <Button
-                  label={isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+                  label={isSubmitting ? t('pages.profile.saving') : t('common.save')}
                   icon="Save"
                   color="var(--color-primary)"
                   className="flex-1"
@@ -223,7 +316,7 @@ const Profil: React.FC = () => {
           <div className="bg-white rounded-xl shadow-sm p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
               <User className="text-blue-500" />
-              Informations personnelles
+              {t('pages.profile.personalInfo')}
             </h2>
 
             {!isEditing ? (
@@ -231,7 +324,7 @@ const Profil: React.FC = () => {
                 <div className="flex items-start gap-4">
                   <Hash className="w-6 h-6 text-gray-400 mt-1" />
                   <div>
-                    <p className="text-gray-600">Code utilisateur</p>
+                    <p className="text-gray-600">{t('pages.profile.userCode')}</p>
                     <p className="text-lg font-medium">{profil?.code_user}</p>
                   </div>
                 </div>
@@ -239,7 +332,7 @@ const Profil: React.FC = () => {
                 <div className="flex items-start gap-4">
                   <User className="w-6 h-6 text-gray-400 mt-1" />
                   <div>
-                    <p className="text-gray-600">Nom complet</p>
+                    <p className="text-gray-600">{t('pages.profile.fullName')}</p>
                     <p className="text-lg font-medium">{profil?.prenom} {profil?.nom}</p>
                   </div>
                 </div>
@@ -247,15 +340,15 @@ const Profil: React.FC = () => {
                 <div className="flex items-start gap-4">
                   <Phone className="w-6 h-6 text-gray-400 mt-1" />
                   <div>
-                    <p className="text-gray-600">Téléphone</p>
-                    <p className="text-lg font-medium">{profil?.telephone || 'Non renseigné'}</p>
+                    <p className="text-gray-600">{t('pages.profile.phone')}</p>
+                    <p className="text-lg font-medium">{profil?.telephone || t('pages.profile.notSpecified')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
                   <Calendar className="w-6 h-6 text-gray-400 mt-1" />
                   <div>
-                    <p className="text-gray-600">Membre depuis</p>
+                    <p className="text-gray-600">{t('pages.profile.memberSince')}</p>
                     <p className="text-lg font-medium">
                       {profil?.created_at && format(new Date(profil.created_at), 
                         'd MMMM yyyy', 
@@ -267,24 +360,24 @@ const Profil: React.FC = () => {
             ) : (
               <Form size={100} onSubmit={handleSubmit}>
                 <FormField
-                  label="Code utilisateur"
+                  label={t('pages.profile.userCode')}
                   required
                   error={formErrors.code_user}
-                  description="Code unique dans votre organisation"
+                  description={t('pages.profile.form.userCodeDescription')}
                   className="mb-4"
                 >
                   <FormInput
                     name="code_user"
                     value={formData.code_user}
                     onChange={handleInputChange}
-                    placeholder="Ex: JDUPONT, USER001"
+                    placeholder={t('pages.profile.form.userCodePlaceholder')}
                     disabled={isSubmitting}
                     error={!!formErrors.code_user}
                   />
                 </FormField>
 
                 <FormField
-                  label="Prénom"
+                  label={t('pages.profile.form.firstName')}
                   required
                   error={formErrors.prenom}
                   className="mb-4"
@@ -293,14 +386,14 @@ const Profil: React.FC = () => {
                     name="prenom"
                     value={formData.prenom}
                     onChange={handleInputChange}
-                    placeholder="Jean"
+                    placeholder={t('pages.profile.form.firstNamePlaceholder')}
                     disabled={isSubmitting}
                     error={!!formErrors.prenom}
                   />
                 </FormField>
 
                 <FormField
-                  label="Nom"
+                  label={t('pages.profile.form.lastName')}
                   required
                   error={formErrors.nom}
                   className="mb-4"
@@ -309,14 +402,14 @@ const Profil: React.FC = () => {
                     name="nom"
                     value={formData.nom}
                     onChange={handleInputChange}
-                    placeholder="Dupont"
+                    placeholder={t('pages.profile.form.lastNamePlaceholder')}
                     disabled={isSubmitting}
                     error={!!formErrors.nom}
                   />
                 </FormField>
 
                 <FormField
-                  label="Téléphone"
+                  label={t('pages.profile.phone')}
                   error={formErrors.telephone}
                   className="mb-6"
                 >
@@ -325,7 +418,7 @@ const Profil: React.FC = () => {
                     type="tel"
                     value={formData.telephone}
                     onChange={handleInputChange}
-                    placeholder="+33 6 12 34 56 78"
+                    placeholder={t('pages.profile.form.phonePlaceholder')}
                     disabled={isSubmitting}
                     error={!!formErrors.telephone}
                   />
