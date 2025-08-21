@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../context/MenuContext';
 import { filterMenuItemsByFeatures } from '../../config/menuConfig';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
@@ -17,6 +18,7 @@ interface MenuItem {
 }
 
 const Header: React.FC<HeaderProps> = ({ onExpandChange }) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
   const { menuItems } = useMenu();
   const navigate = useNavigate();
@@ -56,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({ onExpandChange }) => {
         </button>
         {isExpanded && (
           <Link to="/" className="ml-4 text-xl font-semibold whitespace-nowrap hover:text-gray-100 hover:bg-[rgba(255,255,255,0.1)] transition-all px-3 py-1 rounded-lg">
-            Finance-Resto
+            {t('navigation.appName')}
           </Link>
         )}
       </div>

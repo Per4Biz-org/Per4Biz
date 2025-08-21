@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useMenu } from '../../context/MenuContext';
@@ -40,6 +41,7 @@ interface TypeTiers {
 }
 
 const Tiers: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [tiers, setTiers] = useState<Tiers[]>([]);
@@ -77,7 +79,7 @@ const Tiers: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des tiers:', error);
       addToast({
-        label: 'Erreur lors de la récupération des tiers',
+        label: t('messages.errorLoadingThirdParties', 'Erreur lors de la récupération des tiers'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -200,14 +202,14 @@ const Tiers: React.FC = () => {
       setIsModalOpen(false);
       setSelectedTiers(null);
       addToast({
-        label: `Tiers ${selectedTiers ? 'modifié' : 'créé'} avec succès`,
+        label: t('messages.thirdPartySavedSuccess', `Tiers ${selectedTiers ? 'modifié' : 'créé'} avec succès`),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       addToast({
-        label: `Erreur lors de la ${selectedTiers ? 'modification' : 'création'} du tiers`,
+        label: t('messages.errorSavingThirdParty', `Erreur lors de la ${selectedTiers ? 'modification' : 'création'} du tiers`),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -226,7 +228,7 @@ const Tiers: React.FC = () => {
   };
 
   const handleDelete = async (tiers: Tiers) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le tiers "${tiers.nom}" ?`)) {
+    if (window.confirm(t('messages.confirmDeleteThirdParty', `Êtes-vous sûr de vouloir supprimer le tiers "{{name}}" ?`, { name: tiers.nom }))) {
       try {
         const { error: deleteError } = await supabase
           .from('com_tiers')
@@ -246,7 +248,7 @@ const Tiers: React.FC = () => {
 
         await fetchTiers();
         addToast({
-          label: `Le tiers "${tiers.nom}" a été supprimé avec succès`,
+          label: t('messages.thirdPartyDeletedSuccess', `Le tiers "{{name}}" a été supprimé avec succès`, { name: tiers.nom }),
           icon: 'Check',
           color: '#22c55e'
         });
@@ -265,7 +267,7 @@ const Tiers: React.FC = () => {
 
   // Préparer les options pour le dropdown des types de tiers
   const typeTiersOptions: DropdownOption[] = [
-    { value: '', label: 'Tous les types de tiers' },
+    { value: '', label: t('pages.globalSettings.allThirdPartyTypes', 'Tous les types de tiers') },
     ...typesTiers.map(type => ({
       value: type.code,
       label: `${type.code} - ${type.libelle}`
@@ -274,49 +276,49 @@ const Tiers: React.FC = () => {
 
   const columns: Column<Tiers>[] = [
     {
-      label: 'Code',
+      label: t('table.code', 'Code'),
       accessor: 'code',
       sortable: true
     },
     {
-      label: 'Nom',
+      label: t('table.name', 'Nom'),
       accessor: 'nom',
       sortable: true
     },
     {
-      label: 'Type',
+      label: t('table.type', 'Type'),
       accessor: 'type_tiers',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Email',
+      label: t('table.email', 'Email'),
       accessor: 'email',
       render: (value) => value || '-'
     },
     {
-      label: 'Téléphone',
+      label: t('table.phone', 'Téléphone'),
       accessor: 'telephone',
       render: (value) => value || '-'
     },
     {
-      label: 'Ville',
+      label: t('table.city', 'Ville'),
       accessor: 'ville',
       render: (value) => value || '-'
     },
     {
-      label: 'Actif',
+      label: t('table.active', 'Actif'),
       accessor: 'actif',
       align: 'center',
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('common.yes', 'Oui') : t('common.no', 'Non')}
         </span>
       )
     },
     {
-      label: 'Date de création',
+      label: t('table.creationDate', 'Date de création'),
       accessor: 'created_at',
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
     }
@@ -324,15 +326,14 @@ const Tiers: React.FC = () => {
 
   const actions = [
     {
-      label: 'Éditer',
+      label: t('table.edit', 'Éditer'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Désactiver',
+      label: t('table.delete', 'Supprimer'),
       icon: 'delete',
-      label: 'Supprimer',
       color: '#ef4444',
       onClick: handleDelete
     }
@@ -341,13 +342,13 @@ const Tiers: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Tiers"}
-        description="Gérez les tiers de votre organisation"
+        title={loading || profilLoading ? t('common.loading', 'Chargement...') : t('pages.globalSettings.thirdParties', 'Tiers')}
+        description={t('pages.globalSettings.thirdPartiesSubtitle', 'Gérez les tiers de votre organisation')}
         className={styles.header}
       >
         <div className="mb-6 flex justify-between items-center">
           <Button
-            label="Ajouter un tiers"
+            label={t('pages.globalSettings.addThirdParty', 'Ajouter un tiers')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
@@ -357,7 +358,7 @@ const Tiers: React.FC = () => {
               options={typeTiersOptions}
               value={selectedTypeTiers}
               onChange={handleTypeChange}
-              label="Tous les types de tiers"
+              label={t('pages.globalSettings.allThirdPartyTypes', 'Tous les types de tiers')}
               size="sm"
             />
           </div>
@@ -365,7 +366,7 @@ const Tiers: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des tiers...</p>
+            <p className="text-gray-500">{t('messages.loadingThirdParties', 'Chargement des tiers...')}</p>
           </div>
         ) : (
           <DataTable
@@ -373,8 +374,8 @@ const Tiers: React.FC = () => {
             data={filteredTiers}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucun tiers"
-            emptyMessage="Aucun tiers n'a été créé pour le moment."
+            emptyTitle={t('messages.noThirdParties', 'Aucun tiers')}
+            emptyMessage={t('messages.noThirdPartiesCreated', 'Aucun tiers n\'a été créé pour le moment.')}
           />
         )}
 

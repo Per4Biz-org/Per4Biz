@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FactureLignesTable } from './FactureLignesTable';
 
 interface FactureLigne {
@@ -34,16 +35,18 @@ export function FactureLignesSection({
   onAddLigne,
   disabled = false
 }: FactureLignesSectionProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">Détail analytique de la facture</h3>
+        <h3 className="text-lg font-medium">{t('invoices.form.analyticalDetail')}</h3>
         <button
           onClick={onAddLigne}
           className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
           disabled={disabled}
         >
-          <span className="mr-1">+</span> Ajouter une ligne
+          <span className="mr-1">+</span> {t('invoices.form.addLine')}
         </button>
       </div>
       
