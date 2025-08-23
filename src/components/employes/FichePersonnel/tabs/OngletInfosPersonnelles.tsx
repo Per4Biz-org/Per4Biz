@@ -305,14 +305,15 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
 
     setIsSubmitting(true);
     try {
-      // Récupérer la valeur la plus récente du champ lien_photo
+      // Récupérer la valeur la plus récente du champ lien_photo et la normaliser
       const currentPhotoPath = getValues('lien_photo');
+      const normalizedPhotoPath = !currentPhotoPath || currentPhotoPath.trim() === '' ? null : currentPhotoPath;
       console.log('Valeur actuelle du champ lien_photo lors de la soumission:', currentPhotoPath, typeof currentPhotoPath);
-      
+
       console.log('Données du formulaire avant nettoyage:', data);
       console.log('Valeur de lien_photo avant nettoyage:', data.lien_photo);
-      console.log('Valeur de lien_photo depuis getValues:', currentPhotoPath);
-      
+      console.log('Valeur de lien_photo normalisée:', normalizedPhotoPath);
+
       // Nettoyer les données avant envoi - convertir les chaînes vides en null pour les champs optionnels
       const cleanedData = {
         ...data,
@@ -326,25 +327,27 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         numero_securite_sociale: !data.numero_securite_sociale || data.numero_securite_sociale === '' ? null : data.numero_securite_sociale,
         nif: !data.nif || data.nif === '' ? null : data.nif,
         email_perso: !data.email_perso || data.email_perso === '' ? null : data.email_perso,
-        telephone: !data.telephone || data.telephone === '' ? null : data.telephone,
-        lien_photo: !currentPhotoPath || currentPhotoPath === '' ? null : currentPhotoPath
+        telephone: !data.telephone || data.telephone === '' ? null : data.telephone
       };
-      
+
       console.log('Données nettoyées avant envoi:', cleanedData);
-      console.log('Valeur de lien_photo après nettoyage:', cleanedData.lien_photo);
+      console.log('Valeur de lien_photo après normalisation:', normalizedPhotoPath);
+
+      const payload = {
+        ...cleanedData,
+        lien_photo: normalizedPhotoPath,
+        com_contrat_client_id: profil.com_contrat_client_id
+      };
 
       let result;
-      
+
       if (mode === 'edit' && personnelId) {
-        console.log('Mode édition - Mise à jour du personnel avec ID:', personnelId, 'et lien_photo:', cleanedData.lien_photo);
-        
+        console.log('Mode édition - Mise à jour du personnel avec ID:', personnelId, 'et lien_photo:', normalizedPhotoPath);
+
         // Mode édition
         const { data: updatedData, error } = await supabase
           .from('rh_personnel')
-          .update({
-            ...cleanedData,
-            com_contrat_client_id: profil.com_contrat_client_id
-          })
+          .update(payload)
           .eq('id', personnelId)
           .select()
           .single();
@@ -359,14 +362,11 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         result = updatedData;
       } else {
         console.log('Mode création - Création d\'un nouveau personnel');
-        
+
         // Mode création
         const { data: newData, error } = await supabase
           .from('rh_personnel')
-          .insert({
-            ...cleanedData,
-            com_contrat_client_id: profil.com_contrat_client_id
-          })
+          .insert(payload)
           .select()
           .single();
 
