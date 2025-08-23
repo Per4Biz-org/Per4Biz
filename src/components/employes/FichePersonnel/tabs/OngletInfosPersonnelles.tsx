@@ -73,7 +73,7 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
       nif: '',
       email_perso: '',
       telephone: '',
-      lien_photo: '',
+      lien_photo: '', // chemin relatif dans le bucket (ex: 'clientId/nom.jpg')
       id_tiers: '',
       actif: true,
       code_court: '',
@@ -266,7 +266,14 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
           // Charger l'aperçu de la photo si disponible
           if (data.lien_photo) {
             console.log('Chargement de l\'aperçu de la photo:', data.lien_photo);
-            loadPhotoPreview(data.lien_photo, setPhotoPreview);
+            const preview = await loadPhotoPreview(data.lien_photo, setPhotoPreview);
+            if (!preview) {
+              addToast({
+                label: 'Impossible de charger la photo',
+                icon: 'AlertTriangle',
+                color: '#f59e0b'
+              });
+            }
           }
         } catch (error) {
           console.error('Erreur lors du chargement du personnel:', error);
@@ -380,7 +387,14 @@ export const OngletInfosPersonnelles: React.FC<OngletInfosPersonnellesProps> = (
         
         // Mettre à jour l'aperçu de la photo si nécessaire
         if (result.lien_photo) {
-          loadPhotoPreview(result.lien_photo, setPhotoPreview);
+          const preview = await loadPhotoPreview(result.lien_photo, setPhotoPreview);
+          if (!preview) {
+            addToast({
+              label: 'Impossible de charger la photo',
+              icon: 'AlertTriangle',
+              color: '#f59e0b'
+            });
+          }
         } else {
           setPhotoPreview(null);
         }
