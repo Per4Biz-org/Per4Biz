@@ -23,8 +23,8 @@ $$ LANGUAGE plpgsql;
 DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM pg_trigger 
-    WHERE tgname = 'normalize_empty_strings_trigger' 
+    SELECT 1 FROM pg_trigger
+    WHERE tgname = 'normalize_empty_strings_trigger'
     AND tgrelid = 'rh_personnel'::regclass
   ) THEN
     CREATE TRIGGER normalize_empty_strings_trigger
@@ -33,6 +33,9 @@ BEGIN
     EXECUTE FUNCTION normalize_empty_strings();
   END IF;
 END $$;
+
+-- S'assurer que le trigger est actif
+ALTER TABLE rh_personnel ENABLE TRIGGER normalize_empty_strings_trigger;
 
 -- Mettre à jour les enregistrements existants pour corriger les chaînes vides
 UPDATE rh_personnel
