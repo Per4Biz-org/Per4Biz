@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../../../../lib/supabase';
 import { useProfil } from '../../../../../context/ProfilContext';
 import { ToastData } from '../../../../../components/ui/toast';
@@ -13,27 +13,63 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
   const { profil } = useProfil();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-  
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Fonction pour charger l'aperçu de la photo
-  const loadPhotoPreview = async (photoPath: string, setPreview: (url: string | null) => void) => {
+  const loadPhotoPreview = async (
+    photoPath: string,
+    setPreview: (url: string | null) => void
+  ): Promise<string | null> => {
     try {
       console.log('Génération de l\'URL signée pour la photo:', photoPath);
       const { data, error } = await supabase
         .storage
         .from('personnel-photos')
-        .createSignedUrl(photoPath, 60);
-      
-      if (error) {
+        .createSignedUrl(photoPath, 3600);
+
+      if (error || !data?.signedUrl) {
         console.error('Erreur lors de la création de l\'URL signée:', error);
-        throw error;
+        if (props?.addToast) {
+          props.addToast({
+            label: "Impossible de générer le lien de la photo",
+            icon: 'AlertTriangle',
+            color: '#ef4444'
+          });
+        }
+        setPreview(null);
+        return null;
       }
 
       console.log('URL signée créée avec succès, longueur:', data.signedUrl.length);
       setPreview(data.signedUrl);
+
+      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+      refreshTimeoutRef.current = setTimeout(() => {
+        loadPhotoPreview(photoPath, setPreview);
+      }, 55 * 60 * 1000);
+
+      return data.signedUrl;
     } catch (error) {
       console.error('Erreur lors du chargement de la photo:', error);
+      if (props?.addToast) {
+        props.addToast({
+          label: 'Erreur lors du chargement de la photo',
+          icon: 'AlertTriangle',
+          color: '#ef4444'
+        });
+      }
+      setPreview(null);
+      return null;
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Gérer l'upload de la photo
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +110,7 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
       }
       
       // Charger l'aperçu
-      loadPhotoPreview(filePath, setPhotoPreview);
+      await loadPhotoPreview(filePath, setPhotoPreview);
       
       if (props?.addToast) {
         props.addToast({
@@ -116,6 +152,10 @@ export const usePhotoManagement = (props?: UsePhotoManagementProps) => {
         console.log('Valeur du champ lien_photo après suppression:', props?.getValues ? props.getValues('lien_photo') : null);
       }
       setPhotoPreview(null);
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+        refreshTimeoutRef.current = null;
+      }
       
       if (props?.addToast) {
         props.addToast({
