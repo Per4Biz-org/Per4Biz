@@ -351,7 +351,7 @@ export function useFermetureCaisseForm({
   // Sauvegarde des données en base
   const saveFermetureCaisse = useCallback(async (fermetureData: any, fermetureId: number | undefined) => {
     // Exclure les propriétés qui ne sont pas des colonnes de la table fin_ferm_caisse
-    const { entite, ...cleanFermetureData } = fermetureData;
+    const { entite, id, ...cleanFermetureData } = fermetureData;
     
     if (!fermetureId) {
       // Création d'une nouvelle fermeture
