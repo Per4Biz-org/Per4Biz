@@ -75,9 +75,9 @@ export function FactureAchatForm({
   const [selectedModePaiement, setSelectedModePaiement] = useState<string>(facture.id_mode_paiement || '');
   const [selectedEntite, setSelectedEntite] = useState<string>(facture.id_entite || '');
   const [selectedTiers, setSelectedTiers] = useState<string>(facture.id_tiers || '');
-  const [montantHT, setMontantHT] = useState<string>(facture.montant_ht?.toString() || '');
-  const [montantTVA, setMontantTVA] = useState<string>(facture.montant_tva?.toString() || '');
-  const [montantTTC, setMontantTTC] = useState<string>(facture.montant_ttc?.toString() || '');
+  const [montantHT, setMontantHT] = useState<string>(facture.montant_ht && facture.montant_ht !== 0 ? facture.montant_ht.toString() : '');
+  const [montantTVA, setMontantTVA] = useState<string>(facture.montant_tva && facture.montant_tva !== 0 ? facture.montant_tva.toString() : '');
+  const [montantTTC, setMontantTTC] = useState<string>(facture.montant_ttc && facture.montant_ttc !== 0 ? facture.montant_ttc.toString() : '');
   const [typeFactureLibelle, setTypeFactureLibelle] = useState<string>(exploitationTypeFacture?.libelle || 'Facture d\'exploitation');
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -126,9 +126,9 @@ export function FactureAchatForm({
     setSelectedModePaiement(facture.id_mode_paiement || selectedModePaiement);
     setSelectedEntite(facture.id_entite || selectedEntite);
     setSelectedTiers(facture.id_tiers || selectedTiers);
-    setMontantHT(facture.montant_ht?.toString() || '');
-    setMontantTVA(facture.montant_tva?.toString() || '');
-    setMontantTTC(facture.montant_ttc?.toString() || '');
+    setMontantHT(facture.montant_ht && facture.montant_ht !== 0 ? facture.montant_ht.toString() : '');
+    setMontantTVA(facture.montant_tva && facture.montant_tva !== 0 ? facture.montant_tva.toString() : '');
+    setMontantTTC(facture.montant_ttc && facture.montant_ttc !== 0 ? facture.montant_ttc.toString() : '');
     
     // Mettre à jour le libellé du type de facture
     if (exploitationTypeFacture) {
@@ -263,7 +263,7 @@ export function FactureAchatForm({
       newErrors.date_facture = t('invoices.validation.invoiceDateRequired');
     }
     
-    if (!facture.montant_ht || facture.montant_ht <= 0) {
+    if (facture.montant_ht === null || facture.montant_ht === undefined) {
       newErrors.montant_ht = t('invoices.validation.amountExVatRequired');
     }
     

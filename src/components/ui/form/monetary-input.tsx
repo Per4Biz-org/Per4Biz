@@ -35,19 +35,28 @@ export function MonetaryInput({
   // Formater un nombre en format monétaire français
   const formatCurrency = (num: number): string => {
     if (isNaN(num)) return '';
-    return new Intl.NumberFormat('fr-FR', {
+    // Format français avec espaces comme séparateurs de milliers et virgule décimale
+    const formatted = new Intl.NumberFormat('fr-FR', {
       useGrouping: true,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    }).format(num);
+    }).format(Math.abs(num)); // Utiliser la valeur absolue pour le formatage
+    
+    // Ajouter le signe négatif si nécessaire
+    return num < 0 ? `-${formatted}` : formatted;
   };
 
   // Parser une chaîne monétaire en nombre
   const parseCurrency = (str: string): number => {
     if (!str || str.trim() === '') return 0;
     
+    // Détecter le signe négatif
+    const isNegative = str.trim().startsWith('-');
+    
+    // Supprimer le signe négatif temporairement pour le traitement
+    let cleanStr = str.replace('-', '');
+    
     // Supprimer les espaces (séparateurs de milliers) et remplacer la virgule par un point
-    // Garder le signe négatif s'il existe
     const cleaned = str
       .replace(/\s/g, '') // Supprimer tous les espaces
       .replace(',', '.') // Remplacer virgule par point pour le parsing
@@ -61,6 +70,12 @@ export function MonetaryInput({
   // Mettre à jour l'affichage quand la valeur change
   useEffect(() => {
     if (typeof value === 'number') {
+      if (value === 0 && !isFocused) {
+        // Afficher un champ vide si la valeur est 0 et pas en focus
+        setDisplayValue('');
+        return;
+      }
+      
       if (isFocused) {
         // En mode édition, afficher la valeur brute avec virgule
         setDisplayValue(value.toString().replace('.', ','));
@@ -70,6 +85,12 @@ export function MonetaryInput({
       }
     } else if (typeof value === 'string') {
       const numValue = parseCurrency(value);
+      if (numValue === 0 && !isFocused && value === '') {
+        // Garder le champ vide si la chaîne est vide
+        setDisplayValue('');
+        return;
+      }
+      
       if (isFocused) {
         // En mode édition, garder la valeur telle que saisie (avec virgule)
         setDisplayValue(value.replace('.', ','));
@@ -98,8 +119,12 @@ export function MonetaryInput({
     setIsFocused(false);
     const numValue = parseCurrency(e.target.value);
     
-    // Formater pour l'affichage
-    setDisplayValue(formatCurrency(numValue));
+    // Formater pour l'affichage seulement si la valeur n'est pas 0
+    if (numValue === 0) {
+      setDisplayValue('');
+    } else {
+      setDisplayValue(formatCurrency(numValue));
+    }
     
     // Déclencher les callbacks
     if (onValueChange) {
@@ -124,8 +149,13 @@ export function MonetaryInput({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     
+    // Si le champ est vide, permettre de commencer par un signe négatif
+    if (inputValue === '-') {
+      setDisplayValue('-');
+      return;
+    }
+    
     // Permettre seulement les chiffres, virgules, points, espaces et le signe moins
-    // Le signe moins ne peut être qu'en première position
     let sanitized = inputValue.replace(/[^0-9,.\-\s]/g, '');
     
     // Gérer le signe négatif : ne peut être qu'en première position

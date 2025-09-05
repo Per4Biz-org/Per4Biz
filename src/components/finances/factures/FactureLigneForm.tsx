@@ -143,8 +143,8 @@ export function FactureLigneForm({
       setFormData({
         id_categorie_flux: initialData.id_categorie_flux || '',
         id_sous_categorie_flux: initialData.id_sous_categorie_flux || '',
-        montant_ht: initialData.montant_ht?.toString() || '',
-        montant_tva: initialData.montant_tva?.toString() || '',
+        montant_ht: initialData.montant_ht && initialData.montant_ht !== 0 ? initialData.montant_ht.toString() : '',
+        montant_tva: initialData.montant_tva && initialData.montant_tva !== 0 ? initialData.montant_tva.toString() : '',
         commentaire: initialData.commentaire || ''
       });
     } else {
@@ -227,7 +227,7 @@ export function FactureLigneForm({
     }
     
     const montantHT = parseFloat(formData.montant_ht.toString().replace(',', '.')) || 0;
-    if (!formData.montant_ht || montantHT === 0) {
+    if (!formData.montant_ht || formData.montant_ht.trim() === '') {
       newErrors.montant_ht = t('invoices.validation.amountExVatRequired');
     }
     
