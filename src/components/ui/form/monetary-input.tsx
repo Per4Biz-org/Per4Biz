@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Euro } from 'lucide-react';
 import styles from './monetary-input.module.css';
 
 interface MonetaryInputProps {
@@ -137,9 +136,6 @@ export function MonetaryInput({
         className={styles.input}
         inputMode="decimal"
       />
-      <div className={styles.currency}>
-        <Euro size={16} />
-      </div>
     </div>
   );
 }
