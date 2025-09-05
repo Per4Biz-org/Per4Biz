@@ -6,6 +6,7 @@ import { useProfil } from '../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
 import { Dropdown, DropdownOption } from '../../ui/dropdown';
 import { Button } from '../../ui/button';
+import { MonetaryInput } from '../../ui/form/monetary-input';
 
 interface CategorieFlux {
   id: string;
@@ -54,8 +55,8 @@ export function FactureLigneForm({
   const [formData, setFormData] = useState({
     id_categorie_flux: '',
     id_sous_categorie_flux: '',
-    montant_ht: 0,
-    montant_tva: 0,
+    montant_ht: '',
+    montant_tva: '',
     commentaire: ''
   });
   
@@ -142,16 +143,16 @@ export function FactureLigneForm({
       setFormData({
         id_categorie_flux: initialData.id_categorie_flux || '',
         id_sous_categorie_flux: initialData.id_sous_categorie_flux || '',
-        montant_ht: initialData.montant_ht || 0,
-        montant_tva: initialData.montant_tva || 0,
+        montant_ht: initialData.montant_ht && initialData.montant_ht !== 0 ? initialData.montant_ht.toString() : '',
+        montant_tva: initialData.montant_tva && initialData.montant_tva !== 0 ? initialData.montant_tva.toString() : '',
         commentaire: initialData.commentaire || ''
       });
     } else {
       setFormData({
         id_categorie_flux: '',
         id_sous_categorie_flux: '',
-        montant_ht: 0,
-        montant_tva: 0,
+        montant_ht: '',
+        montant_tva: '',
         commentaire: ''
       });
     }
@@ -188,13 +189,7 @@ export function FactureLigneForm({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
-    // Traitement spécial pour les champs numériques
-    if (['montant_ht', 'montant_tva'].includes(name)) {
-      const numValue = value === '' ? 0 : parseFloat(value);
-      setFormData(prev => ({ ...prev, [name]: numValue }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
     
     // Effacer l'erreur quand l'utilisateur modifie un champ
     if (errors[name]) {
@@ -231,8 +226,9 @@ export function FactureLigneForm({
       newErrors.id_sous_categorie_flux = t('invoices.validation.subcategoryRequired');
     }
     
-    if (formData.montant_ht <= 0) {
-      newErrors.montant_ht = 'Le montant HT doit être supérieur à 0';
+    const montantHT = parseFloat(formData.montant_ht.toString().replace(',', '.')) || 0;
+    if (!formData.montant_ht || formData.montant_ht.trim() === '') {
+      newErrors.montant_ht = t('invoices.validation.amountExVatRequired');
     }
     
     setErrors(newErrors);
@@ -248,7 +244,11 @@ export function FactureLigneForm({
     const sousCategorie = sousCategories.find(sc => sc.id === formData.id_sous_categorie_flux);
     
     const ligneData = {
-      ...formData,
+      id_categorie_flux: formData.id_categorie_flux,
+      id_sous_categorie_flux: formData.id_sous_categorie_flux,
+      montant_ht: parseFloat(formData.montant_ht.toString().replace(',', '.')) || 0,
+      montant_tva: parseFloat(formData.montant_tva.toString().replace(',', '.')) || 0,
+      commentaire: formData.commentaire,
       fin_flux_categorie: categorie ? { code: categorie.code, libelle: categorie.libelle } : undefined,
       fin_flux_sous_categorie: sousCategorie ? { code: sousCategorie.code, libelle: sousCategorie.libelle } : undefined
     };
@@ -318,26 +318,23 @@ export function FactureLigneForm({
             required
             error={errors.montant_ht}
           >
-            <FormInput
-              type="number"
+            <MonetaryInput
               name="montant_ht"
-              value={formData.montant_ht.toString()}
+              value={formData.montant_ht}
               onChange={handleInputChange}
-              step="0.01"
-              min="0"
+              placeholder="0,00"
+              error={!!errors.montant_ht}
             />
           </FormField>
           
           <FormField
             label={t('invoices.lineModal.vatAmount')}
           >
-            <FormInput
-              type="number"
+            <MonetaryInput
               name="montant_tva"
-              value={formData.montant_tva.toString()}
+               value={formData.montant_tva}
               onChange={handleInputChange}
-              step="0.01"
-              min="0"
+              placeholder="0,00"
             />
           </FormField>
           
