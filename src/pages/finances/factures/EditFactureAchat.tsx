@@ -341,14 +341,12 @@ const EditFactureAchat: React.FC = () => {
     // Vérifier qu'il y a au moins une ligne
     if (lignes.length === 0) {
       addToast({
-        label: 'Veuillez ajouter au moins une ligne à la facture',
+        label: t('messages.addAtLeastOneLine'),
         icon: 'AlertCircle',
         color: '#f59e0b'
       });
       return;
     }
-    
-    
     setSaving(true);
     
     try {

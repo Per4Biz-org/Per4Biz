@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
+import { MonetaryInput } from '../../ui/form';
 import { Dropdown, DropdownOption } from '../../ui/dropdown';
 import { Button } from '../../ui/button';
 
@@ -318,24 +319,21 @@ export function FactureLigneForm({
             required
             error={errors.montant_ht}
           >
-            <FormInput
-              type="number"
+            <MonetaryInput
               name="montant_ht"
               value={formData.montant_ht.toString()}
               onChange={handleInputChange}
-              step="0.01"
+              error={!!errors.montant_ht}
             />
           </FormField>
           
           <FormField
             label={t('invoices.lineModal.vatAmount')}
           >
-            <FormInput
-              type="number"
+            <MonetaryInput
               name="montant_tva"
               value={formData.montant_tva.toString()}
               onChange={handleInputChange}
-              step="0.01"
             />
           </FormField>
           

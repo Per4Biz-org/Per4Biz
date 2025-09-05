@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
+import { MonetaryInput } from '../../ui/form';
 import { Dropdown, DropdownOption } from '../../ui/dropdown'; 
 import { Button } from '../../ui/button';
 import { useNavigate } from 'react-router-dom'; 
@@ -424,14 +425,13 @@ export function FactureAchatForm({
         required
         error={errors.montant_ht}
       >
-        <FormInput
-          type="number"
+        <MonetaryInput
           name="montant_ht"
           value={montantHT}
           onChange={handleInputChange}
-          step="0.01"
           placeholder={t('invoices.form.amountExVat')}
           disabled={isSaving}
+          error={!!errors.montant_ht}
         />
       </FormField>
       
@@ -440,14 +440,13 @@ export function FactureAchatForm({
         required
         error={errors.montant_tva}
       >
-        <FormInput
-          type="number"
+        <MonetaryInput
           name="montant_tva"
           value={montantTVA}
           onChange={handleInputChange}
-          step="0.01"
           placeholder={t('invoices.form.vatAmount')}
           disabled={isSaving}
+          error={!!errors.montant_tva}
         />
       </FormField>
       
@@ -456,14 +455,13 @@ export function FactureAchatForm({
         required
         error={errors.montant_ttc}
       >
-        <FormInput
-          type="number"
+        <MonetaryInput
           name="montant_ttc"
           value={montantTTC}
           onChange={handleInputChange}
-          step="0.01"
           placeholder={t('invoices.form.amountIncVat')}
           disabled={isSaving}
+          error={!!errors.montant_ttc}
         />
       </FormField>
 
