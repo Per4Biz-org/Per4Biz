@@ -36,6 +36,7 @@ export function MonetaryInput({
   const formatCurrency = (num: number): string => {
     if (isNaN(num)) return '';
     return new Intl.NumberFormat('fr-FR', {
+      useGrouping: true,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(num);
@@ -45,8 +46,13 @@ export function MonetaryInput({
   const parseCurrency = (str: string): number => {
     if (!str || str.trim() === '') return 0;
     
-    // Supprimer tous les espaces et remplacer la virgule par un point
-    const cleaned = str.replace(/\s/g, '').replace(',', '.').replace(/[^\d.,-]/g, '');
+    // Supprimer les espaces (séparateurs de milliers) et remplacer la virgule par un point
+    // Garder le signe négatif s'il existe
+    const cleaned = str
+      .replace(/\s/g, '') // Supprimer tous les espaces
+      .replace(',', '.') // Remplacer virgule par point pour le parsing
+      .replace(/[^\d.\-]/g, ''); // Garder seulement chiffres, point et tiret
+    
     const parsed = parseFloat(cleaned);
     
     return isNaN(parsed) ? 0 : parsed;
@@ -55,10 +61,22 @@ export function MonetaryInput({
   // Mettre à jour l'affichage quand la valeur change
   useEffect(() => {
     if (typeof value === 'number') {
-      setDisplayValue(isFocused ? value.toString().replace('.', ',') : formatCurrency(value));
+      if (isFocused) {
+        // En mode édition, afficher la valeur brute avec virgule
+        setDisplayValue(value.toString().replace('.', ','));
+      } else {
+        // En mode affichage, formater avec espaces et virgule
+        setDisplayValue(formatCurrency(value));
+      }
     } else if (typeof value === 'string') {
       const numValue = parseCurrency(value);
-      setDisplayValue(isFocused ? value : formatCurrency(numValue));
+      if (isFocused) {
+        // En mode édition, garder la valeur telle que saisie (avec virgule)
+        setDisplayValue(value.replace('.', ','));
+      } else {
+        // En mode affichage, formater
+        setDisplayValue(formatCurrency(numValue));
+      }
     }
   }, [value, isFocused]);
 
@@ -66,7 +84,11 @@ export function MonetaryInput({
     setIsFocused(true);
     // Afficher la valeur brute pour l'édition
     const numValue = parseCurrency(displayValue);
-    setDisplayValue(numValue.toString().replace('.', ','));
+    if (numValue === 0) {
+      setDisplayValue(''); // Afficher un champ vide si la valeur est 0
+    } else {
+      setDisplayValue(numValue.toString().replace('.', ','));
+    }
     e.target.select(); // Sélectionner tout le texte
   };
 
@@ -100,8 +122,9 @@ export function MonetaryInput({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     
-    // Permettre seulement les chiffres, virgules, points et le signe moins
-    const sanitized = inputValue.replace(/[^0-9,.\-]/g, '');
+    // Permettre seulement les chiffres, virgules, points, espaces et le signe moins
+    // Garder les espaces pour permettre la saisie au format "1 234,56"
+    const sanitized = inputValue.replace(/[^0-9,.\-\s]/g, '');
     
     setDisplayValue(sanitized);
     
