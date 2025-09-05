@@ -1,7 +1,5 @@
 .monetaryInput {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 .input {
@@ -41,4 +39,3 @@
 .error .input:focus {
   border-color: #dc2626;
   box-shadow: 0 0 0 3px color-mix(in srgb, #ef4444 20%, transparent);
-}

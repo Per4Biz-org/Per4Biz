@@ -55,8 +55,8 @@ export function FactureLigneForm({
   const [formData, setFormData] = useState({
     id_categorie_flux: '',
     id_sous_categorie_flux: '',
-    montant_ht: 0,
-    montant_tva: 0,
+    montant_ht: '',
+    montant_tva: '',
     commentaire: ''
   });
   
@@ -143,16 +143,16 @@ export function FactureLigneForm({
       setFormData({
         id_categorie_flux: initialData.id_categorie_flux || '',
         id_sous_categorie_flux: initialData.id_sous_categorie_flux || '',
-        montant_ht: initialData.montant_ht || 0,
-        montant_tva: initialData.montant_tva || 0,
+        montant_ht: initialData.montant_ht && initialData.montant_ht !== 0 ? initialData.montant_ht.toString() : '',
+        montant_tva: initialData.montant_tva && initialData.montant_tva !== 0 ? initialData.montant_tva.toString() : '',
         commentaire: initialData.commentaire || ''
       });
     } else {
       setFormData({
         id_categorie_flux: '',
         id_sous_categorie_flux: '',
-        montant_ht: 0,
-        montant_tva: 0,
+        montant_ht: '',
+        montant_tva: '',
         commentaire: ''
       });
     }
@@ -189,13 +189,7 @@ export function FactureLigneForm({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
-    // Traitement spécial pour les champs numériques
-    if (['montant_ht', 'montant_tva'].includes(name)) {
-      const numValue = value === '' ? 0 : parseFloat(value);
-      setFormData(prev => ({ ...prev, [name]: numValue }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
     
     // Effacer l'erreur quand l'utilisateur modifie un champ
     if (errors[name]) {
@@ -232,7 +226,8 @@ export function FactureLigneForm({
       newErrors.id_sous_categorie_flux = t('invoices.validation.subcategoryRequired');
     }
     
-   if (formData.montant_ht === undefined || formData.montant_ht === null) {
+    const montantHT = parseFloat(formData.montant_ht.toString()) || 0;
+    if (!formData.montant_ht || montantHT === 0) {
      newErrors.montant_ht = 'Le montant HT est requis';
     }
     
@@ -249,7 +244,11 @@ export function FactureLigneForm({
     const sousCategorie = sousCategories.find(sc => sc.id === formData.id_sous_categorie_flux);
     
     const ligneData = {
-      ...formData,
+      id_categorie_flux: formData.id_categorie_flux,
+      id_sous_categorie_flux: formData.id_sous_categorie_flux,
+      montant_ht: parseFloat(formData.montant_ht.toString()) || 0,
+      montant_tva: parseFloat(formData.montant_tva.toString()) || 0,
+      commentaire: formData.commentaire,
       fin_flux_categorie: categorie ? { code: categorie.code, libelle: categorie.libelle } : undefined,
       fin_flux_sous_categorie: sousCategorie ? { code: sousCategorie.code, libelle: sousCategorie.libelle } : undefined
     };
@@ -321,7 +320,7 @@ export function FactureLigneForm({
           >
             <MonetaryInput
               name="montant_ht"
-              value={formData.montant_ht.toString()}
+              value={formData.montant_ht}
               onChange={handleInputChange}
               error={!!errors.montant_ht}
             />
@@ -332,7 +331,7 @@ export function FactureLigneForm({
           >
             <MonetaryInput
               name="montant_tva"
-              value={formData.montant_tva.toString()}
+              value={formData.montant_tva}
               onChange={handleInputChange}
             />
           </FormField>
