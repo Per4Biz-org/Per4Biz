@@ -8,6 +8,7 @@ import { Button } from '../../ui/button';
 import { useNavigate } from 'react-router-dom'; 
 import { TiersSelector } from '../../ParametreGlobal/Tiers/TiersSelector';
 import { FactureFileUpload } from './FactureFileUpload';
+import { MonetaryInput } from '../../ui/form/monetary-input';
 
 interface Tiers {
   id: string;
@@ -266,11 +267,11 @@ export function FactureAchatForm({
       newErrors.montant_ht = t('invoices.validation.amountExVatRequired');
     }
     
-    if (facture.montant_tva === null || facture.montant_tva === undefined) { 
+    if (facture.montant_tva === null || facture.montant_tva === undefined) {
       newErrors.montant_tva = t('invoices.validation.vatAmountRequired');
     }
     
-    if (!facture.montant_ttc || facture.montant_ttc <= 0) {
+    if (facture.montant_ttc === null || facture.montant_ttc === undefined) {
       newErrors.montant_ttc = t('invoices.validation.amountIncVatRequired');
     }
 
@@ -424,15 +425,13 @@ export function FactureAchatForm({
         required
         error={errors.montant_ht}
       >
-        <FormInput
-          type="number"
+        <MonetaryInput
           name="montant_ht"
           value={montantHT}
           onChange={handleInputChange}
-          step="0.01"
-          min="0"
-          placeholder={t('invoices.form.amountExVat')}
+          placeholder="0,00"
           disabled={isSaving}
+          error={!!errors.montant_ht}
         />
       </FormField>
       
@@ -441,15 +440,13 @@ export function FactureAchatForm({
         required
         error={errors.montant_tva}
       >
-        <FormInput
-          type="number"
+        <MonetaryInput
           name="montant_tva"
           value={montantTVA}
           onChange={handleInputChange}
-          step="0.01"
-          min="0"
-          placeholder={t('invoices.form.vatAmount')}
+          placeholder="0,00"
           disabled={isSaving}
+          error={!!errors.montant_tva}
         />
       </FormField>
       
@@ -458,15 +455,13 @@ export function FactureAchatForm({
         required
         error={errors.montant_ttc}
       >
-        <FormInput
-          type="number"
+        <MonetaryInput
           name="montant_ttc"
           value={montantTTC}
           onChange={handleInputChange}
-          step="0.01"
-          min="0"
-          placeholder={t('invoices.form.amountIncVat')}
+          placeholder="0,00"
           disabled={isSaving}
+          error={!!errors.montant_ttc}
         />
       </FormField>
 
