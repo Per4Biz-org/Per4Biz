@@ -16,16 +16,16 @@ import { FactureFileUpload } from '../../../components/finances/factures/Facture
 
 interface FactureAchat {
   id?: string;
-  id_entite: string;
-  id_tiers: string;
+  id_entite: string | null;
+  id_tiers: string | null;
   date_facture: string;
   num_document: string | null;
-  id_mode_paiement: string;
+  id_mode_paiement: string | null;
   montant_ht: number;
   montant_tva: number | null;
   montant_ttc: number;
   commentaire?: string | null;
-  id_type_facture?: string;
+  id_type_facture?: string | null;
   lien_piece_jointe?: string | null;
 }
 
@@ -353,11 +353,16 @@ const EditFactureAchat: React.FC = () => {
       let factureId = facture.id;
       
       // Préparation des données de la facture
-      const factureToSave = { 
+      const factureToSave = {
         ...factureData,
         com_contrat_client_id: profil.com_contrat_client_id,
         code_user: profil.code_user,
-        lien_piece_jointe: facture.lien_piece_jointe
+        lien_piece_jointe: facture.lien_piece_jointe,
+        // Convertir les chaînes vides en null pour les champs UUID
+        id_entite: factureData.id_entite || null,
+        id_tiers: factureData.id_tiers || null,
+        id_mode_paiement: factureData.id_mode_paiement || null,
+        id_type_facture: factureData.id_type_facture || null
       };
       
       if (factureId) {
