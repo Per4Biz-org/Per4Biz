@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
-import { MonetaryInput } from '../../ui/form';
 import { Dropdown, DropdownOption } from '../../ui/dropdown'; 
 import { Button } from '../../ui/button';
 import { useNavigate } from 'react-router-dom'; 
@@ -75,9 +74,9 @@ export function FactureAchatForm({
   const [selectedModePaiement, setSelectedModePaiement] = useState<string>(facture.id_mode_paiement || '');
   const [selectedEntite, setSelectedEntite] = useState<string>(facture.id_entite || '');
   const [selectedTiers, setSelectedTiers] = useState<string>(facture.id_tiers || '');
-  const [montantHT, setMontantHT] = useState<string>(facture.montant_ht && facture.montant_ht !== 0 ? facture.montant_ht.toString() : '');
-  const [montantTVA, setMontantTVA] = useState<string>(facture.montant_tva && facture.montant_tva !== 0 ? facture.montant_tva.toString() : '');
-  const [montantTTC, setMontantTTC] = useState<string>(facture.montant_ttc && facture.montant_ttc !== 0 ? facture.montant_ttc.toString() : '');
+  const [montantHT, setMontantHT] = useState<string>(facture.montant_ht?.toString() || '');
+  const [montantTVA, setMontantTVA] = useState<string>(facture.montant_tva?.toString() || '');
+  const [montantTTC, setMontantTTC] = useState<string>(facture.montant_ttc?.toString() || '');
   const [typeFactureLibelle, setTypeFactureLibelle] = useState<string>(exploitationTypeFacture?.libelle || 'Facture d\'exploitation');
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -126,9 +125,9 @@ export function FactureAchatForm({
     setSelectedModePaiement(facture.id_mode_paiement || selectedModePaiement);
     setSelectedEntite(facture.id_entite || selectedEntite);
     setSelectedTiers(facture.id_tiers || selectedTiers);
-    setMontantHT(facture.montant_ht && facture.montant_ht !== 0 ? facture.montant_ht.toString() : '');
-    setMontantTVA(facture.montant_tva && facture.montant_tva !== 0 ? facture.montant_tva.toString() : '');
-    setMontantTTC(facture.montant_ttc && facture.montant_ttc !== 0 ? facture.montant_ttc.toString() : '');
+    setMontantHT(facture.montant_ht?.toString() || '');
+    setMontantTVA(facture.montant_tva?.toString() || '');
+    setMontantTTC(facture.montant_ttc?.toString() || '');
     
     // Mettre à jour le libellé du type de facture
     if (exploitationTypeFacture) {
@@ -263,16 +262,16 @@ export function FactureAchatForm({
       newErrors.date_facture = t('invoices.validation.invoiceDateRequired');
     }
     
-    if (facture.montant_ht === undefined || facture.montant_ht === null || facture.montant_ht === 0) {
-     newErrors.montant_ht = 'Le montant HT est requis';
+    if (!facture.montant_ht || facture.montant_ht <= 0) {
+      newErrors.montant_ht = t('invoices.validation.amountExVatRequired');
     }
     
     if (facture.montant_tva === null || facture.montant_tva === undefined) { 
       newErrors.montant_tva = t('invoices.validation.vatAmountRequired');
     }
     
-    if (facture.montant_ttc === undefined || facture.montant_ttc === null || facture.montant_ttc === 0) {
-     newErrors.montant_ttc = 'Le montant TTC est requis';
+    if (!facture.montant_ttc || facture.montant_ttc <= 0) {
+      newErrors.montant_ttc = t('invoices.validation.amountIncVatRequired');
     }
 
     if (!selectedModePaiement) {
@@ -425,13 +424,15 @@ export function FactureAchatForm({
         required
         error={errors.montant_ht}
       >
-        <MonetaryInput
+        <FormInput
+          type="number"
           name="montant_ht"
           value={montantHT}
           onChange={handleInputChange}
+          step="0.01"
+          min="0"
           placeholder={t('invoices.form.amountExVat')}
           disabled={isSaving}
-          error={!!errors.montant_ht}
         />
       </FormField>
       
@@ -440,13 +441,15 @@ export function FactureAchatForm({
         required
         error={errors.montant_tva}
       >
-        <MonetaryInput
+        <FormInput
+          type="number"
           name="montant_tva"
           value={montantTVA}
           onChange={handleInputChange}
+          step="0.01"
+          min="0"
           placeholder={t('invoices.form.vatAmount')}
           disabled={isSaving}
-          error={!!errors.montant_tva}
         />
       </FormField>
       
@@ -455,13 +458,15 @@ export function FactureAchatForm({
         required
         error={errors.montant_ttc}
       >
-        <MonetaryInput
+        <FormInput
+          type="number"
           name="montant_ttc"
           value={montantTTC}
           onChange={handleInputChange}
+          step="0.01"
+          min="0"
           placeholder={t('invoices.form.amountIncVat')}
           disabled={isSaving}
-          error={!!errors.montant_ttc}
         />
       </FormField>
 

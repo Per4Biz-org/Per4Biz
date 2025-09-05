@@ -12,17 +12,16 @@ import { X } from 'lucide-react';
 
 interface FactureAchat {
   id?: string;
-  id_entite: string | null;
-  id_tiers: string | null;
+  id_entite: string;
+  id_tiers: string;
   date_facture: string;
   num_document: string | null;
-  id_mode_paiement: string | null;
+  id_mode_paiement: string;
   montant_ht: number;
   montant_tva: number | null;
   montant_ttc: number;
   commentaire?: string | null;
   lien_piece_jointe?: string | null;
-  id_type_facture?: string | null;
 }
 
 interface FactureLigne {
@@ -390,28 +389,34 @@ const EditFactureAchatModal: React.FC<EditFactureAchatModalProps> = ({
     // Vérifier qu'il y a au moins une ligne
     if (lignes.length === 0) {
       addToast({
-        label: t('messages.addAtLeastOneLine'),
+        label: 'Veuillez ajouter au moins une ligne à la facture',
         icon: 'AlertCircle',
         color: '#f59e0b'
       });
       return;
     }
+    
+    // Vérifier que le total HT des lignes est égal au montant HT de la facture
+    if (isTotalMismatch()) {
+      addToast({
+        label: 'Le montant HT de la facture doit être défini et égal au total des lignes',
+        icon: 'AlertTriangle',
+        color: '#ef4444'
+      });
+      return;
+    }
+    
     setSaving(true);
     
     try {
       let factureId = facture.id;
       
       // Préparation des données de la facture - code_user est toujours nécessaire dans fin_facture_achat
-      const factureToSave = {
+      const factureToSave = { 
         ...factureData,
         com_contrat_client_id: profil.com_contrat_client_id,
         code_user: profil.code_user,
-        lien_piece_jointe: facture.lien_piece_jointe,
-        // Convertir les chaînes vides en null pour les champs UUID
-        id_entite: factureData.id_entite || null,
-        id_tiers: factureData.id_tiers || null,
-        id_mode_paiement: factureData.id_mode_paiement || null,
-        id_type_facture: factureData.id_type_facture || null
+        lien_piece_jointe: facture.lien_piece_jointe
       };
       
       console.log('Données de la facture à sauvegarder:', factureToSave);
