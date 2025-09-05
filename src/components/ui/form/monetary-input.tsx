@@ -46,7 +46,7 @@ export function MonetaryInput({
     if (!str || str.trim() === '') return 0;
     
     // Supprimer tous les espaces et remplacer la virgule par un point
-    const cleaned = str.replace(/\s/g, '').replace(',', '.');
+    const cleaned = str.replace(/\s/g, '').replace(',', '.').replace(/[^\d.,-]/g, '');
     const parsed = parseFloat(cleaned);
     
     return isNaN(parsed) ? 0 : parsed;

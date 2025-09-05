@@ -227,7 +227,7 @@ export function FactureLigneForm({
     }
     
     const montantHT = parseFloat(formData.montant_ht.toString()) || 0;
-    if (!formData.montant_ht || montantHT === 0) {
+    if (!formData.montant_ht) {
      newErrors.montant_ht = 'Le montant HT est requis';
     }
     

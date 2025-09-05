@@ -263,7 +263,7 @@ export function FactureAchatForm({
       newErrors.date_facture = t('invoices.validation.invoiceDateRequired');
     }
     
-   if (facture.montant_ht === undefined || facture.montant_ht === null) {
+    if (facture.montant_ht === undefined || facture.montant_ht === null || facture.montant_ht === 0) {
      newErrors.montant_ht = 'Le montant HT est requis';
     }
     
@@ -271,7 +271,7 @@ export function FactureAchatForm({
       newErrors.montant_tva = t('invoices.validation.vatAmountRequired');
     }
     
-   if (facture.montant_ttc === undefined || facture.montant_ttc === null) {
+    if (facture.montant_ttc === undefined || facture.montant_ttc === null || facture.montant_ttc === 0) {
      newErrors.montant_ttc = 'Le montant TTC est requis';
     }
 
