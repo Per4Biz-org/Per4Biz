@@ -87,7 +87,9 @@ export function MonetaryInput({
     if (numValue === 0) {
       setDisplayValue(''); // Afficher un champ vide si la valeur est 0
     } else {
-      setDisplayValue(numValue.toString().replace('.', ','));
+      // Conserver le signe négatif et formater avec virgule
+      const formattedValue = numValue.toString().replace('.', ',');
+      setDisplayValue(formattedValue);
     }
     e.target.select(); // Sélectionner tout le texte
   };
@@ -123,8 +125,18 @@ export function MonetaryInput({
     const inputValue = e.target.value;
     
     // Permettre seulement les chiffres, virgules, points, espaces et le signe moins
-    // Garder les espaces pour permettre la saisie au format "1 234,56"
-    const sanitized = inputValue.replace(/[^0-9,.\-\s]/g, '');
+    // Le signe moins ne peut être qu'en première position
+    let sanitized = inputValue.replace(/[^0-9,.\-\s]/g, '');
+    
+    // Gérer le signe négatif : ne peut être qu'en première position
+    const hasNegativeSign = sanitized.startsWith('-');
+    if (hasNegativeSign) {
+      // Supprimer tous les autres signes négatifs après le premier
+      sanitized = '-' + sanitized.substring(1).replace(/-/g, '');
+    } else {
+      // Supprimer tous les signes négatifs si pas en première position
+      sanitized = sanitized.replace(/-/g, '');
+    }
     
     setDisplayValue(sanitized);
     
