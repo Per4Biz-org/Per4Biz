@@ -231,8 +231,8 @@ export function FactureLigneForm({
       newErrors.id_sous_categorie_flux = t('invoices.validation.subcategoryRequired');
     }
     
-    if (formData.montant_ht <= 0) {
-      newErrors.montant_ht = 'Le montant HT doit être supérieur à 0';
+   if (formData.montant_ht === undefined || formData.montant_ht === null) {
+     newErrors.montant_ht = 'Le montant HT est requis';
     }
     
     setErrors(newErrors);

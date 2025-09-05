@@ -262,16 +262,16 @@ export function FactureAchatForm({
       newErrors.date_facture = t('invoices.validation.invoiceDateRequired');
     }
     
-    if (!facture.montant_ht || facture.montant_ht <= 0) {
-      newErrors.montant_ht = t('invoices.validation.amountExVatRequired');
+   if (facture.montant_ht === undefined || facture.montant_ht === null) {
+     newErrors.montant_ht = 'Le montant HT est requis';
     }
     
     if (facture.montant_tva === null || facture.montant_tva === undefined) { 
       newErrors.montant_tva = t('invoices.validation.vatAmountRequired');
     }
     
-    if (!facture.montant_ttc || facture.montant_ttc <= 0) {
-      newErrors.montant_ttc = t('invoices.validation.amountIncVatRequired');
+   if (facture.montant_ttc === undefined || facture.montant_ttc === null) {
+     newErrors.montant_ttc = 'Le montant TTC est requis';
     }
 
     if (!selectedModePaiement) {
