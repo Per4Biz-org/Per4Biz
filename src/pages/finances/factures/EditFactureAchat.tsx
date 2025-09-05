@@ -348,15 +348,6 @@ const EditFactureAchat: React.FC = () => {
       return;
     }
     
-    // Vérifier que le total HT des lignes est égal au montant HT de la facture
-    if (isTotalMismatch()) {
-      addToast({
-        label: 'Le montant HT de la facture doit être défini et égal au total des lignes',
-        icon: 'AlertTriangle',
-        color: '#ef4444'
-      });
-      return;
-    }
     
     setSaving(true);
     

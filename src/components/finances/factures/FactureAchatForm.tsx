@@ -430,7 +430,6 @@ export function FactureAchatForm({
           value={montantHT}
           onChange={handleInputChange}
           step="0.01"
-          min="0"
           placeholder={t('invoices.form.amountExVat')}
           disabled={isSaving}
         />
@@ -447,7 +446,6 @@ export function FactureAchatForm({
           value={montantTVA}
           onChange={handleInputChange}
           step="0.01"
-          min="0"
           placeholder={t('invoices.form.vatAmount')}
           disabled={isSaving}
         />
@@ -464,7 +462,6 @@ export function FactureAchatForm({
           value={montantTTC}
           onChange={handleInputChange}
           step="0.01"
-          min="0"
           placeholder={t('invoices.form.amountIncVat')}
           disabled={isSaving}
         />

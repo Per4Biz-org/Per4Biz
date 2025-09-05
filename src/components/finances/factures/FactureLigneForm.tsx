@@ -324,7 +324,6 @@ export function FactureLigneForm({
               value={formData.montant_ht.toString()}
               onChange={handleInputChange}
               step="0.01"
-              min="0"
             />
           </FormField>
           
@@ -337,7 +336,6 @@ export function FactureLigneForm({
               value={formData.montant_tva.toString()}
               onChange={handleInputChange}
               step="0.01"
-              min="0"
             />
           </FormField>
           
