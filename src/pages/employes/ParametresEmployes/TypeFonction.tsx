@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS, pt } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../../context/MenuContext';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
@@ -25,6 +26,7 @@ interface TypeFonction {
 }
 
 const TypeFonction: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [fonctions, setFonctions] = useState<TypeFonction[]>([]);
@@ -41,6 +43,16 @@ const TypeFonction: React.FC = () => {
     actif: true
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Função para obter o locale de data baseado no idioma actual
+  const getDateLocale = () => {
+    switch (i18n.language) {
+      case 'en': return enUS;
+      case 'pt': return pt;
+      case 'fr':
+      default: return fr;
+    }
+  };
 
   useEffect(() => {
     setMenuItems(menuItemsParamGestionRH);
@@ -68,7 +80,7 @@ const TypeFonction: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des types de fonctions:', error);
       addToast({
-        label: 'Erreur lors de la récupération des types de fonctions',
+        label: t('employeeParams.functionTypes.messages.loadError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -125,13 +137,13 @@ const TypeFonction: React.FC = () => {
     const errors: Record<string, string> = {};
     
     if (!formData.code.trim()) {
-      errors.code = 'Le code est requis';
+      errors.code = t('employeeParams.functionTypes.validation.codeRequired');
     } else if (formData.code.length > 10) {
       errors.code = 'Le code ne doit pas dépasser 10 caractères';
     }
     
     if (!formData.libelle.trim()) {
-      errors.libelle = 'Le libellé est requis';
+      errors.libelle = t('employeeParams.functionTypes.validation.labelRequired');
     } else if (formData.libelle.length > 50) {
       errors.libelle = 'Le libellé ne doit pas dépasser 50 caractères';
     }
@@ -197,22 +209,15 @@ const TypeFonction: React.FC = () => {
         actif: true
       });
       addToast({
-        label: `Type de fonction ${selectedFonction ? 'modifié' : 'créé'} avec succès`,
+        label: t('employeeParams.functionTypes.messages.saveSuccess'),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error: any) {
       console.error('Erreur lors de la sauvegarde:', error);
       
-      let errorMessage = `Erreur lors de la ${selectedFonction ? 'modification' : 'création'} du type de fonction`;
-      
-      // Gestion des erreurs de contrainte d'unicité
-      if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
-        errorMessage = 'Ce code existe déjà. Veuillez utiliser un code unique.';
-      }
-      
       addToast({
-        label: errorMessage,
+        label: t('employeeParams.functionTypes.messages.saveError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -234,7 +239,7 @@ const TypeFonction: React.FC = () => {
   };
 
   const handleDelete = async (fonction: TypeFonction) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le type de fonction "${fonction.libelle}" ?`)) {
+    if (window.confirm(t('employeeParams.functionTypes.messages.deleteConfirm'))) {
       try {
         const { error } = await supabase
           .from('rh_fonction')
@@ -245,14 +250,14 @@ const TypeFonction: React.FC = () => {
 
         await fetchFonctions();
         addToast({
-          label: `Le type de fonction "${fonction.libelle}" a été supprimé avec succès`,
+          label: t('employeeParams.functionTypes.messages.deleteSuccess'),
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression du type de fonction',
+          label: t('employeeParams.functionTypes.messages.deleteError'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -262,55 +267,55 @@ const TypeFonction: React.FC = () => {
 
   const columns: Column<TypeFonction>[] = [
     {
-      label: 'Code',
+      label: t('employeeParams.functionTypes.columns.code'),
       accessor: 'code',
       sortable: true
     },
     {
-      label: 'Libellé',
+      label: t('employeeParams.functionTypes.columns.label'),
       accessor: 'libelle',
       sortable: true
     },
     {
-      label: 'Commentaire',
+      label: t('employeeParams.functionTypes.columns.comment'),
       accessor: 'commentaire',
       render: (value) => value || '-'
     },
     {
-      label: 'Ordre',
+      label: t('employeeParams.functionTypes.columns.displayOrder'),
       accessor: 'ordre_affichage',
       align: 'center',
       render: (value) => value?.toString() || '0'
     },
     {
-      label: 'Actif',
+      label: t('employeeParams.functionTypes.columns.active'),
       accessor: 'actif',
       align: 'center',
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('employeeParams.common.yes') : t('employeeParams.common.no')}
         </span>
       )
     },
     {
-      label: 'Date de création',
+      label: t('employeeParams.functionTypes.columns.createdAt'),
       accessor: 'created_at',
-      render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
+      render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: getDateLocale() })
     }
   ];
 
   const actions = [
     {
-      label: 'Éditer',
-      icon: 'edit',
+      label: t('employeeParams.common.edit'),
+      icon: 'edit' as const,
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
-      icon: 'delete',
+      label: t('employeeParams.common.delete'),
+      icon: 'delete' as const,
       color: '#ef4444',
       onClick: handleDelete
     }
@@ -319,13 +324,13 @@ const TypeFonction: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Types de Fonctions"}
-        description="Gérez les types de fonctions pour vos employés"
+        title={loading || profilLoading ? t('employeeParams.common.loading') : t('employeeParams.functionTypes.pageTitle')}
+        description={t('employeeParams.functionTypes.pageDescription')}
         className={styles.header}
       >
         <div className="mb-6">
           <Button
-            label="Ajouter un type de fonction"
+            label={t('employeeParams.functionTypes.addNew')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => {
@@ -344,7 +349,7 @@ const TypeFonction: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des types de fonctions...</p>
+            <p className="text-gray-500">{t('employeeParams.common.loading')}</p>
           </div>
         ) : (
           <DataTable
@@ -352,8 +357,8 @@ const TypeFonction: React.FC = () => {
             data={fonctions}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucun type de fonction"
-            emptyMessage="Aucun type de fonction n'a été créé pour le moment."
+            emptyTitle={t('employeeParams.functionTypes.pageTitle')}
+            emptyMessage={t('employeeParams.common.noData')}
           />
         )}
 
@@ -373,11 +378,11 @@ const TypeFonction: React.FC = () => {
             });
             setFormErrors({});
           }}
-          title={selectedFonction ? 'Modifier un type de fonction' : 'Ajouter un type de fonction'}
+          title={selectedFonction ? t('employeeParams.functionTypes.editTitle') : t('employeeParams.functionTypes.createTitle')}
         >
               <Form size={100} onSubmit={handleSubmit}>
                 <FormField
-                  label="Code"
+                  label={t('employeeParams.functionTypes.form.code')}
                   required
                   error={formErrors.code}
                   description="Code unique du type de fonction (10 caractères max)"
@@ -386,14 +391,14 @@ const TypeFonction: React.FC = () => {
                     name="code"
                     value={formData.code}
                     onChange={handleInputChange}
-                    placeholder="Ex: CHEF, SERVEUR"
+                    placeholder={t('employeeParams.functionTypes.form.codePlaceholder')}
                     disabled={isSubmitting}
                     maxLength={10}
                   />
                 </FormField>
 
                 <FormField
-                  label="Libellé"
+                  label={t('employeeParams.functionTypes.form.label')}
                   required
                   error={formErrors.libelle}
                   description="Nom du type de fonction (50 caractères max)"
@@ -402,14 +407,14 @@ const TypeFonction: React.FC = () => {
                     name="libelle"
                     value={formData.libelle}
                     onChange={handleInputChange}
-                    placeholder="Ex: Chef de cuisine, Serveur"
+                    placeholder={t('employeeParams.functionTypes.form.labelPlaceholder')}
                     disabled={isSubmitting}
                     maxLength={50}
                   />
                 </FormField>
 
                 <FormField
-                  label="Ordre d'affichage"
+                  label={t('employeeParams.functionTypes.form.displayOrder')}
                   description="Position dans la liste (0 = premier)"
                 >
                   <FormInput
@@ -424,7 +429,7 @@ const TypeFonction: React.FC = () => {
                 </FormField>
 
                 <FormField
-                  label="Commentaire"
+                  label={t('employeeParams.functionTypes.form.comment')}
                   description="Description optionnelle du type de fonction"
                 >
                   <textarea
@@ -433,7 +438,7 @@ const TypeFonction: React.FC = () => {
                     onChange={handleInputChange}
                     className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
                     rows={3}
-                    placeholder="Description ou notes sur ce type de fonction..."
+                    placeholder={t('employeeParams.functionTypes.form.commentPlaceholder')}
                     disabled={isSubmitting}
                   />
                 </FormField>
@@ -445,7 +450,7 @@ const TypeFonction: React.FC = () => {
                   <Toggle
                     checked={formData.actif}
                     onChange={handleToggleChange}
-                    label={formData.actif ? 'Actif' : 'Inactif'}
+                    label={formData.actif ? t('employeeParams.functionTypes.form.active') : 'Inactif'}
                     icon="Check"
                     disabled={isSubmitting}
                   />
@@ -453,7 +458,7 @@ const TypeFonction: React.FC = () => {
 
                 <FormActions>
                   <Button
-                    label="Annuler"
+                    label={t('employeeParams.common.cancel')}
                     color="#6B7280"
                     onClick={() => {
                       setIsModalOpen(false);
@@ -470,7 +475,7 @@ const TypeFonction: React.FC = () => {
                     type="button"
                   />
                   <Button
-                    label={isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+                    label={isSubmitting ? 'Enregistrement...' : t('employeeParams.common.save')}
                     icon="Save"
                     color="var(--color-primary)"
                     type="submit"

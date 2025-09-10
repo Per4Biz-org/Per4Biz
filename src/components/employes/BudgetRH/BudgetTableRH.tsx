@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ColumnAnnee } from './DataTableAnnee';
 import { BudgetData } from '../../../hooks/employes/useBudgetRHCalculations';
 import { BudgetRHLine } from './BudgetRHLine';
@@ -13,6 +14,8 @@ interface BudgetTableRHProps {
 }
 
 export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
+  const { t } = useTranslation();
+  
   // Utiliser le hook de pliage/dépliage
   const { 
     isExpanded, 
@@ -27,8 +30,18 @@ export function BudgetTableRH({ data, year }: BudgetTableRHProps) {
 
   // Mois de l'année
   const months = [
-    'janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin',
-    'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'
+    t('hrBudget.months.january'), 
+    t('hrBudget.months.february'), 
+    t('hrBudget.months.march'), 
+    t('hrBudget.months.april'), 
+    t('hrBudget.months.may'), 
+    t('hrBudget.months.june'),
+    t('hrBudget.months.july'), 
+    t('hrBudget.months.august'), 
+    t('hrBudget.months.september'), 
+    t('hrBudget.months.october'), 
+    t('hrBudget.months.november'), 
+    t('hrBudget.months.december')
   ];
   
   // Fonction pour générer un ID unique pour chaque ligne

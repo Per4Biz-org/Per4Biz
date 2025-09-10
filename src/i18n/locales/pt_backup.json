@@ -525,10 +525,7 @@
         "fileAttachedSuccess": "Ficheiro anexado com sucesso",
         "addAtLeastOneLine": "Por favor, adicione pelo menos uma linha \u00e0 factura",
         "totalMustMatch": "O montante da factura sem IVA deve estar definido e ser igual ao total das linhas",
-        "errorSavingInvoice": "Erro ao guardar factura",
-        "requiredFields": "Campos obrigat\u00f3rios: {0}",
-        "selectRestaurantToSearch": "Por favor, seleccione um restaurante para pesquisar facturas",
-        "selectRestaurantToCreate": "Por favor, seleccione um restaurante antes de criar uma factura"
+        "errorSavingInvoice": "Erro ao guardar factura"
     },
     "parametersFinances": {
         "subCategoryFlux": {
@@ -708,44 +705,6 @@
             },
             "success": {
                 "budgetCreated": "Or\u00e7amento criado com sucesso"
-            },
-            "table": {
-                "columns": {
-                    "entity": "Entidade",
-                    "year": "Ano",
-                    "month": "M\u00eas",
-                    "category": "Categoria",
-                    "type": "Tipo",
-                    "amountHT": "Montante HT",
-                    "amountTTC": "Montante TTC",
-                    "serviceType": "Tipo de servi\u00e7o",
-                    "subCategory": "Subcategoria",
-                    "openDays": "Dias abertos",
-                    "covers": "Cobertos",
-                    "averagePrice": "Pre\u00e7o m\u00e9dio"
-                },
-                "types": {
-                    "product": "Produto",
-                    "charge": "Despesa"
-                },
-                "months": {
-                    "january": "Janeiro",
-                    "february": "Fevereiro",
-                    "march": "Mar\u00e7o",
-                    "april": "Abril",
-                    "may": "Maio",
-                    "june": "Junho",
-                    "july": "Julho",
-                    "august": "Agosto",
-                    "september": "Setembro",
-                    "october": "Outubro",
-                    "november": "Novembro",
-                    "december": "Dezembro"
-                },
-                "units": {
-                    "day": "dia",
-                    "days": "dias"
-                }
             }
         }
     },

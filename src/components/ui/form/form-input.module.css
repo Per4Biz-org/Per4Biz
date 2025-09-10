@@ -40,3 +40,46 @@
   -webkit-appearance: none;
   margin: 0;
 }
+
+/* Styles spécifiques pour les inputs de date */
+.input[type="date"] {
+  position: relative;
+  padding-right: 2.5rem;
+  font-weight: 500;
+  color: var(--color-text);
+  background-color: var(--color-white);
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  min-height: 2.25rem;
+}
+
+.input[type="date"]:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.input[type="date"]:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  color: #6b7280;
+  opacity: 0;
+}
+
+.input[type="date"]::-webkit-inner-spin-button,
+.input[type="date"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

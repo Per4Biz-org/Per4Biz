@@ -1,4 +1,5 @@
 import { Database } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ImportingPhaseProps {
   progress: {
@@ -9,6 +10,7 @@ interface ImportingPhaseProps {
 }
 
 export function ImportingPhase({ progress }: ImportingPhaseProps) {
+  const { t } = useTranslation();
   const percentComplete = progress.total > 0 
     ? Math.round((progress.current / progress.total) * 100) 
     : 0;
@@ -19,7 +21,7 @@ export function ImportingPhase({ progress }: ImportingPhaseProps) {
         <div className="flex items-start gap-3">
           <Database className="w-5 h-5 text-blue-600 mt-0.5" />
           <div>
-            <h3 className="font-medium text-blue-900 mb-2">Import en cours</h3>
+            <h3 className="font-medium text-blue-900 mb-2">{t('importModal.importing.title')}</h3>
             <p className="text-sm text-blue-700 mb-4">
               {progress.message}
             </p>
@@ -32,7 +34,7 @@ export function ImportingPhase({ progress }: ImportingPhaseProps) {
               ></div>
             </div>
             <p className="text-xs text-blue-600 mt-2">
-              {progress.current} / {progress.total} lignes traitées ({percentComplete}%)
+              {t('importModal.importing.progress', { current: progress.current, total: progress.total })} ({percentComplete}%)
             </p>
           </div>
         </div>

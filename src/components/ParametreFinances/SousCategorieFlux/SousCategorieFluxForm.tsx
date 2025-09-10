@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
@@ -50,6 +51,7 @@ export function SousCategorieFluxForm({
   onCancel,
   isSubmitting = false
 }: SousCategorieFluxFormProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<SousCategorieFluxFormData>(initialData);
   const [entites, setEntites] = useState<Entite[]>([]);
   const [categoriesFlux, setCategoriesFlux] = useState<CategorieFlux[]>([]);
@@ -174,9 +176,9 @@ export function SousCategorieFluxForm({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof SousCategorieFluxFormData, string>> = {};
 
-    if (!formData.code.trim()) newErrors.code = 'Le code est requis';
-    if (!formData.libelle.trim()) newErrors.libelle = 'Le libellé est requis';
-    if (!formData.id_categorie) newErrors.id_categorie = 'La catégorie de flux est requise';
+    if (!formData.code.trim()) newErrors.code = t('parametersFinances.subCategoryFlux.form.validation.codeRequired');
+    if (!formData.libelle.trim()) newErrors.libelle = t('parametersFinances.subCategoryFlux.form.validation.labelRequired');
+    if (!formData.id_categorie) newErrors.id_categorie = t('parametersFinances.subCategoryFlux.form.validation.categoryRequired');
     // id_entite peut être null pour une sous-catégorie liée à une catégorie globale
 
     setErrors(newErrors);
@@ -190,7 +192,7 @@ export function SousCategorieFluxForm({
   };
 
   const entiteOptions: DropdownOption[] = [
-    { value: '', label: 'Global (toutes les entités)' },
+    { value: '', label: t('parametersFinances.subCategoryFlux.globalAllEntities') },
     ...entites.map(entite => ({
       value: entite.id,
       label: `${entite.code} - ${entite.libelle}`
@@ -205,22 +207,22 @@ export function SousCategorieFluxForm({
   return (
     <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
       <FormField
-        label="Entité"
+        label={t('parametersFinances.subCategoryFlux.form.entity')}
         error={errors.id_entite}
-        description="Laissez vide pour une sous-catégorie liée à une catégorie globale"
+        description={t('parametersFinances.subCategoryFlux.form.entityDescription')}
         className="mb-3"
       >
         <Dropdown
           options={entiteOptions}
           value={formData.id_entite}
           onChange={handleEntiteChange}
-          label="Sélectionner une entité"
+          label={t('parametersFinances.subCategoryFlux.form.selectEntity')}
           size="sm"
         />
       </FormField>
 
       <FormField
-        label="Catégorie de flux"
+        label={t('parametersFinances.subCategoryFlux.form.fluxCategory')}
         required
         error={errors.id_categorie}
         className="mb-3"
@@ -229,14 +231,14 @@ export function SousCategorieFluxForm({
           options={categorieOptions}
           value={formData.id_categorie}
           onChange={handleCategorieChange}
-          label="Sélectionner une catégorie"
+          label={t('parametersFinances.subCategoryFlux.form.selectCategory')}
           size="sm"
           disabled={categorieOptions.length === 0}
         />
       </FormField>
 
       <FormField
-        label="Code"
+        label={t('parametersFinances.subCategoryFlux.form.code')}
         required
         error={errors.code}
         className="mb-3"
@@ -245,13 +247,13 @@ export function SousCategorieFluxForm({
           name="code"
           value={formData.code}
           onChange={handleInputChange}
-          placeholder="Ex: VENTE_BOISSON"
+          placeholder={t('parametersFinances.subCategoryFlux.form.codeExample')}
           className="h-9"
         />
       </FormField>
 
       <FormField
-        label="Libellé"
+        label={t('parametersFinances.subCategoryFlux.form.label')}
         required
         error={errors.libelle}
         className="mb-3"
@@ -260,13 +262,13 @@ export function SousCategorieFluxForm({
           name="libelle"
           value={formData.libelle}
           onChange={handleInputChange}
-          placeholder="Ex: Vente de boissons"
+          placeholder={t('parametersFinances.subCategoryFlux.form.labelExample')}
           className="h-9"
         />
       </FormField>
 
       <FormField
-        label="Ordre d'affichage"
+        label={t('parametersFinances.subCategoryFlux.form.displayOrder')}
         className="mb-3"
       >
         <FormInput
@@ -281,19 +283,19 @@ export function SousCategorieFluxForm({
       </FormField>
 
       <FormField
-        label="Statut"
+        label={t('parametersFinances.subCategoryFlux.form.status')}
         className="mb-3"
       >
         <Toggle
           checked={formData.actif}
           onChange={handleToggleChange}
-          label={formData.actif ? 'Actif' : 'Inactif'}
+          label={formData.actif ? t('parametersFinances.subCategoryFlux.form.activeStatus') : t('parametersFinances.subCategoryFlux.form.inactiveStatus')}
           size="sm"
         />
       </FormField>
 
       <FormField
-        label="Description"
+        label={t('parametersFinances.subCategoryFlux.form.description')}
         className="mb-3 col-span-2"
       >
         <textarea
@@ -302,20 +304,20 @@ export function SousCategorieFluxForm({
           onChange={handleInputChange}
           className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
           rows={2}
-          placeholder="Description optionnelle de la sous-catégorie..."
+          placeholder={t('parametersFinances.subCategoryFlux.form.descriptionPlaceholder')}
         />
       </FormField>
 
       <FormActions>
         <Button
-          label="Annuler"
+          label={t('parametersFinances.subCategoryFlux.form.cancel')}
           size="sm"
           color="#6B7280"
           onClick={onCancel}
           type="button"
         />
         <Button
-          label={isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+          label={isSubmitting ? t('parametersFinances.subCategoryFlux.form.saving') : t('parametersFinances.subCategoryFlux.form.save')}
           size="sm"
           icon="Save"
           color="var(--color-primary)"

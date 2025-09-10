@@ -12,7 +12,11 @@
     "search": "Rechercher",
     "actions": "Actions",
     "confirm": "Confirmer",
-    "close": "Fermer"
+    "close": "Fermer",
+    "select": "Sélectionner",
+    "selectEntity": "Sélectionner une entité",
+    "all": "Tous les",
+    "searchBy": "Rechercher par"
   },
   "auth": {
     "login": "Connexion",
@@ -61,6 +65,88 @@
     "employees": "Employés",
     "globalSettings": "Paramètres globaux",
     "profile": "Profil"
+  },
+  "sidebar": {
+    "sections": {
+      "management": "GESTION",
+      "configuration": "CONFIGURATION"
+    },
+    "dashboards": "Tableaux de bord",
+    "home": "Accueil",
+    "overview": "Vue d'ensemble",
+    "finance": {
+      "title": "Gestion Financière",
+      "overview": "Vue d'ensemble",
+      "invoices": "Mes Factures",
+      "cashClosure": "Fermeture Caisse",
+      "revenueTracking": "Suivi CA Réel",
+      "budgetTracking": "Suivi CA Budget",
+      "expenseBudget": "Gestion Budget Dépenses",
+      "settings": "Paramètres"
+    },
+    "banking": {
+      "title": "Gestion Bancaire",
+      "overview": "Vue d'ensemble", 
+      "movements": "Mouvements Bancaires",
+      "importStatements": "Import Relevés",
+      "settings": "Paramètres"
+    },
+    "employees": {
+      "title": "Gestion Employés",
+      "overview": "Vue d'ensemble",
+      "myEmployees": "Mes Employés", 
+      "budgetHR": "Budget RH",
+      "settings": "Paramètres"
+    },
+    "globalSettings": {
+      "title": "Paramètres Global",
+      "overview": "Vue d'ensemble",
+      "thirdParties": "Tiers",
+      "thirdPartyTypes": "Type Tiers",
+      "invoiceTypes": "Type Facture",
+      "entities": "Entités",
+      "import": "Import"
+    }
+  },
+  "header": {
+    "notifications": "Notifications",
+    "noNotifications": "Aucune notification récente",
+    "profile": "Mon Profil",
+    "logout": "Déconnexion",
+    "breadcrumbs": {
+      "dashboard": "Tableau de bord",
+      "finance": {
+        "title": "Gestion Financière",
+        "invoices": "Mes Factures",
+        "cashClosure": "Fermeture Caisse",
+        "revenueTracking": "Suivi CA Réel",
+        "budgetTracking": "Suivi CA Budget",
+        "expenseBudget": "Budget Dépenses",
+        "settings": "Paramètres"
+      },
+      "banking": {
+        "title": "Gestion Bancaire",
+        "movements": "Mouvements Bancaires",
+        "importStatements": "Import Relevés",
+        "settings": "Paramètres"
+      },
+      "employees": {
+        "title": "Gestion Employés",
+        "myEmployees": "Mes Employés",
+        "budgetHR": "Budget RH",
+        "settings": "Paramètres"
+      },
+      "globalSettings": {
+        "title": "Paramètres Global",
+        "thirdParties": "Tiers",
+        "thirdPartyTypes": "Type Tiers",
+        "invoiceTypes": "Type Facture",
+        "entities": "Entités",
+        "import": "Import"
+      },
+      "profile": "Mon Profil",
+      "contact": "Contact"
+    }
   },
   "pages": {
     "profile": {
@@ -442,6 +528,632 @@
     "incompleteUserProfile": "Erreur: Profil utilisateur incomplet",
     "addAtLeastOneLine": "Veuillez ajouter au moins une ligne à la facture",
     "totalMustMatch": "Le montant HT de la facture doit être défini et égal au total des lignes",
-    "errorSavingInvoice": "Erreur lors de la sauvegarde de la facture"
+    "errorSavingInvoice": "Erreur lors de la sauvegarde de la facture",
+    "requiredFields": "Champs obligatoires: {0}",
+    "selectRestaurantToSearch": "Veuillez sélectionner un restaurant pour rechercher les factures",
+    "selectRestaurantToCreate": "Veuillez sélectionner un restaurant avant de créer une facture"
+  },
+  "parametersFinances": {
+    "subCategoryFlux": {
+      "title": "Sous-Catégories de Flux",
+      "description": "Gérez les sous-catégories de flux financiers de votre organisation",
+      "addSubCategory": "Ajouter une sous-catégorie",
+      "allFluxCategories": "Toutes les catégories de flux",
+      "loading": "Chargement...",
+      "loadingSubCategories": "Chargement des sous-catégories de flux...",
+      "noSubCategories": "Aucune sous-catégorie de flux",
+      "noSubCategoriesMessage": "Aucune sous-catégorie de flux n'a été créée pour le moment.",
+      "entity": "Entité",
+      "fluxCategory": "Catégorie de flux",
+      "code": "Code",
+      "label": "Libellé",
+      "order": "Ordre",
+      "active": "Actif",
+      "creationDate": "Date de création",
+      "yes": "Oui",
+      "no": "Non",
+      "edit": "Éditer",
+      "delete": "Supprimer",
+      "globalAllEntities": "Global (toutes les entités)",
+      "errors": {
+        "fetchError": "Erreur lors de la récupération des sous-catégories de flux",
+        "noContractAssociated": "Aucun contrat client associé au profil",
+        "saveError": "Erreur lors de la sauvegarde de la sous-catégorie de flux",
+        "createError": "Erreur lors de la création de la sous-catégorie de flux",
+        "updateError": "Erreur lors de la modification de la sous-catégorie de flux",
+        "deleteError": "Erreur lors de la suppression de la sous-catégorie de flux",
+        "deleteConstraintError": "Impossible de supprimer cette sous-catégorie car elle est utilisée dans des factures ou d'autres éléments. Veuillez la désactiver plutôt que la supprimer."
+      },
+      "success": {
+        "created": "Sous-catégorie de flux créée avec succès",
+        "updated": "Sous-catégorie de flux modifiée avec succès",
+        "deleted": "Sous-catégorie de flux supprimée avec succès"
+      },
+      "modal": {
+        "addTitle": "Ajouter une sous-catégorie de flux",
+        "editTitle": "Modifier une sous-catégorie de flux"
+      },
+      "form": {
+        "entity": "Entité",
+        "entityDescription": "Laissez vide pour une sous-catégorie liée à une catégorie globale",
+        "selectEntity": "Sélectionner une entité",
+        "fluxCategory": "Catégorie de flux",
+        "selectCategory": "Sélectionner une catégorie",
+        "code": "Code",
+        "codeExample": "Ex: VENTE_BOISSON",
+        "label": "Libellé",
+        "labelExample": "Ex: Vente de boissons",
+        "displayOrder": "Ordre d'affichage",
+        "status": "Statut",
+        "activeStatus": "Actif",
+        "inactiveStatus": "Inactif",
+        "description": "Description",
+        "descriptionPlaceholder": "Description optionnelle de la sous-catégorie...",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "required": "requis",
+        "validation": {
+          "codeRequired": "Le code est requis",
+          "labelRequired": "Le libellé est requis",
+          "categoryRequired": "La catégorie de flux est requise"
+        }
+      },
+      "deleteConfirmation": "Êtes-vous sûr de vouloir supprimer la sous-catégorie de flux \"{label}\" ? Cette action est irréversible et peut échouer si la sous-catégorie est utilisée dans des factures."
+    },
+    "revenueTracking": {
+      "title": "Suivi CA Réel",
+      "description": "Suivez et analysez votre chiffre d'affaires réel par entité et période",
+      "entity": "Entité",
+      "year": "Année",
+      "loading": "Chargement...",
+      "loadingData": "Chargement des données...",
+      "developmentMessage": "Cette page est en cours de développement.",
+      "selectedFilters": "Filtres sélectionnés: Entité {entity}, Année {year}",
+      "allEntities": "(Toutes)",
+      "errors": {
+        "fetchEntitiesError": "Erreur lors de la récupération des entités"
+      }
+    },
+    "budgetForm": {
+      "title": "Formulaire de Budget",
+      "budgetDetails": "Détails du budget",
+      "addDetail": "Ajouter un détail",
+      "addThisDetail": "Ajouter ce détail",
+      "addedDetails": "Détails ajoutés",
+      "noDetailsMessage": "Aucun détail ajouté. Veuillez ajouter au moins un détail pour ce budget.",
+      "duplicateWarning": "Un budget existe déjà pour cette combinaison entité/année/mois/catégorie de flux.",
+      "duplicateWarningMessage": "Veuillez modifier l'une de ces valeurs ou choisir une autre combinaison.",
+      "checkingDuplicates": "Vérification des doublons en cours...",
+      "total": "Total",
+      "entity": "Entité",
+      "fluxCategory": "Catégorie de flux",
+      "year": "Année",
+      "month": "Mois",
+      "amountHT": "Montant HT",
+      "amountTTC": "Montant TTC",
+      "openDays": "Nombre de jours ouverts",
+      "covers": "Nombre de couverts",
+      "averagePrice": "Prix moyen par couvert",
+      "comment": "Commentaire",
+      "serviceType": "Type de service",
+      "subCategory": "Sous-catégorie",
+      "actions": "Actions",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "chooseEntity": "Choisir l'entité",
+      "chooseCategory": "Choisir la catégorie",
+      "chooseEntityFirst": "Choisir d'abord une entité",
+      "chooseCategoryFirst": "Choisir d'abord une catégorie",
+      "chooseYear": "Choisir l'année",
+      "chooseMonth": "Choisir le mois",
+      "chooseService": "Choisir le service",
+      "chooseSubCategory": "Choisir la sous-catégorie",
+      "notFound": "Non trouvé",
+      "product": "Produit",
+      "charge": "Charge",
+      "placeholders": {
+        "amountHT": "Montant HT",
+        "amountTTC": "Montant TTC",
+        "openDays": "Jours ouverts",
+        "covers": "Nombre de couverts",
+        "averagePrice": "Prix moyen",
+        "comment": "Commentaire sur ce budget...",
+        "detailComment": "Commentaire"
+      },
+      "descriptions": {
+        "amountHTDescription": "Montant total HT (calculé à partir des détails)",
+        "amountTTCDescription": "Montant total TTC (calculé à partir des détails)",
+        "openDaysDescription": "Paramètre global: {days} jours"
+      },
+      "validation": {
+        "entityRequired": "L'entité est requise",
+        "categoryRequired": "La catégorie de flux est requise",
+        "yearRange": "L'année doit être comprise entre 2000 et 2100",
+        "monthRange": "Le mois doit être compris entre 1 et 12",
+        "amountHTNegative": "Le montant HT ne peut pas être négatif",
+        "amountTTCNegative": "Le montant TTC ne peut pas être négatif",
+        "openDaysRange": "Le nombre de jours doit être compris entre 0 et 31",
+        "coversNegative": "Le nombre de couverts ne peut pas être négatif",
+        "averagePriceNegative": "Le prix moyen ne peut pas être négatif",
+        "duplicateBudget": "Un budget existe déjà pour cette combinaison entité/année/mois/catégorie",
+        "serviceTypeRequired": "Le type de service est requis",
+        "subCategoryRequired": "La sous-catégorie est requise",
+        "duplicateServiceSubCategory": "Cette combinaison type de service / sous-catégorie existe déjà",
+        "addAtLeastOneDetail": "Vous devez ajouter au moins un détail de budget"
+      }
+    },
+    "budgetTracking": {
+      "title": "Suivi CA Budget",
+      "description": "Suivez et analysez vos budgets de chiffre d'affaires par entité et période",
+      "loading": "Chargement...",
+      "loadingBudgets": "Chargement des budgets...",
+      "addLine": "Ajouter une ligne",
+      "editInline": "Saisir en ligne",
+      "budgetsDisplayed": "{displayed} budget(s) affiché(s) sur {total} au total",
+      "noBudgets": "Aucun budget",
+      "noBudgetsMessage": "Aucun budget n'a été créé pour le moment.",
+      "entity": "Entité",
+      "year": "Année",
+      "month": "Mois",
+      "modal": {
+        "addBudgetLine": "Ajouter une ligne de budget"
+      },
+      "errors": {
+        "fetchBudgetsError": "Erreur lors de la récupération des budgets",
+        "fetchEntitiesError": "Erreur lors de la récupération des entités",
+        "fetchBudgetDetailsError": "Erreur lors de la récupération des détails du budget",
+        "noContractAssociated": "Aucun contrat client associé au profil",
+        "createBudgetError": "Erreur lors de la création du budget",
+        "budgetCreationError": "Erreur lors de la création du budget",
+        "duplicateBudgetError": "Un budget existe déjà pour cette entité, cette catégorie, ce mois et cette année"
+      },
+      "success": {
+        "budgetCreated": "Budget créé avec succès"
+      },
+      "table": {
+        "columns": {
+          "entity": "Entité",
+          "year": "Année",
+          "month": "Mois",
+          "category": "Catégorie",
+          "type": "Type",
+          "amountHT": "Montant HT",
+          "amountTTC": "Montant TTC",
+          "serviceType": "Type de service",
+          "subCategory": "Sous-catégorie",
+          "openDays": "Jours ouverts",
+          "covers": "Couverts",
+          "averagePrice": "Prix moyen"
+        },
+        "types": {
+          "product": "Produit",
+          "charge": "Charge"
+        },
+        "months": {
+          "january": "Janvier",
+          "february": "Février",
+          "march": "Mars",
+          "april": "Avril",
+          "may": "Mai",
+          "june": "Juin",
+          "july": "Juillet",
+          "august": "Août",
+          "september": "Septembre",
+          "october": "Octobre",
+          "november": "Novembre",
+          "december": "Décembre"
+        },
+        "units": {
+          "day": "jour",
+          "days": "jours"
+        }
+      }
+    }
+  },
+  "importStatements": {
+    "title": "Import de Relevés Bancaires",
+    "description": "Consultez les relevés bancaires importés et leurs détails",
+    "loading": "Chargement...",
+    "newImport": "Nouvel import",
+    "processStatements": "Traiter les relevés",
+    "processingInProgress": "Traitement en cours...",
+    "listTitle": "Liste des imports",
+    "entriesCount": "{count} entrée{plural} à traiter",
+    "loadingImports": "Chargement des imports de relevés...",
+    "columns": {
+      "fileName": "Nom du fichier",
+      "format": "Format",
+      "importDate": "Date d'import",
+      "lines": "Lignes",
+      "status": "Statut",
+      "message": "Message",
+      "creationDate": "Date de création",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "Voir détails",
+      "delete": "Supprimer"
+    },
+    "status": {
+      "finished": "TERMINE",
+      "error": "ERREUR",
+      "pending": "En attente",
+      "notSpecified": "Non spécifié"
+    },
+    "empty": {
+      "title": "Aucun import",
+      "message": "Aucun import de relevé bancaire n'a été effectué pour le moment."
+    },
+    "modal": {
+      "title": "Détails de l'import",
+      "importFormat": "Format d'import",
+      "importDate": "Date d'import",
+      "linesCount": "Nombre de lignes",
+      "status": "Statut",
+      "message": "Message",
+      "importedEntries": "Écritures importées",
+      "loadingDetails": "Chargement des détails...",
+      "totalEntries": "Total des écritures",
+      "totalAmounts": "Total des montants",
+      "detailColumns": {
+        "status": "Statut",
+        "id": "ID",
+        "operationDate": "Date opération",
+        "valueDate": "Date valeur",
+        "account": "Compte",
+        "description": "Description",
+        "amount": "Montant",
+        "balance": "Solde",
+        "reference": "Référence"
+      },
+      "detailStatus": {
+        "toProcess": "A TRAITER",
+        "created": "CREER",
+        "duplicate": "DOUBLON",
+        "error": "ERREUR"
+      },
+      "errorTooltip": "Détail de l'erreur:",
+      "emptyDetails": {
+        "title": "Aucun détail",
+        "message": "Aucun détail n'a été trouvé pour cet import."
+      }
+    },
+    "processing": {
+      "title": "Traitement des écritures bancaires",
+      "currentPhase": "Phase actuelle",
+      "linesProcessed": "lignes traitées",
+      "finished": "Traitement terminé",
+      "totalProcessed": "lignes traitées au total",
+      "created": "Créées",
+      "duplicates": "Doublons",
+      "errors": "Erreurs",
+      "errorMessage": "Des erreurs sont survenues pendant le traitement. Consultez les détails des imports pour voir les erreurs spécifiques.",
+      "phases": {
+        "initialization": "Initialisation"
+      }
+    },
+    "errors": {
+      "fetchImportsError": "Erreur lors de la récupération des imports de relevés",
+      "fetchPendingEntriesError": "Erreur lors de la récupération du nombre d'entrées à traiter",
+      "fetchDetailsError": "Erreur lors de la récupération des détails de l'import",
+      "deleteError": "Erreur lors de la suppression de l'import",
+      "incompleteUserProfile": "Profil utilisateur incomplet"
+    },
+    "confirmations": {
+      "deleteImport": "Êtes-vous sûr de vouloir supprimer l'import \"{fileName}\" ?"
+    },
+    "success": {
+      "importDeleted": "L'import \"{fileName}\" a été supprimé avec succès"
+    }
+  },
+  "importModal": {
+    "title": "Import de relevés bancaires",
+    "fileSelection": {
+      "formatLabel": "Format d'import",
+      "formatDescription": "Sélectionnez le format correspondant à votre fichier",
+      "selectFormat": "Sélectionner un format d'import",
+      "fileLabel": "Fichier à importer",
+      "fileDescription": "Formats acceptés: CSV, TXT, TSV, XLS, XLSX",
+      "selectFile": "Sélectionner un fichier",
+      "analyzing": "Analyse en cours...",
+      "formatInfo": {
+        "title": "Informations sur le format sélectionné",
+        "separator": "Séparateur",
+        "encoding": "Encodage",
+        "firstDataLine": "Première ligne de données",
+        "columns": "colonnes définies",
+        "csvNote": "Assurez-vous que votre fichier CSV utilise bien le séparateur {separator}."
+      },
+      "separators": {
+        "tab": "Tabulation",
+        "semicolon": "Point-virgule (;)",
+        "comma": "Virgule (,)",
+        "pipe": "Pipe (|)"
+      },
+      "errors": {
+        "title": "Erreurs détectées",
+        "fileExists": "Un fichier avec ce nom a déjà été importé",
+        "unsupportedFormat": "Format de fichier non supporté. Veuillez sélectionner un fichier CSV, TXT, TSV, XLS ou XLSX.",
+        "formatNotFound": "Format d'import non trouvé",
+        "incompleteProfile": "Profil utilisateur incomplet",
+        "incompleteData": "Données incomplètes pour l'import",
+        "createHeaderError": "Erreur lors de la création de l'entête d'import",
+        "insertDetailsError": "Erreur lors de l'insertion des détails",
+        "analysisError": "Erreur: {message}"
+      },
+      "info": {
+        "title": "Informations sur l'import",
+        "selectFormat": "• Sélectionnez d'abord un format d'import correspondant à votre banque",
+        "fileFormat": "• Le fichier doit être au format CSV, TXT, TSV, XLS ou XLSX",
+        "uniqueName": "• Le nom du fichier doit être unique pour éviter les doublons",
+        "csvSeparator": "• Pour les fichiers CSV: Assurez-vous que le séparateur de colonnes est bien {separator}",
+        "columnOrder": "• Les colonnes et leur ordre doivent correspondre exactement à ceux définis dans le format d'import",
+        "columnTypes": "• Chaque colonne a un type défini (date, texte, montant) qui détermine comment elle sera traitée"
+      }
+    },
+    "preview": {
+      "title": "Aperçu des données",
+      "subtitle": "Vérifiez les données avant de confirmer l'import",
+      "recordsFound": "{count} enregistrement(s) trouvé(s)",
+      "back": "Retour",
+      "confirm": "Confirmer l'Import"
+    },
+    "importing": {
+      "title": "Import en cours",
+      "preparing": "Préparation de l'import...",
+      "creatingHeader": "Création de l'entête d'import...",
+      "preparingData": "Préparation des données pour l'import...",
+      "finalizing": "Finalisation de l'import...",
+      "progress": "Progression: {current} sur {total}"
+    },
+    "success": {
+      "fileAnalyzed": "Fichier analysé avec succès. {count} ligne(s) trouvée(s).",
+      "excelAnalyzed": "Fichier Excel analysé avec succès. {count} ligne(s) trouvée(s).",
+      "importComplete": "Import réussi ! {count} lignes importées.",
+      "importStatus": "Import terminé avec succès. {count} lignes importées."
+    }
+  },
+  "hrBudget": {
+    "title": "Budget Prévisionnel RH",
+    "description": "Visualisez le budget prévisionnel RH calculé en temps réel à partir des données existantes",
+    "filters": {
+      "title": "Filtres",
+      "year": "Année",
+      "selectYear": "Sélectionner une année",
+      "restaurant": "Restaurant",
+      "allRestaurants": "Tous les restaurants",
+      "showBudget": "Afficher le Budget",
+      "calculating": "Calcul en cours...",
+      "info": {
+        "dynamic": "Le budget est calculé dynamiquement à partir des données RH existantes (contrats, affectations, historique financier).",
+        "charges": "Les charges patronales et salariales sont calculées selon les paramètres définis dans les paramètres généraux RH."
+      }
+    },
+    "budget": {
+      "title": "Budget RH {year}",
+      "allRestaurants": "Tous les restaurants",
+      "calculating": "Calcul du budget en cours...",
+      "calculatingInfo": "Cette opération peut prendre quelques instants",
+      "noData": "Aucune donnée de budget disponible",
+      "noDataInfo": "Vérifiez que des employés avec des contrats et des historiques financiers existent pour cette période"
+    },
+    "months": {
+      "january": "Janvier",
+      "february": "Février",
+      "march": "Mars",
+      "april": "Avril",
+      "may": "Mai",
+      "june": "Juin",
+      "july": "Juillet",
+      "august": "Août",
+      "september": "Septembre",
+      "october": "Octobre",
+      "november": "Novembre",
+      "december": "Décembre"
+    },
+    "table": {
+      "restaurant": "Restaurant",
+      "function": "Fonction",
+      "employee": "Employé",
+      "subcategory": "Sous-catégorie",
+      "total": "Total"
+    },
+    "export": {
+      "excel": "Exporter Excel",
+      "pdf": "Exporter PDF",
+      "pdfNotImplemented": "Fonctionnalité d'export PDF à implémenter avec une bibliothèque comme jsPDF"
+    },
+    "errors": {
+      "loadEntities": "Erreur lors du chargement des entités",
+      "budgetCalculation": "Erreur lors du calcul du budget"
+    }
+  },
+  "employeeParams": {
+    "title": "Paramètres des Employés",
+    "description": "Configuration des paramètres pour la gestion de vos employés",
+    "functionTypes": {
+      "title": "Types de Fonctions",
+      "description": "Gérez les différents types de fonctions pour vos employés (chef, serveur, etc.)",
+      "access": "Accéder aux types de fonctions →",
+      "pageTitle": "Types de Fonctions",
+      "pageDescription": "Gérez les différents types de fonctions des employés",
+      "addNew": "Nouvelle Fonction",
+      "editTitle": "Modifier Fonction",
+      "createTitle": "Créer Fonction",
+      "columns": {
+        "code": "Code",
+        "label": "Libellé",
+        "comment": "Commentaire",
+        "displayOrder": "Ordre",
+        "active": "Actif",
+        "createdAt": "Créé le"
+      },
+      "form": {
+        "code": "Code",
+        "codePlaceholder": "Ex: CHEF",
+        "label": "Libellé",
+        "labelPlaceholder": "Ex: Chef de Cuisine",
+        "comment": "Commentaire",
+        "commentPlaceholder": "Commentaire optionnel",
+        "displayOrder": "Ordre d'affichage",
+        "active": "Actif"
+      },
+      "validation": {
+        "codeRequired": "Le code est obligatoire",
+        "labelRequired": "Le libellé est obligatoire"
+      },
+      "messages": {
+        "loadError": "Erreur lors du chargement des types de fonctions",
+        "saveSuccess": "Type de fonction sauvegardé avec succès",
+        "saveError": "Erreur lors de la sauvegarde du type de fonction",
+        "deleteSuccess": "Type de fonction supprimé avec succès",
+        "deleteError": "Erreur lors de la suppression du type de fonction",
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce type de fonction ?"
+      }
+    },
+    "contractTypes": {
+      "title": "Types de Contrats",
+      "description": "Configurez les différents types de contrats pour vos employés (CDI, CDD, etc.)",
+      "access": "Accéder aux types de contrats →",
+      "pageTitle": "Types de Contrats",
+      "pageDescription": "Gérez les différents types de contrats des employés",
+      "addNew": "Nouveau Contrat",
+      "editTitle": "Modifier Contrat",
+      "createTitle": "Créer Contrat",
+      "columns": {
+        "code": "Code",
+        "label": "Libellé",
+        "comment": "Commentaire",
+        "internal": "Interne",
+        "active": "Actif",
+        "createdAt": "Créé le"
+      },
+      "form": {
+        "code": "Code",
+        "codePlaceholder": "Ex: CDI",
+        "label": "Libellé",
+        "labelPlaceholder": "Ex: Contrat à Durée Indéterminée",
+        "comment": "Commentaire",
+        "commentPlaceholder": "Commentaire optionnel",
+        "internal": "Contrat interne",
+        "active": "Actif"
+      },
+      "validation": {
+        "codeRequired": "Le code est obligatoire",
+        "labelRequired": "Le libellé est obligatoire"
+      },
+      "messages": {
+        "loadError": "Erreur lors du chargement des types de contrats",
+        "saveSuccess": "Type de contrat sauvegardé avec succès",
+        "saveError": "Erreur lors de la sauvegarde du type de contrat",
+        "deleteSuccess": "Type de contrat supprimé avec succès",
+        "deleteError": "Erreur lors de la suppression du type de contrat",
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce type de contrat ?"
+      }
+    },
+    "socialSecurityRates": {
+      "title": "Taux SS",
+      "description": "Gérez les taux de charges sociales applicables à vos employés (obsolète)",
+      "access": "Accéder aux taux SS →"
+    },
+    "generalParams": {
+      "title": "Paramètres Généraux",
+      "description": "Configurez les paramètres généraux RH (taux SS, tickets restaurant, etc.)",
+      "access": "Accéder aux paramètres généraux →",
+      "pageTitle": "Paramètres Généraux RH",
+      "pageDescription": "Configurez les paramètres généraux pour la gestion RH",
+      "addNew": "Nouveau Paramètre",
+      "editTitle": "Modifier Paramètre",
+      "createTitle": "Créer Paramètre",
+      "columns": {
+        "startDate": "Date Début",
+        "endDate": "Date Fin",
+        "employerRate": "Taux Patronal",
+        "employeeRate": "Taux Salarial",
+        "mealVoucher": "Ticket Restaurant",
+        "comment": "Commentaire",
+        "active": "Actif",
+        "createdAt": "Créé le"
+      },
+      "form": {
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "employerRate": "Taux SS patronal (%)",
+        "employeeRate": "Taux SS salarial (%)",
+        "mealVoucher": "Ticket restaurant journalier (€)",
+        "comment": "Commentaire",
+        "active": "Actif",
+        "employeeNumbering": "Numérotation des employés",
+        "prefix": "Préfixe matricule",
+        "prefixPlaceholder": "Ex: EMP",
+        "chronoNumber": "Numéro chronologique",
+        "positions": "Nombre de positions",
+        "positionsPlaceholder": "Ex: 4"
+      },
+      "validation": {
+        "startDateRequired": "La date de début est obligatoire",
+        "employerRateRequired": "Le taux patronal est obligatoire",
+        "employeeRateRequired": "Le taux salarial est obligatoire"
+      },
+      "messages": {
+        "loadError": "Erreur lors du chargement des paramètres généraux",
+        "saveSuccess": "Paramètre général sauvegardé avec succès",
+        "saveError": "Erreur lors de la sauvegarde du paramètre général",
+        "deleteSuccess": "Paramètre général supprimé avec succès",
+        "deleteError": "Erreur lors de la suppression du paramètre général",
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce paramètre ?"
+      }
+    },
+    "common": {
+      "loading": "Chargement...",
+      "noData": "Aucun enregistrement trouvé",
+      "actions": "Actions",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "save": "Sauvegarder",
+      "cancel": "Annuler",
+      "yes": "Oui",
+      "no": "Non",
+      "close": "Fermer"
+    }
+  },
+  "bankEntries": {
+    "title": "Mouvements Bancaires",
+    "description": "Consultez et gérez vos écritures bancaires",
+    "loading": "Chargement...",
+    "loadingEntries": "Chargement des écritures bancaires...",
+    "showEntries": "Afficher les écritures",
+    "entriesFound": "{count} écritures bancaires trouvées",
+    "noEntries": "Aucune écriture bancaire",
+    "noEntriesMessage": "Aucune écriture bancaire trouvée pour les critères sélectionnés.",
+    "filters": {
+      "entity": "Entité",
+      "bankAccount": "Compte bancaire",
+      "startDate": "Date de début",
+      "endDate": "Date de fin"
+    },
+    "columns": {
+      "entity": "Entité",
+      "account": "Compte",
+      "operationDate": "Date opération",
+      "valueDate": "Date valeur",
+      "description": "Description",
+      "amount": "Montant",
+      "balance": "Solde",
+      "reference": "Référence",
+      "sourceId": "ID Source"
+    },
+    "errors": {
+      "fetchReferenceDataError": "Erreur lors du chargement des données de référence",
+      "incompleteUserProfile": "Profil utilisateur incomplet",
+      "selectPeriodError": "Veuillez sélectionner une période",
+      "fetchEntriesError": "Erreur lors de la récupération des écritures bancaires"
+    },
+    "defaultValues": {
+      "undefinedAccount": "- Compte non défini",
+      "undefinedEntity": "- Entité non définie"
+    }
   }
 }

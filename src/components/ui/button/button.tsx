@@ -7,6 +7,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: string;
   icon?: keyof typeof icons;
   label: string;
+  tooltip?: string;
 }
 
 export function Button({
@@ -14,29 +15,41 @@ export function Button({
   size = 'md',
   color,
   icon,
+  tooltip,
   className = '',
+  disabled,
   ...props
 }: ButtonProps) {
-  const style = {
+  // Não aplicar cor customizada se o botão estiver desabilitado
+  const style = !disabled && color ? {
     '--button-bg': color,
     '--button-hover': `color-mix(in srgb, ${color}, black 20%)`,
-  } as React.CSSProperties;
+  } as React.CSSProperties : {};
 
   const IconComponent = icon ? icons[icon] : null;
 
   return (
-    <button
-      className={`${styles.button} ${styles[size]} ${className}`}
-      style={style}
-      {...props}
-    >
-      {IconComponent && (
-        <IconComponent
-          size={size === 'lg' ? 20 : size === 'sm' ? 16 : 18}
-          className={styles.icon}
-        />
+    <div className={tooltip ? styles.tooltipContainer : ''}>
+      <button
+        className={`${styles.button} ${styles[size]} ${disabled ? styles.buttonDisabled : ''} ${className}`}
+        style={style}
+        title={tooltip}
+        disabled={disabled}
+        {...props}
+      >
+        {IconComponent && (
+          <IconComponent
+            size={size === 'lg' ? 20 : size === 'sm' ? 16 : 18}
+            className={styles.icon}
+          />
+        )}
+        {label}
+      </button>
+      {tooltip && (
+        <div className={styles.tooltip}>
+          {tooltip}
+        </div>
       )}
-      {label}
-    </button>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import { FileText, FileSpreadsheet } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './styles.module.css';
 import { BudgetData } from '../../../hooks/employes/useBudgetRHCalculations';
 import * as XLSX from 'xlsx';
@@ -10,28 +11,29 @@ interface BudgetRHExportButtonsProps {
 }
 
 export function BudgetRHExportButtons({ data, year, entiteName }: BudgetRHExportButtonsProps) {
+  const { t } = useTranslation();
 
   // Exporter en Excel
   const handleExportExcel = () => {
     // Préparer les données pour l'export
     const exportData = data.map(row => ({
-      'Restaurant': row.entite_libelle,
-      'Fonction': row.fonction_libelle,
-      'Employé': `${row.prenom} ${row.nom}`,
-      'Sous-catégorie': row.sous_categorie_libelle,
-      'Janvier': row.janvier || 0,
-      'Février': row.fevrier || 0,
-      'Mars': row.mars || 0,
-      'Avril': row.avril || 0,
-      'Mai': row.mai || 0,
-      'Juin': row.juin || 0,
-      'Juillet': row.juillet || 0,
-      'Août': row.aout || 0,
-      'Septembre': row.septembre || 0,
-      'Octobre': row.octobre || 0,
-      'Novembre': row.novembre || 0,
-      'Décembre': row.decembre || 0,
-      'Total': row.total || 0
+      [t('hrBudget.table.restaurant')]: row.entite_libelle,
+      [t('hrBudget.table.function')]: row.fonction_libelle,
+      [t('hrBudget.table.employee')]: `${row.prenom} ${row.nom}`,
+      [t('hrBudget.table.subcategory')]: row.sous_categorie_libelle,
+      [t('hrBudget.months.january')]: row.janvier || 0,
+      [t('hrBudget.months.february')]: row.fevrier || 0,
+      [t('hrBudget.months.march')]: row.mars || 0,
+      [t('hrBudget.months.april')]: row.avril || 0,
+      [t('hrBudget.months.may')]: row.mai || 0,
+      [t('hrBudget.months.june')]: row.juin || 0,
+      [t('hrBudget.months.july')]: row.juillet || 0,
+      [t('hrBudget.months.august')]: row.aout || 0,
+      [t('hrBudget.months.september')]: row.septembre || 0,
+      [t('hrBudget.months.october')]: row.octobre || 0,
+      [t('hrBudget.months.november')]: row.novembre || 0,
+      [t('hrBudget.months.december')]: row.decembre || 0,
+      [t('hrBudget.table.total')]: row.total || 0
     }));
 
     // Créer un workbook
@@ -47,7 +49,7 @@ export function BudgetRHExportButtons({ data, year, entiteName }: BudgetRHExport
 
   // Exporter en PDF (simulé - dans une application réelle, utilisez une bibliothèque comme jsPDF)
   const handleExportPDF = () => {
-    alert('Fonctionnalité d\'export PDF à implémenter avec une bibliothèque comme jsPDF');
+    alert(t('hrBudget.export.pdfNotImplemented'));
     // Dans une implémentation réelle:
     // 1. Utiliser jsPDF ou une autre bibliothèque
     // 2. Formater les données pour le PDF
@@ -59,19 +61,19 @@ export function BudgetRHExportButtons({ data, year, entiteName }: BudgetRHExport
       <button
         onClick={handleExportExcel}
         className={`${styles.exportButton} ${styles.excelButton}`}
-        title="Exporter en Excel"
+        title={t('hrBudget.export.excel')}
       >
         <FileSpreadsheet size={18} />
-        Excel
+        {t('hrBudget.export.excel')}
       </button>
       
       <button
         onClick={handleExportPDF}
         className={`${styles.exportButton} ${styles.pdfButton}`}
-        title="Exporter en PDF"
+        title={t('hrBudget.export.pdf')}
       >
         <FileText size={18} />
-        PDF
+        {t('hrBudget.export.pdf')}
       </button>
     </div>
   );

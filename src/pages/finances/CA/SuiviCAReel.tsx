@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../../context/MenuContext';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
@@ -15,6 +16,7 @@ interface Entite {
 }
 
 const SuiviCAReel: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [entites, setEntites] = useState<Entite[]>([]);
@@ -67,7 +69,7 @@ const SuiviCAReel: React.FC = () => {
       } catch (error) {
         console.error('Erreur lors de la récupération des entités:', error);
         addToast({
-          label: 'Erreur lors de la récupération des entités',
+          label: t('parametersFinances.revenueTracking.errors.fetchEntitiesError'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -89,14 +91,14 @@ const SuiviCAReel: React.FC = () => {
   const filterConfigs = [
     {
       name: 'entite',
-      label: 'Entité',
+      label: t('parametersFinances.revenueTracking.entity'),
       type: 'select' as const,
       options: entites,
       isEntityOption: true
     },
     {
       name: 'annee',
-      label: 'Année',
+      label: t('parametersFinances.revenueTracking.year'),
       type: 'select' as const,
       options: availableYears
     }
@@ -105,8 +107,8 @@ const SuiviCAReel: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Suivi CA Réel"}
-        description="Suivez et analysez votre chiffre d'affaires réel par entité et période"
+        title={loading || profilLoading ? t('parametersFinances.revenueTracking.loading') : t('parametersFinances.revenueTracking.title')}
+        description={t('parametersFinances.revenueTracking.description')}
         className={styles.header}
       >
         <FilterSection
@@ -118,14 +120,16 @@ const SuiviCAReel: React.FC = () => {
         
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des données...</p>
+            <p className="text-gray-500">{t('parametersFinances.revenueTracking.loadingData')}</p>
           </div>
         ) : (
           <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg border border-gray-200">
             <p className="text-gray-500">
-              Cette page est en cours de développement.
+              {t('parametersFinances.revenueTracking.developmentMessage')}
               <br />
-              Filtres sélectionnés: Entité {filters.entite || "(Toutes)"}, Année {filters.annee}
+              {t('parametersFinances.revenueTracking.selectedFilters')
+                .replace('{entity}', filters.entite || t('parametersFinances.revenueTracking.allEntities'))
+                .replace('{year}', filters.annee)}
             </p>
           </div>
         )}

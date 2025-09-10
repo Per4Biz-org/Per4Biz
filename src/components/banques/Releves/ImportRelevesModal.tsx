@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
 import { ToastData } from '../../ui/toast';
@@ -33,6 +34,7 @@ export function ImportRelevesModal({
   onImportSuccess,
   addToast
 }: ImportRelevesModalProps) {
+  const { t } = useTranslation();
   const { profil } = useProfil();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFormatId, setSelectedFormatId] = useState<string>('');
@@ -98,7 +100,7 @@ export function ImportRelevesModal({
       } catch (error) {
         console.error('Erreur lors de la récupération des formats d\'import:', error);
         addToast({
-          label: 'Erreur lors de la récupération des formats d\'import',
+          label: t('importModal.fileSelection.errors.formatNotFound'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -130,7 +132,7 @@ export function ImportRelevesModal({
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     if (!fileExtension || !['csv', 'txt', 'tsv', 'xls', 'xlsx'].includes(fileExtension)) {
       addToast({
-        label: 'Format de fichier non supporté. Veuillez sélectionner un fichier CSV, TXT, TSV, XLS ou XLSX.',
+        label: t('importModal.fileSelection.errors.unsupportedFormat'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -148,7 +150,7 @@ export function ImportRelevesModal({
       if (fileExists) {
         setFileNameExistsError(true);
         addToast({
-          label: 'Un fichier avec ce nom a déjà été importé',
+          label: t('importModal.fileSelection.errors.fileExists'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -183,7 +185,7 @@ export function ImportRelevesModal({
       // Récupérer les détails du format sélectionné
       const format = formats.find(f => f.id.toString() === formatId);
       if (!format) {
-        throw new Error('Format d\'import non trouvé');
+        throw new Error(t('importModal.fileSelection.errors.formatNotFound'));
       }
       
       console.log('Format sélectionné:', format);
@@ -209,7 +211,7 @@ export function ImportRelevesModal({
       // Traitement spécial pour les fichiers Excel
       if (isExcelFile) {
         if (!profil?.com_contrat_client_id) {
-          throw new Error('Profil utilisateur incomplet');
+          throw new Error(t('importModal.fileSelection.errors.incompleteProfile'));
         }
         
         // Utiliser l'utilitaire d'import Excel
@@ -258,7 +260,7 @@ export function ImportRelevesModal({
         setParsedData(result.data);
         setCurrentPhase('preview');
         addToast({
-          label: `Fichier Excel analysé avec succès. ${result.data.length} ligne(s) trouvée(s).`,
+          label: t('importModal.success.excelAnalyzed', { count: result.data.length }),
           icon: 'Check',
           color: '#22c55e'
         });
@@ -287,14 +289,14 @@ export function ImportRelevesModal({
       setParsedData(result.data);
       setCurrentPhase('preview');
       addToast({
-        label: `Fichier analysé avec succès. ${result.data.length} ligne(s) trouvée(s).`,
+        label: t('importModal.success.fileAnalyzed', { count: result.data.length }),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error: any) {
       console.error('Erreur lors de l\'analyse du fichier:', error);
       addToast({
-        label: `Erreur: ${error.message}`,
+        label: t('importModal.fileSelection.errors.analysisError', { message: error.message }),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -306,7 +308,7 @@ export function ImportRelevesModal({
   const handleImportData = async () => {
     if (!selectedFile || !selectedFormatId || parsedData.length === 0 || !profil?.com_contrat_client_id) {
       addToast({
-        label: 'Données incomplètes pour l\'import',
+        label: t('importModal.fileSelection.errors.incompleteData'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -318,13 +320,13 @@ export function ImportRelevesModal({
     setImportProgress({
       current: 0,
       total: parsedData.length,
-      message: 'Préparation de l\'import...',
+      message: t('importModal.importing.preparing'),
     });
 
     try {
       const format = formats.find(f => f.id.toString() === selectedFormatId);
       if (!format) {
-        throw new Error('Format d\'import non trouvé');
+        throw new Error(t('importModal.fileSelection.errors.formatNotFound'));
       }
 
       console.log('Début de l\'import avec le format:', format);
@@ -332,7 +334,7 @@ export function ImportRelevesModal({
       // 1. Créer l'entête d'import
       setImportProgress({
         ...importProgress,
-        message: 'Création de l\'entête d\'import...'
+        message: t('importModal.importing.creatingHeader')
       });
 
       const importHeaderId = await createImportHeader(
@@ -343,7 +345,7 @@ export function ImportRelevesModal({
       );
 
       if (!importHeaderId) {
-        throw new Error('Erreur lors de la création de l\'entête d\'import');
+        throw new Error(t('importModal.fileSelection.errors.createHeaderError'));
       }
 
       console.log('Entête d\'import créé avec ID:', importHeaderId);
@@ -351,7 +353,7 @@ export function ImportRelevesModal({
       // 2. Préparer les données pour l'insertion
       setImportProgress({
         ...importProgress,
-        message: 'Préparation des données pour l\'import...'
+        message: t('importModal.importing.preparingData')
       });
 
       // Préparer les données pour l'insertion en utilisant les définitions de colonnes
@@ -380,7 +382,7 @@ export function ImportRelevesModal({
       );
 
       if (!success) {
-        throw new Error('Erreur lors de l\'insertion des détails');
+        throw new Error(t('importModal.fileSelection.errors.insertDetailsError'));
       }
 
       console.log('Détails insérés avec succès');
@@ -388,18 +390,18 @@ export function ImportRelevesModal({
       // 4. Mettre à jour le statut de l'import
       setImportProgress({
         ...importProgress,
-        message: 'Finalisation de l\'import...'
+        message: t('importModal.importing.finalizing')
       });
 
       await updateImportStatus(
         importHeaderId,
         'TERMINE',
-        `Import terminé avec succès. ${parsedData.length} lignes importées.`
+        t('importModal.success.importStatus', { count: parsedData.length })
       );
 
       // 5. Notifier le succès
       addToast({
-        label: `Import réussi ! ${parsedData.length} lignes importées.`,
+        label: t('importModal.success.importComplete', { count: parsedData.length }),
         icon: 'Check',
         color: '#22c55e'
       });
@@ -411,7 +413,7 @@ export function ImportRelevesModal({
     } catch (error: any) {
       console.error('Erreur lors de l\'import des données:', error);
       addToast({
-        label: `Erreur lors de l'import: ${error.message}`,
+        label: t('importModal.fileSelection.errors.analysisError', { message: error.message }),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -426,7 +428,7 @@ export function ImportRelevesModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Import de relevés bancaires</h2>
+          <h2 className="text-xl font-semibold">{t('importModal.title')}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"

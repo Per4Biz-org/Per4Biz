@@ -1,6 +1,8 @@
+
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS, pt } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../../context/MenuContext';
 import { useProfil } from '../../../context/ProfilContext'; 
 import { supabase } from '../../../lib/supabase';
@@ -45,7 +47,29 @@ interface EcritureBancaire {
 }
 
 const EcritureBancaire: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { setMenuItems } = useMenu();
+
+
+  // Função para obter o locale de data baseado no idioma actual
+  const getDateLocale = () => {
+    switch (i18n.language) {
+      case 'pt': return pt;
+      case 'en': return enUS;
+      case 'fr': return fr;
+      default: return pt; // Fallback para português
+    }
+  };
+
+  // Função para obter o locale de formatação de números/moeda
+  const getNumberLocale = () => {
+    switch (i18n.language) {
+      case 'pt': return 'pt-PT';
+      case 'en': return 'en-US';
+      case 'fr': return 'fr-FR';
+      default: return 'pt-PT'; // Fallback para português
+    }
+  };
   const { profil, loading: profilLoading } = useProfil();
   const [entites, setEntites] = useState<Entite[]>([]);
   const [comptesBancaires, setComptesBancaires] = useState<CompteBancaire[]>([]);
@@ -57,21 +81,21 @@ const EcritureBancaire: React.FC = () => {
   const [filters, setFilters] = useState({
     entite: '',
     compte: '',
-    dateDebut: format(new Date(new Date().setDate(1)), 'yyyy-MM-dd'), // Premier jour du mois courant
-    dateFin: format(new Date(), 'yyyy-MM-dd') // Aujourd'hui
+    dateDebut: format(new Date(new Date().setDate(1)), 'yyyy-MM-dd'), // Primeiro dia do mês actual
+    dateFin: format(new Date(), 'yyyy-MM-dd') // Hoje
   });
 
   useEffect(() => {
     setMenuItems(menuItemsGestionBancaire);
   }, [setMenuItems]);
 
-  // Chargement des entités et comptes bancaires
+  // Carregamento das entidades e contas bancárias
   useEffect(() => {
     const fetchReferenceData = async () => {
       if (!profil?.com_contrat_client_id) return;
 
       try {
-        // Charger les entités
+        // Carregar as entidades
         const { data: entitesData, error: entitesError } = await supabase
           .from('com_entite')
           .select('id, code, libelle')
@@ -82,7 +106,7 @@ const EcritureBancaire: React.FC = () => {
         if (entitesError) throw entitesError;
         setEntites(entitesData || []);
 
-        // Charger les comptes bancaires
+        // Carregar as contas bancárias
         const { data: comptesData, error: comptesError } = await supabase
           .from('bq_compte_bancaire')
           .select('id, code, nom, id_entite')
@@ -96,7 +120,7 @@ const EcritureBancaire: React.FC = () => {
       } catch (error) {
         console.error('Erreur lors du chargement des données de référence:', error);
         addToast({
-          label: 'Erreur lors du chargement des données de référence',
+          label: t('bankEntries.errors.fetchReferenceDataError'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -108,20 +132,20 @@ const EcritureBancaire: React.FC = () => {
     }
   }, [profilLoading, profil?.com_contrat_client_id]);
 
-  // Filtrer les comptes bancaires en fonction de l'entité sélectionnée
+  // Filtrar as contas bancárias com base na entidade seleccionada
   useEffect(() => {
     if (filters.entite) {
-      // Trouver l'ID de l'entité sélectionnée
+      // Encontrar o ID da entidade seleccionada
       const entiteSelectionnee = entites.find(e => e.code === filters.entite);
       
       if (entiteSelectionnee) {
-        // Filtrer les comptes bancaires par l'ID de l'entité
+        // Filtrar as contas bancárias pelo ID da entidade
         const comptesFiltres = comptesBancaires.filter(compte => 
           compte.id_entite === entiteSelectionnee.id
         );
         setFilteredComptesBancaires(comptesFiltres);
         
-        // Si le compte actuellement sélectionné n'appartient pas à cette entité, le réinitialiser
+        // Se a conta actualmente seleccionada não pertence a esta entidade, reinicializar
         if (filters.compte && !comptesFiltres.some(c => c.code === filters.compte)) {
           setFilters(prev => ({
             ...prev,
@@ -130,7 +154,7 @@ const EcritureBancaire: React.FC = () => {
         }
       }
     } else {
-      // Si aucune entité n'est sélectionnée, afficher tous les comptes
+      // Se nenhuma entidade estiver seleccionada, mostrar todas as contas
       setFilteredComptesBancaires(comptesBancaires);
     }
   }, [filters.entite, entites, comptesBancaires]);
@@ -154,17 +178,17 @@ const EcritureBancaire: React.FC = () => {
   const fetchEcritures = async () => {
     if (!profil?.com_contrat_client_id) {
       addToast({
-        label: 'Profil utilisateur incomplet',
+        label: t('bankEntries.errors.incompleteUserProfile'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
       return;
     }
 
-    // Vérifier que les filtres obligatoires sont renseignés
+    // Verificar se os filtros obrigatórios estão preenchidos
     if (!filters.dateDebut || !filters.dateFin) {
       addToast({
-        label: 'Veuillez sélectionner une période',
+        label: t('bankEntries.errors.selectPeriodError'),
         icon: 'AlertTriangle',
         color: '#f59e0b'
       });
@@ -202,22 +226,22 @@ const EcritureBancaire: React.FC = () => {
         .gte('data_lancamento', filters.dateDebut) 
         .lte('data_lancamento', filters.dateFin);
 
-      // Ajouter le filtre sur l'entité seulement si une valeur est sélectionnée
+      // Adicionar o filtro na entidade apenas se um valor estiver seleccionado
       if (filters.entite) {
-        // Trouver l'ID de l'entité sélectionnée
+        // Encontrar o ID da entidade seleccionada
         const entiteSelectionnee = entites.find(e => e.code === filters.entite);
         if (entiteSelectionnee) {
-          // Filtrer par l'ID de l'entité directement sur la table bq_compte_bancaire
+          // Filtrar pelo ID da entidade directamente na tabela bq_compte_bancaire
           query = query.eq('bq_compte_bancaire.id_entite', entiteSelectionnee.id);
         }
       }
 
-      // Ajouter le filtre sur le compte bancaire seulement si une valeur est sélectionnée
+      // Adicionar o filtro na conta bancária apenas se um valor estiver seleccionado
       if (filters.compte) {
-        // Trouver l'ID du compte sélectionné
+        // Encontrar o ID da conta seleccionada
         const compteSelectionne = comptesBancaires.find(c => c.code === filters.compte);
         if (compteSelectionne) {
-          // Filtrer par l'ID du compte directement
+          // Filtrar pelo ID da conta directamente
           query = query.eq('id_compte', compteSelectionne.id);
         }
       }
@@ -226,7 +250,7 @@ const EcritureBancaire: React.FC = () => {
 
       if (error) throw error;
 
-      // Transformation des données pour faciliter l'affichage
+      // Transformação dos dados para facilitar a exibição
       let formattedData = data?.map(item => ({
         id: item.id,
         data_lancamento: item.data_lancamento,
@@ -237,30 +261,30 @@ const EcritureBancaire: React.FC = () => {
         saldo: item.saldo,
         referencia_doc: item.referencia_doc,
         created_at: item.created_at,
-        compte: item.compte || { code: '- Compte non défini', nom: 'Compte non défini', id_entite: null },
-        entite: item.compte?.entite || { code: '- Entité non définie', libelle: 'Entité non définie', id: null }
+        compte: item.compte || { code: t('bankEntries.defaultValues.undefinedAccount'), nom: t('bankEntries.defaultValues.undefinedAccount'), id_entite: null },
+        entite: item.compte?.entite || { code: t('bankEntries.defaultValues.undefinedEntity'), libelle: t('bankEntries.defaultValues.undefinedEntity'), id: null }
       })) || [];
 
-      // Tri côté client selon les critères demandés
+      // Ordenação no lado cliente conforme os critérios solicitados
       formattedData.sort((a, b) => {
-        // 1. Tri par code_entite (ordre croissant)
+        // 1. Ordenação por code_entite (ordem crescente)
         if (a.entite.code !== b.entite.code) {
           return a.entite.code.localeCompare(b.entite.code);
         }
         
-        // 2. Tri par code_compte (ordre croissant)
+        // 2. Ordenação por code_compte (ordem crescente)
         if (a.compte.code !== b.compte.code) {
           return a.compte.code.localeCompare(b.compte.code);
         }
         
-        // 3. Tri par date_lancamento (ordre croissant)
+        // 3. Ordenação por data_lancamento (ordem crescente)
         if (a.data_lancamento !== b.data_lancamento) {
           return new Date(a.data_lancamento).getTime() - new Date(b.data_lancamento).getTime();
         }
         
-        // 4. Tri par source_import_id (ordre croissant)
+        // 4. Ordenação por source_import_id (ordem crescente)
         if (a.source_import_id !== b.source_import_id) {
-          // Gérer le cas où source_import_id peut être null
+          // Gerir o caso onde source_import_id pode ser null
           if (a.source_import_id === null) return 1;
           if (b.source_import_id === null) return -1;
           return a.source_import_id - b.source_import_id;
@@ -273,14 +297,14 @@ const EcritureBancaire: React.FC = () => {
       setDataLoaded(true);
 
       addToast({
-        label: `${formattedData.length} écritures bancaires trouvées`,
+        label: t('bankEntries.entriesFound', { count: formattedData.length }),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error) {
       console.error('Erreur lors de la récupération des écritures bancaires:', error);
       addToast({
-        label: 'Erreur lors de la récupération des écritures bancaires',
+        label: t('bankEntries.errors.fetchEntriesError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -289,11 +313,11 @@ const EcritureBancaire: React.FC = () => {
     }
   };
 
-  // Configuration des filtres
+  // Configuração dos filtros
   const filterConfigs = [
     {
       name: 'entite',
-      label: 'Entité',
+      label: t('bankEntries.filters.entity'),
       type: 'select' as const,
       options: entites.map(entite => ({
         id: entite.id,
@@ -304,7 +328,7 @@ const EcritureBancaire: React.FC = () => {
     },
     {
       name: 'compte',
-      label: 'Compte bancaire',
+      label: t('bankEntries.filters.bankAccount'),
       type: 'select' as const,
       options: filteredComptesBancaires.map(compte => ({
         id: compte.id,
@@ -315,52 +339,52 @@ const EcritureBancaire: React.FC = () => {
     },
     {
       name: 'dateDebut',
-      label: 'Date de début',
+      label: t('bankEntries.filters.startDate'),
       type: 'date' as const
     },
     {
       name: 'dateFin',
-      label: 'Date de fin',
+      label: t('bankEntries.filters.endDate'),
       type: 'date' as const
     }
   ];
 
-  // Colonnes pour le tableau des écritures
+  // Colunas para a tabela dos lançamentos
   const columns: Column<EcritureBancaire>[] = [
     {
-      label: 'Entité',
+      label: t('bankEntries.columns.entity'),
       accessor: 'entite',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Compte',
+      label: t('bankEntries.columns.account'),
       accessor: 'compte',
       render: (value) => `${value.code} - ${value.nom}`
     },
     {
-      label: 'Date opération',
+      label: t('bankEntries.columns.operationDate'),
       accessor: 'data_lancamento',
-      render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr }),
+      render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: getDateLocale() }),
       width: '120px'
     },
     {
-      label: 'Date valeur',
+      label: t('bankEntries.columns.valueDate'),
       accessor: 'data_valor',
-      render: (value) => value ? format(new Date(value), 'dd/MM/yyyy', { locale: fr }) : '-',
+      render: (value) => value ? format(new Date(value), 'dd/MM/yyyy', { locale: getDateLocale() }) : '-',
       width: '120px'
     },
     {
-      label: 'Description',
+      label: t('bankEntries.columns.description'),
       accessor: 'descricao',
       render: (value) => value || '-'
     },
     {
-      label: 'Montant',
+      label: t('bankEntries.columns.amount'),
       accessor: 'valor',
       align: 'right',
       width: '120px',
       render: (value) => {
-        const formattedValue = new Intl.NumberFormat('fr-FR', {
+        const formattedValue = new Intl.NumberFormat(getNumberLocale(), {
           style: 'currency',
           currency: 'EUR'
         }).format(value);
@@ -372,26 +396,26 @@ const EcritureBancaire: React.FC = () => {
       }
     },
     {
-      label: 'Solde',
+      label: t('bankEntries.columns.balance'),
       accessor: 'saldo',
       align: 'right',
       width: '120px',
       render: (value) => {
         if (value === null) return '-';
-        return new Intl.NumberFormat('fr-FR', {
+        return new Intl.NumberFormat(getNumberLocale(), {
           style: 'currency',
           currency: 'EUR'
         }).format(value);
       }
     },
     {
-      label: 'Référence',
+      label: t('bankEntries.columns.reference'),
       accessor: 'referencia_doc',
       render: (value) => value || '-',
       width: '120px'
     },
     {
-      label: 'ID Source',
+      label: t('bankEntries.columns.sourceId'),
       accessor: 'source_import_id',
       width: '100px',
       align: 'center',
@@ -402,11 +426,11 @@ const EcritureBancaire: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title="Mouvements Bancaires"
-        description="Consultez et gérez vos écritures bancaires"
+        title={t('bankEntries.title') || 'Movimentos Bancários'}
+        description={t('bankEntries.description') || 'Consulte e gira os seus lançamentos bancários'}
         className={styles.header}
       >
-        {/* Section des filtres */}
+        {/* Secção dos filtros */}
         <div className="mb-6">
           <FilterSection
             filters={filterConfigs}
@@ -417,7 +441,7 @@ const EcritureBancaire: React.FC = () => {
           
           <div className="flex justify-end">
             <Button
-              label={loading ? "Chargement..." : "Afficher les écritures"}
+              label={loading ? t('bankEntries.loading') : t('bankEntries.showEntries')}
               icon="Search"
               color="var(--color-primary)"
               onClick={fetchEcritures}
@@ -426,11 +450,11 @@ const EcritureBancaire: React.FC = () => {
           </div>
         </div>
 
-        {/* Affichage des écritures uniquement après avoir cliqué sur "Afficher" */}
+        {/* Exibição dos lançamentos apenas após clicar em "Mostrar" */}
         {dataLoaded && (
           <div>
             <div className="text-sm text-gray-600 mb-4">
-              {ecritures.length} écritures bancaires trouvées
+              {t('bankEntries.entriesFound', { count: ecritures.length })}
             </div>
 
             <DataTable
@@ -438,8 +462,8 @@ const EcritureBancaire: React.FC = () => {
               data={ecritures}
               defaultRowsPerPage={25}
               rowsPerPageOptions={[25, 50, 100, 'all']}
-              emptyTitle="Aucune écriture bancaire"
-              emptyMessage={loading ? "Chargement des écritures bancaires..." : "Aucune écriture bancaire trouvée pour les critères sélectionnés."}
+              emptyTitle={t('bankEntries.noEntries')}
+              emptyMessage={loading ? t('bankEntries.loadingEntries') : t('bankEntries.noEntriesMessage')}
             />
           </div>
         )}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../../context/MenuContext';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
@@ -25,6 +26,7 @@ interface Entite {
 }
 
 const SuiviCABudget: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [budgets, setBudgets] = useState<BudgetMensuel[]>([]);
@@ -92,7 +94,7 @@ const SuiviCABudget: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des budgets:', error);
       addToast({
-        label: 'Erreur lors de la récupération des budgets',
+        label: t('parametersFinances.budgetTracking.errors.fetchBudgetsError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -122,7 +124,7 @@ const SuiviCABudget: React.FC = () => {
       } catch (error) {
         console.error('Erreur lors de la récupération des entités:', error);
         addToast({
-          label: 'Erreur lors de la récupération des entités',
+          label: t('parametersFinances.budgetTracking.errors.fetchEntitiesError'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -195,7 +197,7 @@ const SuiviCABudget: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des détails du budget:', error);
       addToast({
-        label: 'Erreur lors de la récupération des détails du budget',
+        label: t('parametersFinances.budgetTracking.errors.fetchBudgetDetailsError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -207,27 +209,27 @@ const SuiviCABudget: React.FC = () => {
   const filterConfigs = [
     {
       name: 'entite',
-      label: 'Entité',
+      label: t('parametersFinances.budgetTracking.entity'),
       type: 'select' as const,
       options: entites.map(entite => entite.code)
     },
     {
       name: 'annee',
-      label: 'Année',
+      label: t('parametersFinances.budgetTracking.year'),
       type: 'select' as const,
       options: availableYears
     },
     {
       name: 'mois',
-      label: 'Mois',
+      label: t('parametersFinances.budgetTracking.month'),
       type: 'select' as const,
       options: Array.from({ length: 12 }, (_, i) => (i + 1).toString())
     }
   ];
 
   // Utilisation des colonnes définies dans l'utilitaire
-  const motherColumns = getBudgetMotherColumns();
-  const childColumns = getBudgetChildColumns();
+  const motherColumns = getBudgetMotherColumns(t);
+  const childColumns = getBudgetChildColumns(t);
 
   // Gestionnaire pour ouvrir la modale d'ajout de ligne
   const handleOpenModal = () => {
@@ -244,7 +246,7 @@ const SuiviCABudget: React.FC = () => {
     setIsSubmitting(true);
     try {
       if (!profil?.com_contrat_client_id) {
-        throw new Error('Aucun contrat client associé au profil');
+        throw new Error(t('parametersFinances.budgetTracking.errors.noContractAssociated'));
       }
 
       // 1. Créer le budget mensuel
@@ -258,7 +260,7 @@ const SuiviCABudget: React.FC = () => {
         .single();
 
       if (budgetError) throw budgetError;
-      if (!budgetInserted) throw new Error('Erreur lors de la création du budget');
+      if (!budgetInserted) throw new Error(t('parametersFinances.budgetTracking.errors.budgetCreationError'));
 
       // 2. Créer les détails du budget
       const detailsToInsert = detailsData.map(detail => ({
@@ -278,16 +280,16 @@ const SuiviCABudget: React.FC = () => {
       setIsModalOpen(false);
       
       addToast({
-        label: 'Budget créé avec succès',
+        label: t('parametersFinances.budgetTracking.success.budgetCreated'),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error: any) {
       console.error('Erreur lors de la création du budget:', error);
       
-      let errorMessage = 'Erreur lors de la création du budget';
+      let errorMessage = t('parametersFinances.budgetTracking.errors.createBudgetError');
       if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
-        errorMessage = 'Un budget existe déjà pour cette entité, cette catégorie, ce mois et cette année';
+        errorMessage = t('parametersFinances.budgetTracking.errors.duplicateBudgetError');
       }
       
       addToast({
@@ -303,19 +305,19 @@ const SuiviCABudget: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Suivi CA Budget"}
-        description="Suivez et analysez vos budgets de chiffre d'affaires par entité et période"
+        title={loading || profilLoading ? t('parametersFinances.budgetTracking.loading') : t('parametersFinances.budgetTracking.title')}
+        description={t('parametersFinances.budgetTracking.description')}
         className={styles.header}
       >
         <div className="mb-4 flex gap-3">
           <Button
-            label="Ajouter une ligne"
+            label={t('parametersFinances.budgetTracking.addLine')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={handleOpenModal}
           />
           <Button
-            label="Saisir en ligne"
+            label={t('parametersFinances.budgetTracking.editInline')}
             icon="Edit"
             color="var(--color-secondary)"
             onClick={() => {}}
@@ -330,12 +332,14 @@ const SuiviCABudget: React.FC = () => {
         />
         
         <div className="text-sm text-gray-600 mb-4">
-          {filteredBudgets.length} budget(s) affiché(s) sur {budgets.length} au total
+          {t('parametersFinances.budgetTracking.budgetsDisplayed')
+            .replace('{displayed}', filteredBudgets.length.toString())
+            .replace('{total}', budgets.length.toString())}
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des budgets...</p>
+            <p className="text-gray-500">{t('parametersFinances.budgetTracking.loadingBudgets')}</p>
           </div>
         ) : (
           <DataTableFull
@@ -345,8 +349,8 @@ const SuiviCABudget: React.FC = () => {
             data={filteredBudgets}
             loadChildren={loadBudgetDetails}
             defaultRowsPerPage={10}
-            emptyTitle="Aucun budget"
-            emptyMessage="Aucun budget n'a été créé pour le moment."
+            emptyTitle={t('parametersFinances.budgetTracking.noBudgets')}
+            emptyMessage={t('parametersFinances.budgetTracking.noBudgetsMessage')}
             duplicateMotherRowsForExport={false}
             showSubtotals={true}
             showInlineSubtotals={false}
@@ -360,7 +364,7 @@ const SuiviCABudget: React.FC = () => {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Ajouter une ligne de budget</h2>
+                <h2 className="text-xl font-semibold">{t('parametersFinances.budgetTracking.modal.addBudgetLine')}</h2>
                 <button
                   onClick={handleCloseModal}
                   className="text-gray-500 hover:text-gray-700"

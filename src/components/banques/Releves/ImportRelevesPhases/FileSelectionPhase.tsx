@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Form, FormField } from '../../../ui/form';
 import { Button } from '../../../ui/button';
 import { Dropdown, DropdownOption } from '../../../ui/dropdown';
@@ -26,9 +27,10 @@ export function FileSelectionPhase({
   onFormatChange,
   onFileSelect
 }: FileSelectionPhaseProps) {
+  const { t } = useTranslation();
   // Formater les options de format pour le dropdown
   const formatOptions: DropdownOption[] = [
-    { value: '', label: 'Sélectionner un format d\'import' },
+    { value: '', label: t('importModal.fileSelection.selectFormat') },
     ...formats.map(format => ({
       value: format.id.toString(),
       label: `${format.code} - ${format.banque} (${format.libelle})`
@@ -42,10 +44,10 @@ export function FileSelectionPhase({
   const formatSeparateur = (sep: string) => {
     switch(sep) {
       case '\t': 
-      case '\\t': return 'Tabulation';
-      case ';': return 'Point-virgule (;)';
-      case ',': return 'Virgule (,)';
-      case '|': return 'Pipe (|)';
+      case '\\t': return t('importModal.fileSelection.separators.tab');
+      case ';': return t('importModal.fileSelection.separators.semicolon');
+      case ',': return t('importModal.fileSelection.separators.comma');
+      case '|': return t('importModal.fileSelection.separators.pipe');
       default: return sep;
     }
   };
@@ -53,39 +55,39 @@ export function FileSelectionPhase({
     <div className="space-y-6">
       <Form size={100}>
         <FormField
-          label="Format d'import"
+          label={t('importModal.fileSelection.formatLabel')}
           required
-          description="Sélectionnez le format correspondant à votre fichier"
+          description={t('importModal.fileSelection.formatDescription')}
         >
           <Dropdown
             options={formatOptions}
             value={selectedFormatId}
             onChange={onFormatChange}
-            label="Sélectionner un format"
+            label={t('importModal.fileSelection.selectFormat')}
             size="md"
             disabled={isProcessingFile}
           />
         </FormField>
         {selectedFormat && (
           <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
-            <h4 className="font-medium text-blue-800 mb-1">Informations sur le format sélectionné</h4>
+            <h4 className="font-medium text-blue-800 mb-1">{t('importModal.fileSelection.formatInfo.title')}</h4>
             <ul className="text-sm text-blue-700 space-y-1">
-              <li><strong>Séparateur:</strong> {formatSeparateur(selectedFormat.separateur)}</li>
-              <li><strong>Encodage:</strong> {selectedFormat.encodage}</li>
-              <li><strong>Première ligne de données:</strong> {selectedFormat.premiere_ligne_donnees}</li>
-              <li><strong>Colonnes:</strong> {selectedFormat.colonnes?.length || 0} colonnes définies</li>
+              <li><strong>{t('importModal.fileSelection.formatInfo.separator')}:</strong> {formatSeparateur(selectedFormat.separateur)}</li>
+              <li><strong>{t('importModal.fileSelection.formatInfo.encoding')}:</strong> {selectedFormat.encodage}</li>
+              <li><strong>{t('importModal.fileSelection.formatInfo.firstDataLine')}:</strong> {selectedFormat.premiere_ligne_donnees}</li>
+              <li><strong>{t('importModal.fileSelection.formatInfo.columns')}:</strong> {selectedFormat.colonnes?.length || 0} {t('importModal.fileSelection.formatInfo.columns')}</li>
             </ul>
             <p className="mt-2 text-sm text-blue-800 font-medium">
-              Assurez-vous que votre fichier CSV utilise bien le séparateur {formatSeparateur(selectedFormat.separateur)}.
+              {t('importModal.fileSelection.formatInfo.csvNote', { separator: formatSeparateur(selectedFormat.separateur) })}
             </p>
           </div>
         )}
 
         <FormField
-          label="Fichier à importer"
+          label={t('importModal.fileSelection.fileLabel')}
           required
-          description="Formats acceptés: CSV, TXT, TSV, XLS, XLSX"
-          error={fileNameExistsError ? 'Un fichier avec ce nom a déjà été importé' : undefined}
+          description={t('importModal.fileSelection.fileDescription')}
+          error={fileNameExistsError ? t('importModal.fileSelection.errors.fileExists') : undefined}
         >
           <div className="flex items-center gap-4">
             <input
@@ -97,7 +99,7 @@ export function FileSelectionPhase({
               disabled={isProcessingFile || !selectedFormatId}
             />
             <Button
-              label={selectedFile ? selectedFile.name : "Sélectionner un fichier"}
+              label={selectedFile ? selectedFile.name : t('importModal.fileSelection.selectFile')}
               icon={selectedFile ? "FileText" : "Upload"}
               color="var(--color-primary)"
               onClick={() => document.getElementById('file-input')?.click()}
@@ -109,7 +111,7 @@ export function FileSelectionPhase({
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Analyse en cours...
+{t('importModal.fileSelection.analyzing')}
               </span>
             )}
           </div>
@@ -121,7 +123,7 @@ export function FileSelectionPhase({
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
             <div>
-              <h3 className="font-medium text-red-900 mb-2">Erreurs détectées</h3>
+              <h3 className="font-medium text-red-900 mb-2">{t('importModal.fileSelection.errors.title')}</h3>
               <ul className="text-sm text-red-700 space-y-1">
                 {importErrors.map((error, index) => (
                   <li key={index}>{error}</li>
@@ -136,14 +138,14 @@ export function FileSelectionPhase({
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
           <div>
-            <h3 className="font-medium text-yellow-900 mb-2">Informations sur l'import</h3>
+            <h3 className="font-medium text-yellow-900 mb-2">{t('importModal.fileSelection.info.title')}</h3>
             <ul className="text-sm text-yellow-700 space-y-1">
-              <li>• Sélectionnez d'abord un format d'import correspondant à votre banque</li>
-              <li>• Le fichier doit être au format CSV, TXT, TSV, XLS ou XLSX</li>
-              <li>• Le nom du fichier doit être unique pour éviter les doublons</li>
-              <li>• <strong>Pour les fichiers CSV</strong>: Assurez-vous que le séparateur de colonnes est bien {selectedFormat ? formatSeparateur(selectedFormat.separateur) : 'celui défini dans le format'}</li>
-              <li>• <strong>Les colonnes et leur ordre</strong> doivent correspondre exactement à ceux définis dans le format d'import</li>
-              <li>• Chaque colonne a un type défini (date, texte, montant) qui détermine comment elle sera traitée</li>
+              <li>{t('importModal.fileSelection.info.selectFormat')}</li>
+              <li>{t('importModal.fileSelection.info.fileFormat')}</li>
+              <li>{t('importModal.fileSelection.info.uniqueName')}</li>
+              <li>{t('importModal.fileSelection.info.csvSeparator', { separator: selectedFormat ? formatSeparateur(selectedFormat.separateur) : t('importModal.fileSelection.formatInfo.separator') })}</li>
+              <li>{t('importModal.fileSelection.info.columnOrder')}</li>
+              <li>{t('importModal.fileSelection.info.columnTypes')}</li>
             </ul>
           </div>
         </div>

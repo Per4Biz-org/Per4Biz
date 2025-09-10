@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as icons from 'lucide-react';
 import { ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './dropdown.module.css';
 
 export interface DropdownOption {
@@ -31,6 +32,7 @@ export function Dropdown({
   className = '',
   disabled = false,
 }: DropdownProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -74,7 +76,7 @@ export function Dropdown({
         {IconComponent && (
           <IconComponent size={iconSize} className={styles.icon} />
         )}
-        <span>{selectedOption?.label || label || 'Sélectionner'}</span>
+        <span>{selectedOption?.label || label || t('common.select')}</span>
         <ChevronDown size={iconSize} className={styles.chevron} />
       </button>
       <div className={styles.menu}>

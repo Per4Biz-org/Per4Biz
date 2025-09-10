@@ -12,7 +12,9 @@
     "search": "Search",
     "actions": "Actions",
     "confirm": "Confirm",
-    "close": "Close"
+    "close": "Close",
+    "select": "Select",
+    "selectEntity": "Select an entity"
   },
   "auth": {
     "login": "Login",
@@ -61,6 +63,88 @@
     "employees": "Employees",
     "globalSettings": "Global Settings",
     "profile": "Profile"
+  },
+  "sidebar": {
+    "sections": {
+      "management": "MANAGEMENT",
+      "configuration": "CONFIGURATION"
+    },
+    "dashboards": "Dashboards",
+    "home": "Home",
+    "overview": "Overview",
+    "finance": {
+      "title": "Financial Management",
+      "overview": "Overview",
+      "invoices": "My Invoices",
+      "cashClosure": "Cash Closure",
+      "revenueTracking": "Real Revenue Tracking",
+      "budgetTracking": "Budget Revenue Tracking",
+      "expenseBudget": "Expense Budget Management",
+      "settings": "Settings"
+    },
+    "banking": {
+      "title": "Banking Management",
+      "overview": "Overview", 
+      "movements": "Bank Movements",
+      "importStatements": "Import Statements",
+      "settings": "Settings"
+    },
+    "employees": {
+      "title": "Employee Management",
+      "overview": "Overview",
+      "myEmployees": "My Employees", 
+      "budgetHR": "HR Budget",
+      "settings": "Settings"
+    },
+    "globalSettings": {
+      "title": "Global Settings",
+      "overview": "Overview",
+      "thirdParties": "Third Parties",
+      "thirdPartyTypes": "Third Party Types",
+      "invoiceTypes": "Invoice Types",
+      "entities": "Entities",
+      "import": "Import"
+    }
+  },
+  "header": {
+    "notifications": "Notifications",
+    "noNotifications": "No recent notifications",
+    "profile": "My Profile",
+    "logout": "Logout",
+    "breadcrumbs": {
+      "dashboard": "Dashboard",
+      "finance": {
+        "title": "Financial Management",
+        "invoices": "My Invoices",
+        "cashClosure": "Cash Closure",
+        "revenueTracking": "Real Revenue Tracking",
+        "budgetTracking": "Budget Revenue Tracking",
+        "expenseBudget": "Expense Budget",
+        "settings": "Settings"
+      },
+      "banking": {
+        "title": "Banking Management",
+        "movements": "Bank Movements",
+        "importStatements": "Import Statements",
+        "settings": "Settings"
+      },
+      "employees": {
+        "title": "Employee Management",
+        "myEmployees": "My Employees",
+        "budgetHR": "HR Budget",
+        "settings": "Settings"
+      },
+      "globalSettings": {
+        "title": "Global Settings",
+        "thirdParties": "Third Parties",
+        "thirdPartyTypes": "Third Party Types",
+        "invoiceTypes": "Invoice Types",
+        "entities": "Entities",
+        "import": "Import"
+      },
+      "profile": "My Profile",
+      "contact": "Contact"
+    }
   },
   "pages": {
     "profile": {
@@ -442,6 +526,227 @@
     "incompleteUserProfile": "Error: Incomplete user profile",
     "addAtLeastOneLine": "Please add at least one line to the invoice",
     "totalMustMatch": "Invoice amount excluding VAT must be defined and equal to the total of lines",
-    "errorSavingInvoice": "Error saving invoice"
+    "errorSavingInvoice": "Error saving invoice",
+    "requiredFields": "Required fields: {0}",
+    "selectRestaurantToSearch": "Please select a restaurant to search invoices",
+    "selectRestaurantToCreate": "Please select a restaurant before creating an invoice"
+  },
+  "parametersFinances": {
+    "subCategoryFlux": {
+      "title": "Sub-Categories of Flow",
+      "description": "Manage the financial flow sub-categories of your organization",
+      "addSubCategory": "Add sub-category",
+      "allFluxCategories": "All flow categories",
+      "loading": "Loading...",
+      "loadingSubCategories": "Loading flow sub-categories...",
+      "noSubCategories": "No flow sub-category",
+      "noSubCategoriesMessage": "No flow sub-category has been created yet.",
+      "entity": "Entity",
+      "fluxCategory": "Flow category",
+      "code": "Code",
+      "label": "Label",
+      "order": "Order",
+      "active": "Active",
+      "creationDate": "Creation date",
+      "yes": "Yes",
+      "no": "No",
+      "edit": "Edit",
+      "delete": "Delete",
+      "globalAllEntities": "Global (all entities)",
+      "errors": {
+        "fetchError": "Error retrieving flow sub-categories",
+        "noContractAssociated": "No client contract associated with the profile",
+        "saveError": "Error saving flow sub-category",
+        "createError": "Error creating flow sub-category",
+        "updateError": "Error modifying flow sub-category",
+        "deleteError": "Error deleting flow sub-category",
+        "deleteConstraintError": "Cannot delete this sub-category because it is being used in invoices or other elements. Please deactivate it rather than delete it."
+      },
+      "success": {
+        "created": "Flow sub-category created successfully",
+        "updated": "Flow sub-category modified successfully",
+        "deleted": "Flow sub-category deleted successfully"
+      },
+      "modal": {
+        "addTitle": "Add flow sub-category",
+        "editTitle": "Modify flow sub-category"
+      },
+      "form": {
+        "entity": "Entity",
+        "entityDescription": "Leave empty for a sub-category linked to a global category",
+        "selectEntity": "Select an entity",
+        "fluxCategory": "Flow category",
+        "selectCategory": "Select a category",
+        "code": "Code",
+        "codeExample": "Ex: BEVERAGE_SALE",
+        "label": "Label",
+        "labelExample": "Ex: Beverage sales",
+        "displayOrder": "Display order",
+        "status": "Status",
+        "activeStatus": "Active",
+        "inactiveStatus": "Inactive",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional description of the sub-category...",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving...",
+        "required": "required",
+        "validation": {
+          "codeRequired": "Code is required",
+          "labelRequired": "Label is required",
+          "categoryRequired": "Flow category is required"
+        }
+      },
+      "deleteConfirmation": "Are you sure you want to delete the flow sub-category \"{label}\"? This action is irreversible and may fail if the sub-category is used in invoices."
+    },
+    "revenueTracking": {
+      "title": "Real Revenue Tracking",
+      "description": "Track and analyze your real revenue by entity and period",
+      "entity": "Entity",
+      "year": "Year",
+      "loading": "Loading...",
+      "loadingData": "Loading data...",
+      "developmentMessage": "This page is under development.",
+      "selectedFilters": "Selected filters: Entity {entity}, Year {year}",
+      "allEntities": "(All)",
+      "errors": {
+        "fetchEntitiesError": "Error retrieving entities"
+      }
+    },
+    "budgetForm": {
+      "title": "Budget Form",
+      "budgetDetails": "Budget details",
+      "addDetail": "Add details",
+      "addThisDetail": "Add this detail",
+      "addedDetails": "Added details",
+      "noDetailsMessage": "No details added. Please add at least one detail for this budget.",
+      "duplicateWarning": "A budget already exists for this entity/year/month/flow category combination.",
+      "duplicateWarningMessage": "Please modify one of these values or choose a different combination.",
+      "checkingDuplicates": "Checking duplicates...",
+      "total": "Total",
+      "entity": "Entity",
+      "fluxCategory": "Flow category",
+      "year": "Year",
+      "month": "Month",
+      "amountHT": "Amount excl. VAT",
+      "amountTTC": "Amount incl. VAT",
+      "openDays": "Open days",
+      "covers": "Covers",
+      "averagePrice": "Average price per cover",
+      "comment": "Comment",
+      "serviceType": "Service type",
+      "subCategory": "Sub-category",
+      "actions": "Actions",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "chooseEntity": "Choose entity",
+      "chooseCategory": "Choose category",
+      "chooseEntityFirst": "Choose an entity first",
+      "chooseCategoryFirst": "Choose a category first",
+      "chooseYear": "Choose year",
+      "chooseMonth": "Choose month",
+      "chooseService": "Choose service",
+      "chooseSubCategory": "Choose sub-category",
+      "notFound": "Not found",
+      "product": "Product",
+      "charge": "Charge",
+      "placeholders": {
+        "amountHT": "Amount excl. VAT",
+        "amountTTC": "Amount incl. VAT",
+        "openDays": "Open days",
+        "covers": "Number of covers",
+        "averagePrice": "Average price",
+        "comment": "Comment on this budget...",
+        "detailComment": "Comment"
+      },
+      "descriptions": {
+        "amountHTDescription": "Total amount excl. VAT (calculated from details)",
+        "amountTTCDescription": "Total amount incl. VAT (calculated from details)",
+        "openDaysDescription": "Global parameter: {days} days"
+      },
+      "validation": {
+        "entityRequired": "Entity is required",
+        "categoryRequired": "Flow category is required",
+        "yearRange": "Year must be between 2000 and 2100",
+        "monthRange": "Month must be between 1 and 12",
+        "amountHTNegative": "Amount excl. VAT cannot be negative",
+        "amountTTCNegative": "Amount incl. VAT cannot be negative",
+        "openDaysRange": "Number of days must be between 0 and 31",
+        "coversNegative": "Number of covers cannot be negative",
+        "averagePriceNegative": "Average price cannot be negative",
+        "duplicateBudget": "A budget already exists for this entity/year/month/category combination",
+        "serviceTypeRequired": "Service type is required",
+        "subCategoryRequired": "Sub-category is required",
+        "duplicateServiceSubCategory": "This service type / sub-category combination already exists",
+        "addAtLeastOneDetail": "You must add at least one budget detail"
+      }
+    },
+    "budgetTracking": {
+      "title": "Revenue Budget Tracking",
+      "description": "Track and analyze your revenue budgets by entity and period",
+      "loading": "Loading...",
+      "loadingBudgets": "Loading budgets...",
+      "addLine": "Add line",
+      "editInline": "Edit inline",
+      "budgetsDisplayed": "{displayed} budget(s) displayed out of {total} total",
+      "noBudgets": "No budget",
+      "noBudgetsMessage": "No budget has been created yet.",
+      "entity": "Entity",
+      "year": "Year",
+      "month": "Month",
+      "modal": {
+        "addBudgetLine": "Add budget line"
+      },
+      "errors": {
+        "fetchBudgetsError": "Error retrieving budgets",
+        "fetchEntitiesError": "Error retrieving entities",
+        "fetchBudgetDetailsError": "Error retrieving budget details",
+        "noContractAssociated": "No client contract associated with the profile",
+        "createBudgetError": "Error creating budget",
+        "budgetCreationError": "Error in budget creation",
+        "duplicateBudgetError": "A budget already exists for this entity, category, month and year"
+      },
+      "success": {
+        "budgetCreated": "Budget created successfully"
+      }
+    },
+    "bankEntries": {
+      "title": "Bank Transactions",
+      "description": "View and manage your bank entries",
+      "loading": "Loading...",
+      "loadingEntries": "Loading bank entries...",
+      "showEntries": "Show entries",
+      "entriesFound": "{count} bank entries found",
+      "noEntries": "No bank entries",
+      "noEntriesMessage": "No bank entries found for the selected criteria.",
+      "filters": {
+        "entity": "Entity",
+        "bankAccount": "Bank account",
+        "startDate": "Start date",
+        "endDate": "End date"
+      },
+      "columns": {
+        "entity": "Entity",
+        "account": "Account",
+        "operationDate": "Operation date",
+        "valueDate": "Value date",
+        "description": "Description",
+        "amount": "Amount",
+        "balance": "Balance",
+        "reference": "Reference",
+        "sourceId": "Source ID"
+      },
+      "errors": {
+        "fetchReferenceDataError": "Error loading reference data",
+        "incompleteUserProfile": "Incomplete user profile",
+        "selectPeriodError": "Please select a period",
+        "fetchEntriesError": "Error fetching bank entries"
+      },
+      "defaultValues": {
+        "undefinedAccount": "- Undefined account",
+        "undefinedEntity": "- Undefined entity"
+      }
+    }
   }
 }

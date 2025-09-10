@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useMenu } from '../../../context/MenuContext';
@@ -33,6 +34,7 @@ interface SousCategorieFlux {
 }
 
 const SousCategorieFlux: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [sousCategoriesFlux, setSousCategoriesFlux] = useState<SousCategorieFlux[]>([]);
@@ -75,7 +77,7 @@ const SousCategorieFlux: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des sous-catégories de flux:', error);
       addToast({
-        label: 'Erreur lors de la récupération des sous-catégories de flux',
+        label: t('parametersFinances.subCategoryFlux.errors.fetchError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -143,7 +145,7 @@ const SousCategorieFlux: React.FC = () => {
     setIsSubmitting(true);
     try {
       if (!profil?.com_contrat_client_id) {
-        throw new Error('Aucun contrat client associé au profil');
+        throw new Error(t('parametersFinances.subCategoryFlux.errors.noContractAssociated'));
       }
 
       let error;
@@ -189,14 +191,18 @@ const SousCategorieFlux: React.FC = () => {
       setIsModalOpen(false);
       setSelectedSousCategorie(null);
       addToast({
-        label: `Sous-catégorie de flux ${selectedSousCategorie ? 'modifiée' : 'créée'} avec succès`,
+        label: selectedSousCategorie 
+          ? t('parametersFinances.subCategoryFlux.success.updated')
+          : t('parametersFinances.subCategoryFlux.success.created'),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       addToast({
-        label: `Erreur lors de la ${selectedSousCategorie ? 'modification' : 'création'} de la sous-catégorie de flux`,
+        label: selectedSousCategorie 
+          ? t('parametersFinances.subCategoryFlux.errors.updateError')
+          : t('parametersFinances.subCategoryFlux.errors.createError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -211,7 +217,7 @@ const SousCategorieFlux: React.FC = () => {
   };
 
   const handleDelete = async (sousCategorie: SousCategorieFlux) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer la sous-catégorie de flux "${sousCategorie.libelle}" ? Cette action est irréversible et peut échouer si la sous-catégorie est utilisée dans des factures.`)) {
+    if (window.confirm(t('parametersFinances.subCategoryFlux.deleteConfirmation').replace('{label}', sousCategorie.libelle))) {
       try {
         const { error } = await supabase
           .from('fin_flux_sous_categorie')
@@ -222,7 +228,7 @@ const SousCategorieFlux: React.FC = () => {
 
         await fetchSousCategoriesFlux();
         addToast({
-          label: `La sous-catégorie de flux "${sousCategorie.libelle}" a été supprimée avec succès`,
+          label: t('parametersFinances.subCategoryFlux.success.deleted').replace('{label}', sousCategorie.libelle),
           icon: 'Check',
           color: '#22c55e'
         });
@@ -230,11 +236,11 @@ const SousCategorieFlux: React.FC = () => {
         console.error('Erreur lors de la suppression:', error);
         
         // Message d'erreur spécifique pour les contraintes de clé étrangère
-        let errorMessage = 'Erreur lors de la suppression de la sous-catégorie de flux';
+        let errorMessage = t('parametersFinances.subCategoryFlux.errors.deleteError');
         
         if (error.message?.includes('foreign key constraint') || 
             error.message?.includes('violates foreign key constraint')) {
-          errorMessage = 'Impossible de supprimer cette sous-catégorie car elle est utilisée dans des factures ou d\'autres éléments. Veuillez la désactiver plutôt que la supprimer.';
+          errorMessage = t('parametersFinances.subCategoryFlux.errors.deleteConstraintError');
         }
         
         addToast({
@@ -252,7 +258,7 @@ const SousCategorieFlux: React.FC = () => {
 
   // Préparer les options pour le dropdown des catégories de flux
   const categorieFluxOptions: DropdownOption[] = [
-    { value: '', label: 'Toutes les catégories de flux' },
+    { value: '', label: t('parametersFinances.subCategoryFlux.allFluxCategories') },
     ...categoriesFlux.map(categorie => ({
       value: categorie.id,
       label: `${categorie.code} - ${categorie.libelle}`
@@ -261,44 +267,44 @@ const SousCategorieFlux: React.FC = () => {
 
   const columns: Column<SousCategorieFlux>[] = [
     {
-      label: 'Entité',
+      label: t('parametersFinances.subCategoryFlux.entity'),
       accessor: 'categorie',
-      render: (value) => value.entite ? `${value.entite.code} - ${value.entite.libelle}` : 'Global (toutes les entités)'
+      render: (value) => value.entite ? `${value.entite.code} - ${value.entite.libelle}` : t('parametersFinances.subCategoryFlux.globalAllEntities')
     },
     {
-      label: 'Catégorie de flux',
+      label: t('parametersFinances.subCategoryFlux.fluxCategory'),
       accessor: 'categorie',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Code',
+      label: t('parametersFinances.subCategoryFlux.code'),
       accessor: 'code',
       sortable: true
     },
     {
-      label: 'Libellé',
+      label: t('parametersFinances.subCategoryFlux.label'),
       accessor: 'libelle',
       sortable: true
     },
     {
-      label: 'Ordre',
+      label: t('parametersFinances.subCategoryFlux.order'),
       accessor: 'ordre_affichage',
       align: 'center'
     },
     {
-      label: 'Actif',
+      label: t('parametersFinances.subCategoryFlux.active'),
       accessor: 'actif',
       align: 'center',
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('parametersFinances.subCategoryFlux.yes') : t('parametersFinances.subCategoryFlux.no')}
         </span>
       )
     },
     {
-      label: 'Date de création',
+      label: t('parametersFinances.subCategoryFlux.creationDate'),
       accessor: 'created_at',
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
     }
@@ -306,13 +312,13 @@ const SousCategorieFlux: React.FC = () => {
 
   const actions = [
     {
-      label: 'Éditer',
+      label: t('parametersFinances.subCategoryFlux.edit'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: t('parametersFinances.subCategoryFlux.delete'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -322,13 +328,13 @@ const SousCategorieFlux: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Sous-Catégories de Flux"}
-        description="Gérez les sous-catégories de flux financiers de votre organisation"
+        title={loading || profilLoading ? t('parametersFinances.subCategoryFlux.loading') : t('parametersFinances.subCategoryFlux.title')}
+        description={t('parametersFinances.subCategoryFlux.description')}
         className={styles.header}
       >
         <div className="mb-6 flex justify-between items-center">
           <Button
-            label="Ajouter une sous-catégorie"
+            label={t('parametersFinances.subCategoryFlux.addSubCategory')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
@@ -338,7 +344,7 @@ const SousCategorieFlux: React.FC = () => {
               options={categorieFluxOptions}
               value={selectedCategorieFlux}
               onChange={handleCategorieFluxChange}
-              label="Toutes les catégories de flux"
+              label={t('parametersFinances.subCategoryFlux.allFluxCategories')}
               size="sm"
             />
           </div>
@@ -346,7 +352,7 @@ const SousCategorieFlux: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des sous-catégories de flux...</p>
+            <p className="text-gray-500">{t('parametersFinances.subCategoryFlux.loadingSubCategories')}</p>
           </div>
         ) : (
           <DataTable
@@ -354,8 +360,8 @@ const SousCategorieFlux: React.FC = () => {
             data={filteredSousCategoriesFlux}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucune sous-catégorie de flux"
-            emptyMessage="Aucune sous-catégorie de flux n'a été créée pour le moment."
+            emptyTitle={t('parametersFinances.subCategoryFlux.noSubCategories')}
+            emptyMessage={t('parametersFinances.subCategoryFlux.noSubCategoriesMessage')}
           />
         )}
 
@@ -366,7 +372,7 @@ const SousCategorieFlux: React.FC = () => {
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">
-                  {selectedSousCategorie ? 'Modifier une sous-catégorie de flux' : 'Ajouter une sous-catégorie de flux'}
+                  {selectedSousCategorie ? t('parametersFinances.subCategoryFlux.modal.editTitle') : t('parametersFinances.subCategoryFlux.modal.addTitle')}
                 </h2>
                 <button
                   onClick={() => {

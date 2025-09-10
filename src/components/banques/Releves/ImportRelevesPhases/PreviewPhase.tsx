@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../../../ui/button';
 import { Check, ChevronDown, ChevronUp, Calculator } from 'lucide-react';
 
@@ -15,6 +16,7 @@ export function PreviewPhase({
   onBack,
   onConfirm
 }: PreviewPhaseProps) {
+  const { t } = useTranslation();
   // Pas de tri par défaut pour conserver l'ordre du fichier
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc'); 
@@ -144,10 +146,10 @@ export function PreviewPhase({
         <div className="flex items-start gap-3">
           <Check className="w-5 h-5 text-green-600 mt-0.5" />
           <div>
-            <h3 className="font-medium text-green-900 mb-2">Fichier analysé avec succès</h3>
+            <h3 className="font-medium text-green-900 mb-2">{t('importModal.preview.title')}</h3>
             <p className="text-sm text-green-700">
-              {parsedData.length} ligne(s) trouvée(s) dans le fichier.
-              Vérifiez que les colonnes ont été correctement mappées avant de confirmer l'import.
+              {t('importModal.preview.recordsFound', { count: parsedData.length })}
+              {t('importModal.preview.subtitle')}
             </p>
           </div>
         </div>
@@ -156,7 +158,7 @@ export function PreviewPhase({
       <div className="border border-gray-200 rounded-lg overflow-hidden">
         <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
           <h3 className="font-medium text-gray-700">
-            Aperçu des données ({parsedData.length} lignes)
+            {t('importModal.preview.title')} ({parsedData.length} linhas)
           </h3>
         </div>
         <div className="overflow-x-auto max-h-[50vh]">
@@ -280,13 +282,13 @@ export function PreviewPhase({
 
       <div className="flex justify-between">
         <Button
-          label="Retour"
+          label={t('importModal.preview.back')}
           color="#6B7280"
           onClick={onBack}
           disabled={isImportingData}
         />
         <Button
-          label="Confirmer l'import"
+          label={t('importModal.preview.confirm')}
           icon="Database"
           color="var(--color-primary)"
           onClick={onConfirm}

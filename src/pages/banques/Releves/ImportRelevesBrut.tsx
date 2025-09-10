@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS, pt } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../../context/MenuContext';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
@@ -50,8 +51,34 @@ interface ImportReleveDetail {
 }
 
 const ImportRelevesBrut: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
+
+  // Debug: verificar se as traduções estão a funcionar
+  console.log('Idioma actual:', i18n.language);
+  console.log('Tradução título:', t('importStatements.title'));
+  console.log('Tradução descrição:', t('importStatements.description'));
+
+  // Função para obter o locale de data baseado no idioma actual
+  const getDateLocale = () => {
+    switch (i18n.language) {
+      case 'pt': return pt;
+      case 'en': return enUS;
+      case 'fr': return fr;
+      default: return pt; // Fallback para português
+    }
+  };
+
+  // Função para obter o locale de formatação de números/moeda
+  const getNumberLocale = () => {
+    switch (i18n.language) {
+      case 'pt': return 'pt-PT';
+      case 'en': return 'en-US';
+      case 'fr': return 'fr-FR';
+      default: return 'pt-PT'; // Fallback para português
+    }
+  };
   const [imports, setImports] = useState<ImportReleve[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImport, setSelectedImport] = useState<ImportReleve | null>(null);
@@ -95,7 +122,7 @@ const ImportRelevesBrut: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des imports de relevés:', error);
       addToast({
-        label: 'Erreur lors de la récupération des imports de relevés',
+        label: t('importStatements.errors.fetchImportsError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -151,7 +178,7 @@ const ImportRelevesBrut: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des détails de l\'import:', error);
       addToast({
-        label: 'Erreur lors de la récupération des détails de l\'import',
+        label: t('importStatements.errors.fetchDetailsError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -187,7 +214,7 @@ const ImportRelevesBrut: React.FC = () => {
 
   // Fonction pour supprimer un import
   const handleDelete = async (importItem: ImportReleve) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'import "${importItem.nom_fichier}" ?`)) {
+    if (window.confirm(t('importStatements.confirmations.deleteImport', { fileName: importItem.nom_fichier }))) {
       try {
         const { error } = await supabase
           .from('bq_import_releves_brut')
@@ -198,14 +225,14 @@ const ImportRelevesBrut: React.FC = () => {
 
         await fetchImports();
         addToast({
-          label: `L'import "${importItem.nom_fichier}" a été supprimé avec succès`,
+          label: t('importStatements.success.importDeleted', { fileName: importItem.nom_fichier }),
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression de l\'import',
+          label: t('importStatements.errors.deleteError'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -217,7 +244,7 @@ const ImportRelevesBrut: React.FC = () => {
   const handleProcessBankEntries = async () => {
     if (!profil?.com_contrat_client_id) {
       addToast({
-        label: 'Profil utilisateur incomplet',
+        label: t('importStatements.errors.incompleteUserProfile'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -271,29 +298,29 @@ const ImportRelevesBrut: React.FC = () => {
   // Colonnes pour le tableau des imports
   const importColumns: Column<ImportReleve>[] = [
     {
-      label: 'Nom du fichier',
+      label: t('importStatements.columns.fileName'),
       accessor: 'nom_fichier',
       sortable: true
     },
     {
-      label: 'Format',
+      label: t('importStatements.columns.format'),
       accessor: 'format_import',
-      render: (value) => value ? `${value.code} - ${value.banque}` : 'Non spécifié'
+      render: (value) => value ? `${value.code} - ${value.banque}` : t('importStatements.status.notSpecified')
     },
     {
-      label: 'Date d\'import',
+      label: t('importStatements.columns.importDate'),
       accessor: 'date_import',
       sortable: true,
-      render: (value) => format(new Date(value), 'dd/MM/yyyy HH:mm', { locale: fr })
+      render: (value) => format(new Date(value), 'dd/MM/yyyy HH:mm', { locale: getDateLocale() })
     },
     {
-      label: 'Lignes',
+      label: t('importStatements.columns.lines'),
       accessor: 'nb_lignes',
       align: 'center',
       render: (value) => value || '-'
     },
     {
-      label: 'Statut',
+      label: t('importStatements.columns.status'),
       accessor: 'statut',
       align: 'center',
       render: (value) => (
@@ -302,22 +329,24 @@ const ImportRelevesBrut: React.FC = () => {
           value === 'ERREUR' ? 'bg-red-100 text-red-800' : 
           'bg-yellow-100 text-yellow-800'
         }`}>
-          {value || 'En attente'}
+          {value === 'TERMINE' ? t('importStatements.status.finished') :
+           value === 'ERREUR' ? t('importStatements.status.error') :
+           t('importStatements.status.pending')}
         </span>
       )
     },
     {
-      label: 'Message',
+      label: t('importStatements.columns.message'),
       accessor: 'message',
       render: (value) => value || '-'
     },
     {
-      label: 'Date de création',
+      label: t('importStatements.columns.creationDate'),
       accessor: 'created_at',
-      render: (value) => format(new Date(value), 'dd/MM/yyyy HH:mm', { locale: fr })
+      render: (value) => format(new Date(value), 'dd/MM/yyyy HH:mm', { locale: getDateLocale() })
     },
     {
-      label: 'Actions',
+      label: t('importStatements.columns.actions'),
       accessor: 'id',
       width: '100px',
       align: 'center',
@@ -329,7 +358,7 @@ const ImportRelevesBrut: React.FC = () => {
           }}
           className="px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium"
         >
-          Voir détails
+          {t('importStatements.actions.viewDetails')}
         </button>
       )
     }
@@ -338,13 +367,13 @@ const ImportRelevesBrut: React.FC = () => {
   // Actions pour le tableau
   const actions = [
     {
-      label: 'Voir détails',
-      icon: 'FileText',
+      label: t('importStatements.actions.viewDetails'),
+      icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleOpenDetailsModal
     },
     {
-      label: 'Supprimer',
+      label: t('importStatements.actions.delete'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -354,51 +383,56 @@ const ImportRelevesBrut: React.FC = () => {
   // Colonnes pour le tableau des détails d'import
   const detailColumns: Column<ImportReleveDetail>[] = [
     {
-      label: 'Statut',
+      label: t('importStatements.modal.detailColumns.status'),
       accessor: 'traite',
       align: 'center',
       render: (value, row) => {
         // Déterminer la couleur et le style en fonction du statut
-        let bgColor, textColor, icon;
+        let bgColor, textColor, icon, displayText;
         
         switch(value) {
           case 'A TRAITER':
             bgColor = 'bg-yellow-100';
             textColor = 'text-yellow-800';
             icon = <Play className="w-3 h-3 mr-1" />;
+            displayText = t('importStatements.modal.detailStatus.toProcess');
             break;
           case 'CREER':
             bgColor = 'bg-green-100';
             textColor = 'text-green-800';
             icon = <Check className="w-3 h-3 mr-1" />;
+            displayText = t('importStatements.modal.detailStatus.created');
             break;
           case 'DOUBLON':
             bgColor = 'bg-blue-100';
             textColor = 'text-blue-800';
             icon = <Database className="w-3 h-3 mr-1" />;
+            displayText = t('importStatements.modal.detailStatus.duplicate');
             break;
           case 'ERREUR':
             bgColor = 'bg-red-100';
             textColor = 'text-red-800';
             icon = <AlertCircle className="w-3 h-3 mr-1" />;
+            displayText = t('importStatements.modal.detailStatus.error');
             break;
           default:
             bgColor = 'bg-gray-100';
             textColor = 'text-gray-800';
             icon = null;
+            displayText = t('importStatements.modal.detailStatus.toProcess');
         }
         
         return (
           <div className="relative group">
             <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center justify-center ${bgColor} ${textColor}`}>
               {icon}
-              {value || 'A TRAITER'}
+              {displayText}
             </span>
             
             {/* Infobulle pour afficher le message d'erreur si présent */}
             {row.message && value === 'ERREUR' && (
               <div className="absolute z-10 invisible group-hover:visible bg-red-50 border border-red-200 text-red-800 text-xs rounded p-2 shadow-lg w-64 left-0 mt-1">
-                <div className="font-medium mb-1">Détail de l'erreur:</div>
+                <div className="font-medium mb-1">{t('importStatements.modal.errorTooltip')}</div>
                 <div>{row.message}</div>
               </div>
             )}
@@ -407,39 +441,39 @@ const ImportRelevesBrut: React.FC = () => {
       }
     },
     {
-      label: 'ID',
+      label: t('importStatements.modal.detailColumns.id'),
       accessor: 'id',
       width: '60px',
       align: 'center'
     },
     {
-      label: 'Date opération',
+      label: t('importStatements.modal.detailColumns.operationDate'),
       accessor: 'data_lancamento',
       sortable: true,
-      render: (value) => value ? format(new Date(value), 'dd/MM/yyyy', { locale: fr }) : '-'
+      render: (value) => value ? format(new Date(value), 'dd/MM/yyyy', { locale: getDateLocale() }) : '-'
     },
     {
-      label: 'Date valeur',
+      label: t('importStatements.modal.detailColumns.valueDate'),
       accessor: 'data_valor',
-      render: (value) => value ? format(new Date(value), 'dd/MM/yyyy', { locale: fr }) : '-'
+      render: (value) => value ? format(new Date(value), 'dd/MM/yyyy', { locale: getDateLocale() }) : '-'
     },
     {
-      label: 'Compte',
+      label: t('importStatements.modal.detailColumns.account'),
       accessor: 'conta',
       render: (value) => value || '-'
     },
     {
-      label: 'Description',
+      label: t('importStatements.modal.detailColumns.description'),
       accessor: 'descricao',
       render: (value) => value || '-'
     },
     {
-      label: 'Montant',
+      label: t('importStatements.modal.detailColumns.amount'),
       accessor: 'valor',
       align: 'right',
       render: (value) => {
         if (value === null) return '-';
-        const formattedValue = new Intl.NumberFormat('fr-FR', {
+        const formattedValue = new Intl.NumberFormat(getNumberLocale(), {
           style: 'currency',
           currency: 'EUR'
         }).format(value);
@@ -451,19 +485,19 @@ const ImportRelevesBrut: React.FC = () => {
       }
     },
     {
-      label: 'Solde',
+      label: t('importStatements.modal.detailColumns.balance'),
       accessor: 'saldo',
       align: 'right',
       render: (value) => {
         if (value === null) return '-';
-        return new Intl.NumberFormat('fr-FR', {
+        return new Intl.NumberFormat(getNumberLocale(), {
           style: 'currency',
           currency: 'EUR'
         }).format(value);
       }
     },
     {
-      label: 'Référence',
+      label: t('importStatements.modal.detailColumns.reference'),
       accessor: 'referencia_doc',
       render: (value) => value || '-'
     }
@@ -472,20 +506,20 @@ const ImportRelevesBrut: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Import de Relevés Bancaires"}
-        description="Consultez les relevés bancaires importés et leurs détails"
+        title={loading || profilLoading ? (t('importStatements.loading') || 'A carregar...') : (t('importStatements.title') || 'Import de Extractos Bancários')}
+        description={t('importStatements.description') || 'Consulte os extractos bancários importados e os seus detalhes'}
         className={styles.header}
       >
         <div className="mb-6">
           <div className="flex gap-3">
             <Button
-              label="Nouvel import"
+              label={t('importStatements.newImport') || 'Novo import'}
               icon="FileText"
               onClick={() => setIsImportModalOpen(true)}
               color="var(--color-primary)"
             />
             <Button
-              label={isProcessingBankEntries ? "Traitement en cours..." : "Traiter les relevés"}
+              label={isProcessingBankEntries ? (t('importStatements.processingInProgress') || 'Processamento em curso...') : (t('importStatements.processStatements') || 'Processar extractos')}
               icon="Play"
               onClick={handleProcessBankEntries}
               color="#22c55e"
@@ -499,11 +533,11 @@ const ImportRelevesBrut: React.FC = () => {
               <div className="flex items-start gap-3">
                 <Loader className="w-5 h-5 text-blue-600 mt-1 animate-spin" />
                 <div className="flex-1">
-                  <h3 className="font-medium text-blue-900 mb-2">Traitement des écritures bancaires</h3>
+                  <h3 className="font-medium text-blue-900 mb-2">{t('importStatements.processing.title')}</h3>
                   
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm text-blue-800">
-                      <span>Phase actuelle:</span>
+                      <span>{t('importStatements.processing.currentPhase')}:</span>
                       <span className="font-medium">{processProgress.phase}</span>
                     </div>
                     
@@ -517,7 +551,7 @@ const ImportRelevesBrut: React.FC = () => {
                         </div>
                         
                         <div className="flex justify-between text-xs text-blue-700">
-                          <span>{processProgress.processed} / {processProgress.total} lignes traitées</span>
+                          <span>{processProgress.processed} / {processProgress.total} {t('importStatements.processing.linesProcessed')}</span>
                           <span>{Math.round((processProgress.processed / processProgress.total) * 100)}%</span>
                         </div>
                         
@@ -529,15 +563,15 @@ const ImportRelevesBrut: React.FC = () => {
                         
                         <div className="grid grid-cols-3 gap-2 mt-2">
                           <div className="bg-green-100 p-2 rounded text-center">
-                            <div className="text-green-800 text-xs font-medium">Créées</div>
+                            <div className="text-green-800 text-xs font-medium">{t('importStatements.processing.created')}</div>
                             <div className="text-green-900 font-bold">{processProgress.created || 0}</div>
                           </div>
                           <div className="bg-blue-100 p-2 rounded text-center">
-                            <div className="text-blue-800 text-xs font-medium">Doublons</div>
+                            <div className="text-blue-800 text-xs font-medium">{t('importStatements.processing.duplicates')}</div>
                             <div className="text-blue-900 font-bold">{processProgress.duplicates || 0}</div>
                           </div>
                           <div className="bg-red-100 p-2 rounded text-center">
-                            <div className="text-red-800 text-xs font-medium">Erreurs</div>
+                            <div className="text-red-800 text-xs font-medium">{t('importStatements.processing.errors')}</div>
                             <div className="text-red-900 font-bold">{processProgress.errors || 0}</div>
                           </div>
                         </div>
@@ -555,24 +589,24 @@ const ImportRelevesBrut: React.FC = () => {
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 text-green-600 mt-1" />
                 <div className="flex-1">
-                  <h3 className="font-medium text-green-900 mb-2">Traitement terminé</h3>
+                  <h3 className="font-medium text-green-900 mb-2">{t('importStatements.processing.finished')}</h3>
                   
                   <div className="space-y-2">
                     <div className="text-sm text-green-800">
-                      <span>{processProgress.processed} lignes traitées au total</span>
+                      <span>{processProgress.processed} {t('importStatements.processing.totalProcessed')}</span>
                     </div>
                     
                     <div className="grid grid-cols-3 gap-2 mt-2">
                       <div className="bg-green-100 p-2 rounded text-center">
-                        <div className="text-green-800 text-xs font-medium">Créées</div>
+                        <div className="text-green-800 text-xs font-medium">{t('importStatements.processing.created')}</div>
                         <div className="text-green-900 font-bold">{processProgress.created || 0}</div>
                       </div>
                       <div className="bg-blue-100 p-2 rounded text-center">
-                        <div className="text-blue-800 text-xs font-medium">Doublons</div>
+                        <div className="text-blue-800 text-xs font-medium">{t('importStatements.processing.duplicates')}</div>
                         <div className="text-blue-900 font-bold">{processProgress.duplicates || 0}</div>
                       </div>
                       <div className={`p-2 rounded text-center ${processProgress.errors > 0 ? 'bg-red-100' : 'bg-gray-100'}`}>
-                        <div className={`text-xs font-medium ${processProgress.errors > 0 ? 'text-red-800' : 'text-gray-800'}`}>Erreurs</div>
+                        <div className={`text-xs font-medium ${processProgress.errors > 0 ? 'text-red-800' : 'text-gray-800'}`}>{t('importStatements.processing.errors')}</div>
                         <div className={`font-bold ${processProgress.errors > 0 ? 'text-red-900' : 'text-gray-900'}`}>{processProgress.errors || 0}</div>
                       </div>
                     </div>
@@ -580,7 +614,7 @@ const ImportRelevesBrut: React.FC = () => {
                     {processProgress.errors > 0 && (
                       <div className="flex items-center gap-2 mt-2 text-sm text-red-700">
                         <AlertCircle className="w-4 h-4" />
-                        <span>Des erreurs sont survenues pendant le traitement. Consultez les détails des imports pour voir les erreurs spécifiques.</span>
+                        <span>{t('importStatements.processing.errorMessage')}</span>
                       </div>
                     )}
                   </div>
@@ -593,12 +627,15 @@ const ImportRelevesBrut: React.FC = () => {
         {/* Tableau des imports */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Liste des imports</h2>
+            <h2 className="text-lg font-semibold">{t('importStatements.listTitle')}</h2>
             <div className="flex items-center gap-3">
               {pendingEntriesCount > 0 && (
                 <div className="flex items-center gap-2 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
                   <AlertTriangle className="w-4 h-4" />
-                  <span>{pendingEntriesCount} entrée{pendingEntriesCount > 1 ? 's' : ''} à traiter</span>
+                  <span>{t('importStatements.entriesCount', { 
+                    count: pendingEntriesCount,
+                    plural: pendingEntriesCount > 1 ? 's' : ''
+                  })}</span>
                 </div>
               )}
             </div>
@@ -606,16 +643,15 @@ const ImportRelevesBrut: React.FC = () => {
           
           {loading ? (
             <div className="flex justify-center items-center h-64">
-              <p className="text-gray-500">Chargement des imports de relevés...</p>
+              <p className="text-gray-500">{t('importStatements.loadingImports')}</p>
             </div>
           ) : (
             <DataTable
               columns={importColumns}
               data={imports}
-              actions={actions}
               defaultRowsPerPage={10}
-              emptyTitle="Aucun import"
-              emptyMessage="Aucun import de relevé bancaire n'a été effectué pour le moment."
+              emptyTitle={t('importStatements.empty.title')}
+              emptyMessage={t('importStatements.empty.message')}
             />
           )}
         </div>
@@ -640,7 +676,7 @@ const ImportRelevesBrut: React.FC = () => {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold flex items-center">
                   <Database className="mr-2 text-blue-600" size={20} />
-                  Détails de l'import : {selectedImport.nom_fichier}
+                  {t('importStatements.modal.title')} : {selectedImport.nom_fichier}
                 </h2>
                 <button
                   onClick={handleCloseDetailsModal}
@@ -653,31 +689,33 @@ const ImportRelevesBrut: React.FC = () => {
               <div className="bg-blue-50 p-4 rounded-lg mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-blue-700 font-medium">Format d'import</p>
-                    <p className="text-sm">{selectedImport.format_import ? `${selectedImport.format_import.code} - ${selectedImport.format_import.banque}` : 'Non spécifié'}</p>
+                    <p className="text-sm text-blue-700 font-medium">{t('importStatements.modal.importFormat')}</p>
+                    <p className="text-sm">{selectedImport.format_import ? `${selectedImport.format_import.code} - ${selectedImport.format_import.banque}` : t('importStatements.status.notSpecified')}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-blue-700 font-medium">Date d'import</p>
-                    <p className="text-sm">{format(new Date(selectedImport.date_import), 'dd MMMM yyyy à HH:mm', { locale: fr })}</p>
+                    <p className="text-sm text-blue-700 font-medium">{t('importStatements.modal.importDate')}</p>
+                    <p className="text-sm">{format(new Date(selectedImport.date_import), 'dd MMMM yyyy à HH:mm', { locale: getDateLocale() })}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-blue-700 font-medium">Nombre de lignes</p>
-                    <p className="text-sm">{selectedImport.nb_lignes || 'Non spécifié'}</p>
+                    <p className="text-sm text-blue-700 font-medium">{t('importStatements.modal.linesCount')}</p>
+                    <p className="text-sm">{selectedImport.nb_lignes || t('importStatements.status.notSpecified')}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-blue-700 font-medium">Statut</p>
+                    <p className="text-sm text-blue-700 font-medium">{t('importStatements.modal.status')}</p>
                     <p className="text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         selectedImport.statut === 'TERMINE' ? 'bg-green-100 text-green-800' : 
                         selectedImport.statut === 'ERREUR' ? 'bg-red-100 text-red-800' : 
                         'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {selectedImport.statut || 'En attente'}
+                        {selectedImport.statut === 'TERMINE' ? t('importStatements.status.finished') :
+                         selectedImport.statut === 'ERREUR' ? t('importStatements.status.error') :
+                         t('importStatements.status.pending')}
                       </span>
                     </p>
                   </div>
                   <div className="md:col-span-2">
-                    <p className="text-sm text-blue-700 font-medium">Message</p>
+                    <p className="text-sm text-blue-700 font-medium">{t('importStatements.modal.message')}</p>
                     <p className="text-sm">{selectedImport.message || '-'}</p>
                   </div>
                 </div>
@@ -687,31 +725,31 @@ const ImportRelevesBrut: React.FC = () => {
                 <div className="flex justify-center items-center h-64">
                   <div className="flex flex-col items-center">
                     <Loader className="w-8 h-8 text-blue-600 animate-spin mb-2" />
-                    <p className="text-blue-600">Chargement des détails...</p>
+                    <p className="text-blue-600">{t('importStatements.modal.loadingDetails')}</p>
                   </div>
                 </div>
               ) : (
                 <>
-                  <h3 className="text-lg font-medium mb-3">Écritures importées</h3>
+                  <h3 className="text-lg font-medium mb-3">{t('importStatements.modal.importedEntries')}</h3>
                   <DataTable
                     columns={detailColumns}
                     data={importDetails}
                     defaultRowsPerPage={25}
-                    emptyTitle="Aucun détail"
-                    emptyMessage="Aucun détail n'a été trouvé pour cet import."
+                    emptyTitle={t('importStatements.modal.emptyDetails.title')}
+                    emptyMessage={t('importStatements.modal.emptyDetails.message')}
                   />
                   
                   {importDetails.length > 0 && (
                     <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
                       <div className="flex justify-between items-center">
                         <div>
-                          <span className="text-sm font-medium text-gray-700">Total des écritures: </span>
+                          <span className="text-sm font-medium text-gray-700">{t('importStatements.modal.totalEntries')}: </span>
                           <span className="text-sm text-gray-900">{importDetails.length}</span>
                         </div>
                         <div>
-                          <span className="text-sm font-medium text-gray-700">Total des montants: </span>
+                          <span className="text-sm font-medium text-gray-700">{t('importStatements.modal.totalAmounts')}: </span>
                           <span className="text-sm text-gray-900">
-                            {new Intl.NumberFormat('fr-FR', {
+                            {new Intl.NumberFormat(getNumberLocale(), {
                              style: 'currency',
                              currency: 'EUR'
                             }).format(importDetails.reduce((sum, detail) => sum + (detail.valor || 0), 0))}

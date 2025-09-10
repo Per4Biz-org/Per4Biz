@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
@@ -79,6 +80,7 @@ export function SuiviCABudgetForm({
   onCancel,
   isSubmitting = false
 }: SuiviCABudgetFormProps) {
+  const { t } = useTranslation();
   const { profil } = useProfil();
   const [budgetData, setBudgetData] = useState<BudgetFormData>({
     id_entite: '',
@@ -559,40 +561,40 @@ export function SuiviCABudgetForm({
   const validateBudgetForm = (): boolean => {
     const errors: Partial<Record<keyof BudgetFormData, string>> = {};
 
-    if (!budgetData.id_entite) errors.id_entite = 'L\'entité est requise';
-    if (!budgetData.id_flux_categorie) errors.id_flux_categorie = 'La catégorie de flux est requise';
+    if (!budgetData.id_entite) errors.id_entite = t('parametersFinances.budgetForm.validation.entityRequired');
+    if (!budgetData.id_flux_categorie) errors.id_flux_categorie = t('parametersFinances.budgetForm.validation.categoryRequired');
     
     if (!budgetData.annee || budgetData.annee < 2000 || budgetData.annee > 2100) {
-      errors.annee = 'L\'année doit être comprise entre 2000 et 2100';
+      errors.annee = t('parametersFinances.budgetForm.validation.yearRange');
     }
     
     if (!budgetData.mois || budgetData.mois < 1 || budgetData.mois > 12) {
-      errors.mois = 'Le mois doit être compris entre 1 et 12';
+      errors.mois = t('parametersFinances.budgetForm.validation.monthRange');
     }
 
     if (budgetData.montant_ht < 0) {
-      errors.montant_ht = 'Le montant HT ne peut pas être négatif';
+      errors.montant_ht = t('parametersFinances.budgetForm.validation.amountHTNegative');
     }
 
     if (budgetData.montant_ttc < 0) {
-      errors.montant_ttc = 'Le montant TTC ne peut pas être négatif';
+      errors.montant_ttc = t('parametersFinances.budgetForm.validation.amountTTCNegative');
     }
 
     if (budgetData.nb_jours_ouverts !== null && (budgetData.nb_jours_ouverts < 0 || budgetData.nb_jours_ouverts > 31)) {
-      errors.nb_jours_ouverts = 'Le nombre de jours doit être compris entre 0 et 31';
+      errors.nb_jours_ouverts = t('parametersFinances.budgetForm.validation.openDaysRange');
     }
 
     if (budgetData.nb_couverts !== null && budgetData.nb_couverts < 0) {
-      errors.nb_couverts = 'Le nombre de couverts ne peut pas être négatif';
+      errors.nb_couverts = t('parametersFinances.budgetForm.validation.coversNegative');
     }
 
     if (budgetData.prix_moyen_couvert !== null && budgetData.prix_moyen_couvert < 0) {
-      errors.prix_moyen_couvert = 'Le prix moyen ne peut pas être négatif';
+      errors.prix_moyen_couvert = t('parametersFinances.budgetForm.validation.averagePriceNegative');
     }
 
     // Vérifier les doublons
     if (isDuplicateBudget) {
-      errors.id_flux_categorie = 'Un budget existe déjà pour cette combinaison entité/année/mois/catégorie';
+      errors.id_flux_categorie = t('parametersFinances.budgetForm.validation.duplicateBudget');
     }
 
     setBudgetErrors(errors);
@@ -603,27 +605,27 @@ export function SuiviCABudgetForm({
   const validateDetailForm = (): boolean => {
     const errors: Partial<Record<keyof BudgetDetailFormData, string>> = {};
 
-    if (!currentDetail.id_type_service) errors.id_type_service = 'Le type de service est requis';
-    if (!currentDetail.id_flux_sous_categorie) errors.id_flux_sous_categorie = 'La sous-catégorie est requise';
+    if (!currentDetail.id_type_service) errors.id_type_service = t('parametersFinances.budgetForm.validation.serviceTypeRequired');
+    if (!currentDetail.id_flux_sous_categorie) errors.id_flux_sous_categorie = t('parametersFinances.budgetForm.validation.subCategoryRequired');
     
     if (currentDetail.montant_ht < 0) {
-      errors.montant_ht = 'Le montant HT ne peut pas être négatif';
+      errors.montant_ht = t('parametersFinances.budgetForm.validation.amountHTNegative');
     }
 
     if (currentDetail.montant_ttc < 0) {
-      errors.montant_ttc = 'Le montant TTC ne peut pas être négatif';
+      errors.montant_ttc = t('parametersFinances.budgetForm.validation.amountTTCNegative');
     }
 
     if (currentDetail.nb_jours_ouverts !== null && (currentDetail.nb_jours_ouverts < 0 || currentDetail.nb_jours_ouverts > 31)) {
-      errors.nb_jours_ouverts = 'Le nombre de jours doit être compris entre 0 et 31';
+      errors.nb_jours_ouverts = t('parametersFinances.budgetForm.validation.openDaysRange');
     }
 
     if (currentDetail.nb_couverts !== null && currentDetail.nb_couverts < 0) {
-      errors.nb_couverts = 'Le nombre de couverts ne peut pas être négatif';
+      errors.nb_couverts = t('parametersFinances.budgetForm.validation.coversNegative');
     }
 
     if (currentDetail.prix_moyen_couvert !== null && currentDetail.prix_moyen_couvert < 0) {
-      errors.prix_moyen_couvert = 'Le prix moyen ne peut pas être négatif';
+      errors.prix_moyen_couvert = t('parametersFinances.budgetForm.validation.averagePriceNegative');
     }
 
     // Vérifier si cette combinaison type_service/sous_categorie existe déjà
@@ -633,7 +635,7 @@ export function SuiviCABudgetForm({
     );
 
     if (isDuplicate) {
-      errors.id_type_service = 'Cette combinaison type de service / sous-catégorie existe déjà';
+      errors.id_type_service = t('parametersFinances.budgetForm.validation.duplicateServiceSubCategory');
     }
 
     setDetailErrors(errors);
@@ -648,7 +650,7 @@ export function SuiviCABudgetForm({
     
     // Vérifier qu'il y a au moins un détail
     if (detailsData.length === 0) {
-      alert('Vous devez ajouter au moins un détail de budget');
+      alert(t('parametersFinances.budgetForm.validation.addAtLeastOneDetail'));
       return;
     }
     
@@ -681,7 +683,7 @@ export function SuiviCABudgetForm({
 
   const categorieOptions: DropdownOption[] = filteredCategories.map(categorie => ({
     value: categorie.id,
-    label: `${categorie.code} - ${categorie.libelle} (${categorie.type_flux === 'produit' ? 'Produit' : 'Charge'})`
+    label: `${categorie.code} - ${categorie.libelle} (${categorie.type_flux === 'produit' ? t('parametersFinances.budgetForm.product') : t('parametersFinances.budgetForm.charge')})`
   }));
 
   const sousCategorieOptions: DropdownOption[] = filteredSousCategories.map(sousCategorie => ({
@@ -721,11 +723,11 @@ export function SuiviCABudgetForm({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
             <p className="text-red-700 text-sm font-medium">
-              Un budget existe déjà pour cette combinaison entité/année/mois/catégorie de flux.
+              {t('parametersFinances.budgetForm.duplicateWarning')}
             </p>
           </div>
           <p className="text-red-600 text-sm mt-1">
-            Veuillez modifier l'une de ces valeurs ou choisir une autre combinaison.
+            {t('parametersFinances.budgetForm.duplicateWarningMessage')}
           </p>
         </div>
       )}
@@ -739,7 +741,7 @@ export function SuiviCABudgetForm({
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
             <p className="text-blue-700 text-sm">
-              Vérification des doublons en cours...
+              {t('parametersFinances.budgetForm.checkingDuplicates')}
             </p>
           </div>
         </div>
@@ -748,7 +750,7 @@ export function SuiviCABudgetForm({
       {/* Formulaire principal du budget */}
       <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
         <FormField
-          label="Entité"
+          label={t('parametersFinances.budgetForm.entity')}
           required
           error={budgetErrors.id_entite}
           className="mb-3"
@@ -757,14 +759,14 @@ export function SuiviCABudgetForm({
             options={entiteOptions}
             value={budgetData.id_entite}
             onChange={handleEntiteChange}
-            label="Choisir l'entité"
+            label={t('parametersFinances.budgetForm.chooseEntity')}
             size="sm"
             disabled={isSubmitting}
           />
         </FormField>
 
         <FormField
-          label="Catégorie de flux"
+          label={t('parametersFinances.budgetForm.fluxCategory')}
           required
           error={budgetErrors.id_flux_categorie}
           className="mb-3"
@@ -773,14 +775,14 @@ export function SuiviCABudgetForm({
             options={categorieOptions}
             value={budgetData.id_flux_categorie}
             onChange={handleCategorieChange}
-            label={budgetData.id_entite ? "Choisir la catégorie" : "Choisir d'abord une entité"}
+            label={budgetData.id_entite ? t('parametersFinances.budgetForm.chooseCategory') : t('parametersFinances.budgetForm.chooseEntityFirst')}
             size="sm"
             disabled={!budgetData.id_entite || isSubmitting}
           />
         </FormField>
 
         <FormField
-          label="Année"
+          label={t('parametersFinances.budgetForm.year')}
           required
           error={budgetErrors.annee}
           className="mb-3"
@@ -789,14 +791,14 @@ export function SuiviCABudgetForm({
             options={anneeOptions}
             value={budgetData.annee.toString()}
             onChange={handleAnneeChange}
-            label="Choisir l'année"
+            label={t('parametersFinances.budgetForm.chooseYear')}
             size="sm"
             disabled={isSubmitting}
           />
         </FormField>
 
         <FormField
-          label="Mois"
+          label={t('parametersFinances.budgetForm.month')}
           required
           error={budgetErrors.mois}
           className="mb-3"
@@ -805,16 +807,16 @@ export function SuiviCABudgetForm({
             options={moisOptions}
             value={budgetData.mois.toString()}
             onChange={handleMoisChange}
-            label="Choisir le mois"
+            label={t('parametersFinances.budgetForm.chooseMonth')}
             size="sm"
             disabled={isSubmitting}
           />
         </FormField>
 
         <FormField
-          label="Montant HT"
+          label={t('parametersFinances.budgetForm.amountHT')}
           error={budgetErrors.montant_ht}
-          description="Montant total HT (calculé à partir des détails)"
+          description={t('parametersFinances.budgetForm.descriptions.amountHTDescription')}
           className="mb-3"
         >
           <FormInput
@@ -824,16 +826,16 @@ export function SuiviCABudgetForm({
             value={budgetData.montant_ht?.toString() || '0'}
             onChange={handleBudgetInputChange}
             min="0"
-            placeholder="Montant HT"
+            placeholder={t('parametersFinances.budgetForm.placeholders.amountHT')}
             disabled={isSubmitting || detailsData.length > 0}
             className="h-9"
           />
         </FormField>
 
         <FormField
-          label="Montant TTC"
+          label={t('parametersFinances.budgetForm.amountTTC')}
           error={budgetErrors.montant_ttc}
-          description="Montant total TTC (calculé à partir des détails)"
+          description={t('parametersFinances.budgetForm.descriptions.amountTTCDescription')}
           className="mb-3"
         >
           <FormInput
@@ -843,16 +845,16 @@ export function SuiviCABudgetForm({
             value={budgetData.montant_ttc?.toString() || '0'}
             onChange={handleBudgetInputChange}
             min="0"
-            placeholder="Montant TTC"
+            placeholder={t('parametersFinances.budgetForm.placeholders.amountTTC')}
             disabled={isSubmitting || detailsData.length > 0}
             className="h-9"
           />
         </FormField>
 
         <FormField
-          label="Nombre de jours ouverts"
+          label={t('parametersFinances.budgetForm.openDays')}
           error={budgetErrors.nb_jours_ouverts}
-          description={paramsJours ? `Paramètre global: ${paramsJours.nb_jours_ouverts} jours` : undefined}
+          description={paramsJours ? t('parametersFinances.budgetForm.descriptions.openDaysDescription').replace('{days}', paramsJours.nb_jours_ouverts.toString()) : undefined}
           className="mb-3"
         >
           <FormInput
@@ -862,14 +864,14 @@ export function SuiviCABudgetForm({
             onChange={handleBudgetInputChange}
             min="0"
             max="31"
-            placeholder="Nombre de jours"
+            placeholder={t('parametersFinances.budgetForm.placeholders.openDays')}
             disabled={isSubmitting}
             className="h-9"
           />
         </FormField>
 
         <FormField
-          label="Nombre de couverts"
+          label={t('parametersFinances.budgetForm.covers')}
           error={budgetErrors.nb_couverts}
           className="mb-3"
         >
@@ -879,14 +881,14 @@ export function SuiviCABudgetForm({
             value={budgetData.nb_couverts?.toString() || ''}
             onChange={handleBudgetInputChange}
             min="0"
-            placeholder="Nombre de couverts"
+            placeholder={t('parametersFinances.budgetForm.placeholders.covers')}
             disabled={isSubmitting}
             className="h-9"
           />
         </FormField>
 
         <FormField
-          label="Prix moyen par couvert"
+          label={t('parametersFinances.budgetForm.averagePrice')}
           error={budgetErrors.prix_moyen_couvert}
           className="mb-3"
         >
@@ -897,14 +899,14 @@ export function SuiviCABudgetForm({
             value={budgetData.prix_moyen_couvert?.toString() || ''}
             onChange={handleBudgetInputChange}
             min="0"
-            placeholder="Prix moyen"
+            placeholder={t('parametersFinances.budgetForm.placeholders.averagePrice')}
             disabled={isSubmitting}
             className="h-9"
           />
         </FormField>
 
         <FormField
-          label="Commentaire"
+          label={t('parametersFinances.budgetForm.comment')}
           error={budgetErrors.commentaire}
           className="mb-3 col-span-2"
         >
@@ -914,21 +916,21 @@ export function SuiviCABudgetForm({
             onChange={handleBudgetInputChange}
             className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
             rows={2}
-            placeholder="Commentaire sur ce budget..."
+            placeholder={t('parametersFinances.budgetForm.placeholders.comment')}
             disabled={isSubmitting}
           />
         </FormField>
 
         {/* Section des détails du budget */}
         <div className="col-span-2 mt-4 border-t pt-4">
-          <h3 className="text-lg font-semibold mb-4">Détails du budget</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('parametersFinances.budgetForm.budgetDetails')}</h3>
           
           {/* Formulaire d'ajout de détail */}
           <div className="bg-gray-50 p-4 rounded-lg mb-4">
-            <h4 className="text-md font-medium mb-3">Ajouter un détail</h4>
+            <h4 className="text-md font-medium mb-3">{t('parametersFinances.budgetForm.addDetail')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Type de service"
+                label={t('parametersFinances.budgetForm.serviceType')}
                 required
                 error={detailErrors.id_type_service}
               >
@@ -936,14 +938,14 @@ export function SuiviCABudgetForm({
                   options={typeServiceOptions}
                   value={currentDetail.id_type_service}
                   onChange={handleTypeServiceChange}
-                  label={budgetData.id_entite ? "Choisir le service" : "Choisir d'abord une entité"}
+                  label={budgetData.id_entite ? t('parametersFinances.budgetForm.chooseService') : t('parametersFinances.budgetForm.chooseEntityFirst')}
                   size="sm"
                   disabled={!budgetData.id_entite || isSubmitting}
                 />
               </FormField>
 
               <FormField
-                label="Sous-catégorie"
+                label={t('parametersFinances.budgetForm.subCategory')}
                 required
                 error={detailErrors.id_flux_sous_categorie}
               >
@@ -951,14 +953,14 @@ export function SuiviCABudgetForm({
                   options={sousCategorieOptions}
                   value={currentDetail.id_flux_sous_categorie}
                   onChange={handleSousCategorieChange}
-                  label={budgetData.id_flux_categorie ? "Choisir la sous-catégorie" : "Choisir d'abord une catégorie"}
+                  label={budgetData.id_flux_categorie ? t('parametersFinances.budgetForm.chooseSubCategory') : t('parametersFinances.budgetForm.chooseCategoryFirst')}
                   size="sm"
                   disabled={!budgetData.id_flux_categorie || isSubmitting}
                 />
               </FormField>
 
               <FormField
-                label="Montant HT"
+                label={t('parametersFinances.budgetForm.amountHT')}
                 required
                 error={detailErrors.montant_ht}
               >
@@ -969,14 +971,14 @@ export function SuiviCABudgetForm({
                   value={currentDetail.montant_ht?.toString() || '0'}
                   onChange={handleDetailInputChange}
                   min="0"
-                  placeholder="Montant HT"
+                  placeholder={t('parametersFinances.budgetForm.placeholders.amountHT')}
                   disabled={isSubmitting}
                   className="h-9"
                 />
               </FormField>
 
               <FormField
-                label="Montant TTC"
+                label={t('parametersFinances.budgetForm.amountTTC')}
                 required
                 error={detailErrors.montant_ttc}
               >
@@ -987,14 +989,14 @@ export function SuiviCABudgetForm({
                   value={currentDetail.montant_ttc?.toString() || '0'}
                   onChange={handleDetailInputChange}
                   min="0"
-                  placeholder="Montant TTC"
+                  placeholder={t('parametersFinances.budgetForm.placeholders.amountTTC')}
                   disabled={isSubmitting}
                   className="h-9"
                 />
               </FormField>
 
               <FormField
-                label="Nombre de jours ouverts"
+                label={t('parametersFinances.budgetForm.openDays')}
                 error={detailErrors.nb_jours_ouverts}
               >
                 <FormInput
@@ -1004,14 +1006,14 @@ export function SuiviCABudgetForm({
                   onChange={handleDetailInputChange}
                   min="0"
                   max="31"
-                  placeholder="Jours ouverts"
+                  placeholder={t('parametersFinances.budgetForm.placeholders.openDays')}
                   disabled={isSubmitting}
                   className="h-9"
                 />
               </FormField>
 
               <FormField
-                label="Nombre de couverts"
+                label={t('parametersFinances.budgetForm.covers')}
                 error={detailErrors.nb_couverts}
               >
                 <FormInput
@@ -1020,14 +1022,14 @@ export function SuiviCABudgetForm({
                   value={currentDetail.nb_couverts?.toString() || ''}
                   onChange={handleDetailInputChange}
                   min="0"
-                  placeholder="Nombre de couverts"
+                  placeholder={t('parametersFinances.budgetForm.placeholders.covers')}
                   disabled={isSubmitting}
                   className="h-9"
                 />
               </FormField>
 
               <FormField
-                label="Prix moyen par couvert"
+                label={t('parametersFinances.budgetForm.averagePrice')}
                 error={detailErrors.prix_moyen_couvert}
               >
                 <FormInput
@@ -1037,21 +1039,21 @@ export function SuiviCABudgetForm({
                   value={currentDetail.prix_moyen_couvert?.toString() || ''}
                   onChange={handleDetailInputChange}
                   min="0"
-                  placeholder="Prix moyen"
+                  placeholder={t('parametersFinances.budgetForm.placeholders.averagePrice')}
                   disabled={isSubmitting}
                   className="h-9"
                 />
               </FormField>
 
               <FormField
-                label="Commentaire"
+                label={t('parametersFinances.budgetForm.comment')}
                 error={detailErrors.commentaire}
               >
                 <FormInput
                   name="commentaire"
                   value={currentDetail.commentaire || ''}
                   onChange={handleDetailInputChange}
-                  placeholder="Commentaire"
+                  placeholder={t('parametersFinances.budgetForm.placeholders.detailComment')}
                   disabled={isSubmitting}
                   className="h-9"
                 />
@@ -1060,7 +1062,7 @@ export function SuiviCABudgetForm({
             
             <div className="mt-3 flex justify-end">
               <Button
-                label="Ajouter ce détail"
+                label={t('parametersFinances.budgetForm.addThisDetail')}
                 icon="Plus"
                 color="var(--color-primary)"
                 type="button"
@@ -1074,16 +1076,16 @@ export function SuiviCABudgetForm({
           {/* Liste des détails ajoutés */}
           {detailsData.length > 0 ? (
             <div className="mb-4">
-              <h4 className="text-md font-medium mb-2">Détails ajoutés</h4>
+              <h4 className="text-md font-medium mb-2">{t('parametersFinances.budgetForm.addedDetails')}</h4>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type de service</th>
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sous-catégorie</th>
-                      <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Montant HT</th>
-                      <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Montant TTC</th>
-                      <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('parametersFinances.budgetForm.serviceType')}</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('parametersFinances.budgetForm.subCategory')}</th>
+                      <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('parametersFinances.budgetForm.amountHT')}</th>
+                      <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('parametersFinances.budgetForm.amountTTC')}</th>
+                      <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{t('parametersFinances.budgetForm.actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -1094,10 +1096,10 @@ export function SuiviCABudgetForm({
                       return (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="px-3 py-2 text-sm text-gray-900">
-                            {typeService ? `${typeService.code} - ${typeService.libelle}` : 'Non trouvé'}
+                            {typeService ? `${typeService.code} - ${typeService.libelle}` : t('parametersFinances.budgetForm.notFound')}
                           </td>
                           <td className="px-3 py-2 text-sm text-gray-900">
-                            {sousCategorie ? `${sousCategorie.code} - ${sousCategorie.libelle}` : 'Non trouvé'}
+                            {sousCategorie ? `${sousCategorie.code} - ${sousCategorie.libelle}` : t('parametersFinances.budgetForm.notFound')}
                           </td>
                           <td className="px-3 py-2 text-sm text-gray-900 text-right">
                             {detail.montant_ht?.toFixed(2)} €
@@ -1123,7 +1125,7 @@ export function SuiviCABudgetForm({
                     {/* Ligne de total */}
                     <tr className="bg-gray-100 font-semibold">
                       <td className="px-3 py-2 text-sm text-gray-900" colSpan={2}>
-                        Total
+                        {t('parametersFinances.budgetForm.total')}
                       </td>
                       <td className="px-3 py-2 text-sm text-gray-900 text-right">
                         {totalHT.toFixed(2)} €
@@ -1140,7 +1142,7 @@ export function SuiviCABudgetForm({
           ) : (
             <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="text-yellow-700 text-sm">
-                Aucun détail ajouté. Veuillez ajouter au moins un détail pour ce budget.
+                {t('parametersFinances.budgetForm.noDetailsMessage')}
               </p>
             </div>
           )}
@@ -1148,7 +1150,7 @@ export function SuiviCABudgetForm({
 
         <FormActions>
           <Button
-            label="Annuler"
+            label={t('parametersFinances.budgetForm.cancel')}
             color="#6B7280"
             onClick={onCancel}
             type="button"
@@ -1156,7 +1158,7 @@ export function SuiviCABudgetForm({
             size="sm"
           />
           <Button
-            label={isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+            label={isSubmitting ? t('parametersFinances.budgetForm.saving') : t('parametersFinances.budgetForm.save')}
             icon="Save"
             color="var(--color-primary)"
             type="submit"

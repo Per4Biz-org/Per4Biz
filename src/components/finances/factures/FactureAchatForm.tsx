@@ -152,6 +152,47 @@ export function FactureAchatForm({
     }
   }, [entiteId, facture.id_entite]);
 
+  // Função auxiliar para validar e processar valores monetários
+  const parseMonetaryValue = (value: string): number => {
+    // Permitir valores intermediários como "-", "-.5", "-1.", etc.
+    if (value === '' || value === '-' || value === '-.') {
+      return 0;
+    }
+    
+    // Remover caracteres não numéricos exceto ponto e sinal negativo
+    const cleanValue = value.replace(/[^-\d.]/g, '');
+    
+    const parsed = parseFloat(cleanValue);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  // Handler para permitir digitação do sinal negativo
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    const { name } = target;
+    
+    // Para campos monetários, permitir sinal negativo
+    if (['montant_ht', 'montant_tva', 'montant_ttc'].includes(name)) {
+      // Permitir sinal negativo no início
+      if (e.key === '-') {
+        const currentValue = target.value;
+        const cursorPosition = target.selectionStart || 0;
+        
+        // Se já tem sinal negativo, não permitir outro
+        if (currentValue.includes('-')) {
+          e.preventDefault();
+          return;
+        }
+        
+        // Só permitir no início do input
+        if (cursorPosition !== 0) {
+          e.preventDefault();
+          return;
+        }
+      }
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     let updatedFacture = { ...facture };
@@ -160,10 +201,10 @@ export function FactureAchatForm({
     if (name === 'montant_ht') {
       setMontantHT(value);
       // Recalculer le TTC si la TVA est déjà définie
-      const tva = parseFloat(montantTVA) || 0;
-      const ht = parseFloat(value) || 0;
+      const tva = parseMonetaryValue(montantTVA);
+      const ht = parseMonetaryValue(value);
       const newTTC = ht + tva;
-      setMontantTTC(newTTC.toString());
+      setMontantTTC(newTTC.toFixed(2));
       updatedFacture = {
         ...updatedFacture,
         [name]: value,
@@ -172,16 +213,16 @@ export function FactureAchatForm({
       };
       
       // Effacer l'erreur du TTC si le nouveau montant est valide
-      if (newTTC > 0 && errors.montant_ttc) {
+      if (newTTC !== 0 && errors.montant_ttc) {
         setErrors(prev => ({ ...prev, montant_ttc: '' }));
       }
     } else if (name === 'montant_tva') {
       setMontantTVA(value);
       // Recalculer le TTC
-      const ht = parseFloat(montantHT) || 0;
-      const tva = parseFloat(value) || 0;
+      const ht = parseMonetaryValue(montantHT);
+      const tva = parseMonetaryValue(value);
       const newTTC = ht + tva;
-      setMontantTTC(newTTC.toString());
+      setMontantTTC(newTTC.toFixed(2));
       updatedFacture = {
         ...updatedFacture,
         [name]: value,
@@ -190,15 +231,16 @@ export function FactureAchatForm({
       };
       
       // Effacer l'erreur du TTC si le nouveau montant est valide
-      if (newTTC > 0 && errors.montant_ttc) {
+      if (newTTC !== 0 && errors.montant_ttc) {
         setErrors(prev => ({ ...prev, montant_ttc: '' }));
       }
     } else if (name === 'montant_ttc') {
       setMontantTTC(value);
+      const ttc = parseMonetaryValue(value);
       updatedFacture = {
         ...updatedFacture,
         [name]: value,
-        montant_ttc: parseFloat(value) || 0
+        montant_ttc: ttc
       };
     } else {
       updatedFacture = { ...updatedFacture, [name]: value };
@@ -262,7 +304,7 @@ export function FactureAchatForm({
       newErrors.date_facture = t('invoices.validation.invoiceDateRequired');
     }
     
-    if (!facture.montant_ht || facture.montant_ht <= 0) {
+    if (facture.montant_ht === null || facture.montant_ht === undefined || facture.montant_ht === 0) {
       newErrors.montant_ht = t('invoices.validation.amountExVatRequired');
     }
     
@@ -270,7 +312,7 @@ export function FactureAchatForm({
       newErrors.montant_tva = t('invoices.validation.vatAmountRequired');
     }
     
-    if (!facture.montant_ttc || facture.montant_ttc <= 0) {
+    if (facture.montant_ttc === null || facture.montant_ttc === undefined || facture.montant_ttc === 0) {
       newErrors.montant_ttc = t('invoices.validation.amountIncVatRequired');
     }
 
@@ -344,7 +386,7 @@ export function FactureAchatForm({
             options={entiteOptions}
             value={selectedEntite}
             onChange={handleDropdownChange('id_entite')} 
-            label="Sélectionner une entité"
+            label={t('common.selectEntity')}
             disabled={loading || isSaving}
           />
         )}
@@ -429,8 +471,8 @@ export function FactureAchatForm({
           name="montant_ht"
           value={montantHT}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           step="0.01"
-          min="0"
           placeholder={t('invoices.form.amountExVat')}
           disabled={isSaving}
         />
@@ -446,8 +488,8 @@ export function FactureAchatForm({
           name="montant_tva"
           value={montantTVA}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           step="0.01"
-          min="0"
           placeholder={t('invoices.form.vatAmount')}
           disabled={isSaving}
         />
@@ -463,8 +505,8 @@ export function FactureAchatForm({
           name="montant_ttc"
           value={montantTTC}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           step="0.01"
-          min="0"
           placeholder={t('invoices.form.amountIncVat')}
           disabled={isSaving}
         />

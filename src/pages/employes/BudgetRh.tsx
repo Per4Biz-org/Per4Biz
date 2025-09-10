@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { useMenu } from '../../context/MenuContext';
 import { useProfil } from '../../context/ProfilContext';
@@ -14,6 +15,7 @@ import { useBudgetRHCollapse } from '../../hooks/employes/useBudgetRHCollapse';
 import styles from './styles.module.css';
 
 const BudgetRh: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [toasts, setToasts] = useState<ToastData[]>([]);
@@ -62,7 +64,7 @@ const BudgetRh: React.FC = () => {
       } catch (error) {
         console.error('Erreur lors du chargement des entités:', error);
         addToast({
-          label: 'Erreur lors du chargement des entités',
+          label: t('hrBudget.errors.loadEntities'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -112,7 +114,7 @@ const BudgetRh: React.FC = () => {
 
   // Générer les options pour les entités
   const entiteOptions: DropdownOption[] = [
-    { value: '', label: 'Tous les restaurants' },
+    { value: '', label: t('hrBudget.filters.allRestaurants') },
     ...entites.map(entite => ({
       value: entite.id,
       label: `${entite.code} - ${entite.libelle}`
@@ -122,43 +124,43 @@ const BudgetRh: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title="Budget Prévisionnel RH"
-        description="Visualisez le budget prévisionnel RH calculé en temps réel à partir des données existantes"
+        title={t('hrBudget.title')}
+        description={t('hrBudget.description')}
         className={styles.header}
       >
         <div className="mb-6 bg-white p-6 rounded-lg shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Filtres</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('hrBudget.filters.title')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Année
+                {t('hrBudget.filters.year')}
               </label>
               <Dropdown
                 options={yearOptions}
                 value={selectedYear}
                 onChange={handleYearChange}
-                label="Sélectionner une année"
+                label={t('hrBudget.filters.selectYear')}
                 size="sm"
               />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Restaurant
+                {t('hrBudget.filters.restaurant')}
               </label>
               <Dropdown
                 options={entiteOptions}
                 value={selectedEntiteId}
                 onChange={handleEntiteChange}
-                label="Tous les restaurants"
+                label={t('hrBudget.filters.allRestaurants')}
                 size="sm"
               />
             </div>
             
             <div className="flex items-end">
               <Button
-                label={calculationLoading ? "Calcul en cours..." : "Afficher le Budget"}
+                label={calculationLoading ? t('hrBudget.filters.calculating') : t('hrBudget.filters.showBudget')}
                 icon="Calculator"
                 color="var(--color-primary)"
                 onClick={handleShowBudget}
@@ -168,14 +170,14 @@ const BudgetRh: React.FC = () => {
           </div>
           
           <div className="text-sm text-gray-500">
-            <p>Le budget est calculé dynamiquement à partir des données RH existantes (contrats, affectations, historique financier).</p>
-            <p>Les charges patronales et salariales sont calculées selon les paramètres définis dans les paramètres généraux RH.</p>
+            <p>{t('hrBudget.filters.info.dynamic')}</p>
+            <p>{t('hrBudget.filters.info.charges')}</p>
           </div>
         </div>
         
         {calculationError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-            <p className="font-medium">Erreur lors du calcul du budget</p>
+            <p className="font-medium">{t('hrBudget.errors.budgetCalculation')}</p>
             <p>{calculationError}</p>
           </div>
         )}
@@ -184,14 +186,14 @@ const BudgetRh: React.FC = () => {
           <>
             <div className="mb-4 flex justify-between items-center">
               <h2 className="text-xl font-semibold">
-                Budget RH {selectedYear}
-                {selectedEntiteId ? ` - ${entites.find(e => e.id === selectedEntiteId)?.libelle || ''}` : ' - Tous les restaurants'}
+                {t('hrBudget.budget.title', { year: selectedYear })}
+                {selectedEntiteId ? ` - ${entites.find(e => e.id === selectedEntiteId)?.libelle || ''}` : ` - ${t('hrBudget.budget.allRestaurants')}`}
               </h2>
               
               <BudgetRHExportButtons 
                 data={budgetData} 
                 year={selectedYear}
-                entiteName={selectedEntiteId ? entites.find(e => e.id === selectedEntiteId)?.libelle || '' : 'Tous les restaurants'}
+                entiteName={selectedEntiteId ? entites.find(e => e.id === selectedEntiteId)?.libelle || '' : t('hrBudget.budget.allRestaurants')}
               />
             </div>
             
@@ -199,15 +201,15 @@ const BudgetRh: React.FC = () => {
               <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Calcul du budget en cours...</p>
-                  <p className="text-sm text-gray-500 mt-2">Cette opération peut prendre quelques instants</p>
+                  <p className="text-gray-600">{t('hrBudget.budget.calculating')}</p>
+                  <p className="text-sm text-gray-500 mt-2">{t('hrBudget.budget.calculatingInfo')}</p>
                 </div>
               </div>
             ) : budgetData.length === 0 ? (
               <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="text-center p-6">
-                  <p className="text-gray-600 mb-2">Aucune donnée de budget disponible</p>
-                  <p className="text-gray-500 text-sm">Vérifiez que des employés avec des contrats et des historiques financiers existent pour cette période</p>
+                  <p className="text-gray-600 mb-2">{t('hrBudget.budget.noData')}</p>
+                  <p className="text-gray-500 text-sm">{t('hrBudget.budget.noDataInfo')}</p>
                 </div>
               </div>
             ) : (

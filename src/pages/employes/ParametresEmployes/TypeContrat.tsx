@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS, pt } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../../context/MenuContext';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
@@ -25,6 +26,7 @@ interface TypeContrat {
 }
 
 const TypeContrat: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [contrats, setContrats] = useState<TypeContrat[]>([]);
@@ -41,6 +43,16 @@ const TypeContrat: React.FC = () => {
     actif: true
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Função para obter o locale de data baseado no idioma actual
+  const getDateLocale = () => {
+    switch (i18n.language) {
+      case 'en': return enUS;
+      case 'pt': return pt;
+      case 'fr':
+      default: return fr;
+    }
+  };
 
   useEffect(() => {
     setMenuItems(menuItemsParamGestionRH);
@@ -67,7 +79,7 @@ const TypeContrat: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des types de contrats:', error);
       addToast({
-        label: 'Erreur lors de la récupération des types de contrats',
+        label: t('employeeParams.contractTypes.messages.loadError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -115,13 +127,13 @@ const TypeContrat: React.FC = () => {
     const errors: Record<string, string> = {};
     
     if (!formData.code.trim()) {
-      errors.code = 'Le code est requis';
+      errors.code = t('employeeParams.contractTypes.validation.codeRequired');
     } else if (formData.code.length > 10) {
       errors.code = 'Le code ne doit pas dépasser 10 caractères';
     }
     
     if (!formData.libelle.trim()) {
-      errors.libelle = 'Le libellé est requis';
+      errors.libelle = t('employeeParams.contractTypes.validation.labelRequired');
     } else if (formData.libelle.length > 50) {
       errors.libelle = 'Le libellé ne doit pas dépasser 50 caractères';
     }
@@ -187,7 +199,7 @@ const TypeContrat: React.FC = () => {
         actif: true
       });
       addToast({
-        label: `Type de contrat ${selectedContrat ? 'modifié' : 'créé'} avec succès`,
+        label: t('employeeParams.contractTypes.messages.saveSuccess'),
         icon: 'Check',
         color: '#22c55e'
       });
@@ -202,7 +214,7 @@ const TypeContrat: React.FC = () => {
       }
       
       addToast({
-        label: errorMessage,
+        label: t('employeeParams.contractTypes.messages.saveError'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -224,7 +236,7 @@ const TypeContrat: React.FC = () => {
   };
 
   const handleDelete = async (contrat: TypeContrat) => {
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer le type de contrat "${contrat.libelle}" ?`)) {
+    if (window.confirm(t('employeeParams.contractTypes.messages.deleteConfirm'))) {
       try {
         const { error } = await supabase
           .from('rh_type_contrat')
@@ -235,14 +247,14 @@ const TypeContrat: React.FC = () => {
 
         await fetchContrats();
         addToast({
-          label: `Le type de contrat "${contrat.libelle}" a été supprimé avec succès`,
+          label: t('employeeParams.contractTypes.messages.deleteSuccess'),
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression du type de contrat',
+          label: t('employeeParams.contractTypes.messages.deleteError'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });

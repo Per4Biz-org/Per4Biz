@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
@@ -72,6 +73,7 @@ export function CATypeServiceFormModal({
   const [selectedCategorie, setSelectedCategorie] = useState<string>('');
   const [errors, setErrors] = useState<Partial<Record<keyof CATypeServiceFormData, string>>>({});
   const { profil } = useProfil();
+  const { t } = useTranslation();
 
   // Charger les entités
   useEffect(() => {
@@ -387,7 +389,7 @@ export function CATypeServiceFormModal({
               options={entiteOptions}
               value={formData.id_entite}
               onChange={handleEntiteChange}
-              label="Sélectionner une entité"
+              label={t('common.selectEntity')}
               size="sm"
               disabled={isSubmitting}
             />

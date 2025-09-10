@@ -344,6 +344,48 @@ const MesFactures: React.FC = () => {
     return true;
   };
 
+  // Vérification des requisitos pour activer le bouton
+  const getSearchRequirements = () => {
+    const missingRequirements = [];
+    
+    if (!filters.entite) {
+      missingRequirements.push(t('common.restaurant', 'Restaurante'));
+    }
+    
+    if (!filters.dateDebut) {
+      missingRequirements.push(t('forms.startDate', 'Date de début'));
+    }
+    
+    if (!filters.dateFin) {
+      missingRequirements.push(t('forms.endDate', 'Date de fin'));
+    }
+    
+    const canSearch = missingRequirements.length === 0;
+    let tooltipMessage;
+    
+    if (canSearch) {
+      tooltipMessage = undefined;
+    } else if (!filters.entite && filters.dateDebut && filters.dateFin) {
+      // Se só falta o restaurante
+      tooltipMessage = t('messages.selectRestaurantToSearch', 'Por favor, seleccione um restaurante para pesquisar facturas');
+    } else {
+      // Se faltam outros campos
+      tooltipMessage = t('messages.requiredFields', { 0: missingRequirements.join(', ') });
+    }
+    
+    return { canSearch, tooltipMessage };
+  };
+
+  // Vérification para o botão "Nova factura"
+  const getNewInvoiceRequirements = () => {
+    const canCreate = !!filters.entite;
+    const tooltipMessage = canCreate 
+      ? undefined 
+      : t('messages.selectRestaurantToCreate', 'Por favor, seleccione um restaurante antes de criar uma factura');
+    
+    return { canCreate, tooltipMessage };
+  };
+
   // Gestionnaire pour le bouton de recherche
   const handleSearch = () => {
     if (!validateDates()) return;
@@ -515,22 +557,56 @@ const MesFactures: React.FC = () => {
         description={t('pages.finances.invoicesSubtitle', 'Consultez et gérez vos factures d\'achat')}
         className={styles.header}>
         <div className="mb-6">
-          <div className="flex items-end gap-4">
+          <div className="flex items-end justify-between">
             <FilterSection
               filters={filterConfigs} 
               values={filters}
               onChange={handleFilterChange}
               requireSelection={true}
-              className="flex-1 flex items-end gap-4"
+              className="flex items-end gap-3"
             />
             
-            <Button
-              label={isSearching ? t('table.searchInProgress', 'Recherche en cours...') : t('invoices.showInvoices')}
-              icon="Search"
-              color="var(--color-primary)"
-              onClick={handleSearch}
-              disabled={isSearching || !filters.entite}
-            />
+            <div className="flex gap-2 ml-6">
+              {(() => {
+                const { canSearch, tooltipMessage } = getSearchRequirements();
+                return (
+                  <Button
+                    label={isSearching ? t('table.searchInProgress', 'Recherche en cours...') : t('invoices.showInvoices')}
+                    icon="Search"
+                    color="var(--color-primary)"
+                    onClick={handleSearch}
+                    disabled={isSearching || !canSearch}
+                    tooltip={!canSearch ? tooltipMessage : undefined}
+                  />
+                );
+              })()}
+              
+              {(() => {
+                const { canCreate, tooltipMessage } = getNewInvoiceRequirements();
+                return (
+                  <Button
+                    label={t('pages.finances.newInvoice', 'Nouvelle facture')}
+                    icon="Plus"
+                    color="var(--color-primary)"
+                    onClick={() => {
+                      const selectedEntityId = getSelectedEntityId();
+                      if (selectedEntityId) {
+                        setSelectedFactureId(undefined);
+                        setIsEditModalOpen(true);
+                      } else {
+                        addToast({
+                          label: t('messages.selectEntityBeforeCreate'),
+                          icon: 'AlertTriangle',
+                          color: '#f59e0b'
+                        });
+                      }
+                    }}
+                    disabled={!canCreate}
+                    tooltip={!canCreate ? tooltipMessage : undefined}
+                  />
+                );
+              })()}
+            </div>
           </div>
 
           <div className="mt-2 text-sm text-gray-600">
@@ -542,28 +618,6 @@ const MesFactures: React.FC = () => {
               <span>{t('messages.useFiltersAbove')}</span>
             )}
           </div>
-        </div>
-
-        <div className="mb-6">
-          <Button
-            label={t('pages.finances.newInvoice', 'Nouvelle facture')}
-            icon="Plus"
-            color="var(--color-primary)"
-            onClick={() => {
-              const selectedEntityId = getSelectedEntityId();
-              if (selectedEntityId) {
-                setSelectedFactureId(undefined);
-                setIsEditModalOpen(true);
-              } else {
-                addToast({
-                  label: t('messages.selectEntityBeforeCreate'),
-                  icon: 'AlertTriangle',
-                  color: '#f59e0b'
-                });
-              }
-            }}
-            disabled={!filters.entite}
-          />
         </div>
 
         {loading && !searchPerformed ? (

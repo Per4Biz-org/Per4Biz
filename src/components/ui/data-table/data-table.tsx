@@ -124,7 +124,6 @@ export function DataTable<T extends { id: string | number }>({
       <table className={`${styles.table} ${compact ? styles.compact : ''}`}>
         <thead className={styles.header}>
           <tr>
-            {actions && <th className={styles.headerCell}>Actions</th>}
             {columns.map(column => (
               <th
                 key={String(column.accessor)}
@@ -146,6 +145,7 @@ export function DataTable<T extends { id: string | number }>({
                 )}
               </th>
             ))}
+            {actions && <th className={styles.headerCell}>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -154,6 +154,16 @@ export function DataTable<T extends { id: string | number }>({
               key={row.id} 
               className={`${styles.row} ${customRowClassName ? customRowClassName(row, index) : ''}`}
             >
+              {columns.map(column => (
+                <td
+                  key={`${row.id}-${String(column.accessor)}`}
+                  className={`${styles.cell} ${column.align ? styles[column.align] : ''}`}
+                >
+                  {column.render
+                    ? column.render(row[column.accessor], row)
+                    : row[column.accessor]?.toString()}
+                </td>
+              ))}
               {actions && (
                 <td className={styles.actionsCell}>
                   <div className="flex gap-2">
@@ -174,16 +184,6 @@ export function DataTable<T extends { id: string | number }>({
                   </div>
                 </td>
               )}
-              {columns.map(column => (
-                <td
-                  key={`${row.id}-${String(column.accessor)}`}
-                  className={`${styles.cell} ${column.align ? styles[column.align] : ''}`}
-                >
-                  {column.render
-                    ? column.render(row[column.accessor], row)
-                    : row[column.accessor]?.toString()}
-                </td>
-              ))}
             </tr>
           ))}
         </tbody>
@@ -191,52 +191,87 @@ export function DataTable<T extends { id: string | number }>({
 
       {shouldShowPagination && (
         <div className={styles.pagination}>
+          <div className={styles.paginationLeft}>
           <div className={styles.paginationInfo}>
             {displayedRange}
           </div>
-
-          <div className={styles.paginationControls}>
-            <Button
-              size="sm"
-              icon="ChevronsLeft"
-              label=""
-              onClick={() => handlePageChange(1)}
-              disabled={currentPage === 1}
-            />
-            <Button
-              size="sm"
-              icon="ChevronLeft"
-              label=""
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            />
-          
+            <div className={styles.rowsPerPageContainer}>
+              <span className={styles.rowsPerPageLabel}>Linhas por página:</span>
             <select
-              className="mx-2 px-2 py-1 border rounded"
+                className={styles.rowsPerPageSelect}
               value={rowsPerPage === -1 ? 'all' : rowsPerPage}
               onChange={(e) => handleRowsPerPageChange(e.target.value === 'all' ? -1 : Number(e.target.value))}
             >
               {rowsPerPageOptions.map(option => (
                 <option key={option} value={option === 'all' ? 'all' : option}>
-                  {option === 'all' ? 'Tout afficher' : `${option} par page`}
+                    {option === 'all' ? 'Todos' : option.toString()}
                 </option>
               ))}
             </select>
+            </div>
+          </div>
 
-            <Button
-              size="sm"
-              icon="ChevronRight"
-              label=""
+          <div className={styles.paginationControls}>
+            <button
+              className={`${styles.paginationButton} ${currentPage === 1 ? styles.disabled : ''}`}
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1}
+              title="Primeira página"
+            >
+              <ChevronsLeft size={16} />
+            </button>
+            
+            <button
+              className={`${styles.paginationButton} ${currentPage === 1 ? styles.disabled : ''}`}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              title="Página anterior"
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            <div className={styles.pageNumbers}>
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNumber;
+                if (totalPages <= 5) {
+                  pageNumber = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNumber = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNumber = totalPages - 4 + i;
+                } else {
+                  pageNumber = currentPage - 2 + i;
+                }
+
+                return (
+                  <button
+                    key={pageNumber}
+                    className={`${styles.pageNumber} ${currentPage === pageNumber ? styles.active : ''}`}
+                    onClick={() => handlePageChange(pageNumber)}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              className={`${styles.paginationButton} ${currentPage === totalPages ? styles.disabled : ''}`}
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-            />
-            <Button
-              size="sm"
-              icon="ChevronsRight"
-              label=""
+              title="Próxima página"
+            >
+              <ChevronRight size={16} />
+            </button>
+            
+            <button
+              className={`${styles.paginationButton} ${currentPage === totalPages ? styles.disabled : ''}`}
               onClick={() => handlePageChange(totalPages)}
               disabled={currentPage === totalPages}
-            />
+              title="Última página"
+            >
+              <ChevronsRight size={16} />
+            </button>
           </div>
         </div>
       )}

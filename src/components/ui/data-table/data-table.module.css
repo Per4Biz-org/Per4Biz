@@ -103,20 +103,123 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0.75rem;
-  background-color: color-mix(in srgb, var(--color-primary) 2%, transparent);
-  border-top: 1px solid color-mix(in srgb, var(--color-primary) 5%, transparent);
+  padding: 1rem;
+  background-color: var(--color-white);
+  border-top: 1px solid #e5e7eb;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.paginationLeft {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .paginationInfo {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.rowsPerPageContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rowsPerPageLabel {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.rowsPerPageSelect {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: var(--color-white);
   color: var(--color-text);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.rowsPerPageSelect:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 10%, transparent);
 }
 
 .paginationControls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
+}
+
+.paginationButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: var(--color-white);
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.paginationButton:hover:not(.disabled) {
+  background-color: #f9fafb;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.paginationButton.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: #f9fafb;
+}
+
+.pageNumbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0 0.5rem;
+}
+
+.pageNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: var(--color-white);
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pageNumber:hover {
+  background-color: #f9fafb;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.pageNumber.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+  font-weight: 600;
+}
+
+.pageNumber.active:hover {
+  background-color: color-mix(in srgb, var(--color-primary) 90%, black);
 }
 
 .empty {

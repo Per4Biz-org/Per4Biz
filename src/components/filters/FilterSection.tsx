@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FormInput } from '../ui/form';
 import { Dropdown, DropdownOption } from '../ui/dropdown';
+import { DatePicker } from '../ui/date-picker';
 
 interface FilterConfig {
   name: string;
@@ -26,6 +28,8 @@ export function FilterSection({
   requireSelection = false,
   className = ''
 }: FilterSectionProps) {
+  const { t } = useTranslation();
+  
   const handleFilterChange = (name: string, value: any) => {
     const updatedValues = {
       ...values,
@@ -48,10 +52,10 @@ export function FilterSection({
         let dropdownOptions: DropdownOption[];
         
         if (filter.isEntityOption) {
-          // Pour les options d'entité (avec code et libellé)
+          // Para as opções de entidade (com código e rótulo)
           const entityOptions = options as { id?: string; code: string; libelle: string }[];
           dropdownOptions = requireSelection ? [] : [
-            { value: '', label: `Tous les ${label.toLowerCase()}` }
+            { value: '', label: `${t('common.all')} ${label.toLowerCase()}` }
           ];
           
           dropdownOptions = requireSelection ? 
@@ -59,16 +63,16 @@ export function FilterSection({
               value: option.code,
               label: `${option.code} - ${option.libelle}`
             })) : [
-            { value: '', label: `Tous les ${label.toLowerCase()}` },
+            { value: '', label: `${t('common.all')} ${label.toLowerCase()}` },
             ...entityOptions.map(option => ({
               value: option.code,
               label: `${option.code} - ${option.libelle}`
             }))
           ];
         } else {
-          // Pour les options simples (string ou number)
+          // Para as opções simples (string ou number)
           dropdownOptions = [
-            { value: '', label: `Tous les ${label.toLowerCase()}` },
+            { value: '', label: `${t('common.all')} ${label.toLowerCase()}` },
             ...options.map(option => ({
               value: option.toString(),
               label: option.toString()
@@ -77,15 +81,15 @@ export function FilterSection({
         }
 
         return (
-          <div key={name} className="flex flex-col gap-2" style={width ? { width } : { minWidth: '200px' }}>
-            <label className="text-sm font-medium text-gray-700">
+          <div key={name} className="flex flex-col gap-1" style={width ? { width } : { minWidth: '180px' }}>
+            <label className="text-xs font-medium text-gray-700">
               {label}
             </label>
             <Dropdown
               options={dropdownOptions}
               value={currentValue.toString()}
               onChange={(value) => handleFilterChange(name, value)}
-              label={`Sélectionner ${label.toLowerCase()}`}
+              label={t('common.select') + ' ' + label.toLowerCase()}
               size="sm"
             />
           </div>
@@ -93,15 +97,15 @@ export function FilterSection({
 
       case 'text':
         return (
-          <div key={name} className="flex flex-col gap-2" style={width ? { width } : { minWidth: '200px' }}>
-            <label className="text-sm font-medium text-gray-700">
+          <div key={name} className="flex flex-col gap-1" style={width ? { width } : { minWidth: '180px' }}>
+            <label className="text-xs font-medium text-gray-700">
               {label}
             </label>
             <FormInput
               type="text"
               value={currentValue}
               onChange={(e) => handleFilterChange(name, e.target.value)}
-              placeholder={`Rechercher par ${label.toLowerCase()}...`}
+              placeholder={`${t('common.searchBy')} ${label.toLowerCase()}...`}
               className="h-8 text-sm"
             />
           </div>
@@ -109,8 +113,8 @@ export function FilterSection({
 
       case 'number':
         return (
-          <div key={name} className="flex flex-col gap-2" style={width ? { width } : { minWidth: '150px' }}>
-            <label className="text-sm font-medium text-gray-700">
+          <div key={name} className="flex flex-col gap-1" style={width ? { width } : { minWidth: '140px' }}>
+            <label className="text-xs font-medium text-gray-700">
               {label}
             </label>
             <FormInput
@@ -125,16 +129,15 @@ export function FilterSection({
 
       case 'date':
         return (
-          <div key={name} className="flex flex-col gap-2" style={width ? { width } : { minWidth: '180px' }}>
-            <label className="text-sm font-medium text-gray-700">
+          <div key={name} className="flex flex-col gap-1" style={width ? { width } : { minWidth: '160px' }}>
+            <label className="text-xs font-medium text-gray-700">
               {label}
             </label>
-            <FormInput
-              type="date"
+            <DatePicker
               value={currentValue}
-              onChange={(e) => handleFilterChange(name, e.target.value)}
-              className="h-8 text-sm"
-              style={width ? { width } : undefined}
+              onChange={(value) => handleFilterChange(name, value)}
+              placeholder={`${t('common.select')} ${label.toLowerCase()}`}
+              className="h-9 text-sm"
             />
           </div>
         );
