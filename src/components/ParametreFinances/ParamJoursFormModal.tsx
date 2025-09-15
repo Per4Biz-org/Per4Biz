@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { useProfil } from '../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../ui/form';
@@ -36,6 +37,7 @@ export function ParamJoursFormModal({
   isSubmitting = false
 }: ParamJoursFormModalProps) {
   const { profil } = useProfil();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<ParamJoursFormData>({
     id_entite: '',
     annee: new Date().getFullYear(),
@@ -149,18 +151,18 @@ export function ParamJoursFormModal({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof ParamJoursFormData, string>> = {};
 
-    if (!formData.id_entite) newErrors.id_entite = 'L\'entité est requise';
+    if (!formData.id_entite) newErrors.id_entite = t('financial.paramJoursModal.entityRequired');
     if (!formData.annee || formData.annee < 2000 || formData.annee > 2100) {
-      newErrors.annee = 'L\'année doit être comprise entre 2000 et 2100';
+      newErrors.annee = t('financial.paramJoursModal.yearRequired');
     }
     if (!formData.mois || formData.mois < 1 || formData.mois > 12) {
-      newErrors.mois = 'Le mois doit être compris entre 1 et 12';
+      newErrors.mois = t('financial.paramJoursModal.monthRequired');
     }
     if (formData.nb_jours_ouverts < 0 || formData.nb_jours_ouverts > 31) {
-      newErrors.nb_jours_ouverts = 'Le nombre de jours doit être compris entre 0 et 31';
+      newErrors.nb_jours_ouverts = t('financial.paramJoursModal.openDaysRequired');
     }
     if (formData.taux_mp_prevu !== undefined && (formData.taux_mp_prevu < 0 || formData.taux_mp_prevu > 100)) {
-      newErrors.taux_mp_prevu = 'Le taux MP doit être compris entre 0 et 100%';
+      newErrors.taux_mp_prevu = t('financial.paramJoursModal.expectedRateValidation');
     }
 
     setErrors(newErrors);
@@ -200,18 +202,18 @@ export function ParamJoursFormModal({
   }));
 
   const moisOptions: DropdownOption[] = [
-    { value: '1', label: 'Janvier' },
-    { value: '2', label: 'Février' },
-    { value: '3', label: 'Mars' },
-    { value: '4', label: 'Avril' },
-    { value: '5', label: 'Mai' },
-    { value: '6', label: 'Juin' },
-    { value: '7', label: 'Juillet' },
-    { value: '8', label: 'Août' },
-    { value: '9', label: 'Septembre' },
-    { value: '10', label: 'Octobre' },
-    { value: '11', label: 'Novembre' },
-    { value: '12', label: 'Décembre' }
+    { value: '1', label: t('financial.months.january') },
+    { value: '2', label: t('financial.months.february') },
+    { value: '3', label: t('financial.months.march') },
+    { value: '4', label: t('financial.months.april') },
+    { value: '5', label: t('financial.months.may') },
+    { value: '6', label: t('financial.months.june') },
+    { value: '7', label: t('financial.months.july') },
+    { value: '8', label: t('financial.months.august') },
+    { value: '9', label: t('financial.months.september') },
+    { value: '10', label: t('financial.months.october') },
+    { value: '11', label: t('financial.months.november') },
+    { value: '12', label: t('financial.months.december') }
   ];
 
   if (!isOpen) return null;
@@ -221,7 +223,7 @@ export function ParamJoursFormModal({
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">
-            {initialData ? 'Modifier un paramètre de jours' : 'Ajouter un paramètre de jours'}
+            {initialData ? t('financial.paramJoursModal.editTitle') : t('financial.paramJoursModal.addTitle')}
           </h2>
           <button
             onClick={handleCancel}
@@ -236,25 +238,27 @@ export function ParamJoursFormModal({
 
         <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
           <FormField
-            label="Entité"
+            label={t('financial.paramJoursModal.entityLabel')}
             required
             error={errors.id_entite}
+            description={t('financial.paramJoursModal.entityDescription')}
             className="mb-4"
           >
             <Dropdown
               options={entiteOptions}
               value={formData.id_entite}
               onChange={handleEntiteChange}
-              label="Sélectionner une entité"
+              label={t('financial.paramJoursModal.entityPlaceholder')}
               size="sm"
               disabled={isSubmitting}
             />
           </FormField>
 
           <FormField
-            label="Année"
+            label={t('financial.paramJoursModal.yearLabel')}
             required
             error={errors.annee}
+            description={t('financial.paramJoursModal.yearDescription')}
             className="mb-4"
           >
             <FormInput
@@ -270,26 +274,27 @@ export function ParamJoursFormModal({
           </FormField>
 
           <FormField
-            label="Mois"
+            label={t('financial.paramJoursModal.monthLabel')}
             required
             error={errors.mois}
+            description={t('financial.paramJoursModal.monthDescription')}
             className="mb-4"
           >
             <Dropdown
               options={moisOptions}
               value={formData.mois.toString()}
               onChange={handleMoisChange}
-              label="Sélectionner un mois"
+              label={t('financial.paramJoursModal.monthPlaceholder')}
               size="sm"
               disabled={isSubmitting}
             />
           </FormField>
 
           <FormField
-            label="Nombre de jours ouverts"
+            label={t('financial.paramJoursModal.openDaysLabel')}
             required
             error={errors.nb_jours_ouverts}
-            description="Entre 0 et 31 jours"
+            description={t('financial.paramJoursModal.openDaysDescription')}
             className="mb-4"
           >
             <FormInput
@@ -299,15 +304,16 @@ export function ParamJoursFormModal({
               onChange={handleInputChange}
               min="0"
               max="31"
+              placeholder={t('financial.paramJoursModal.openDaysPlaceholder')}
               disabled={isSubmitting}
               className="h-9"
             />
           </FormField>
 
           <FormField
-            label="Taux MP prévu (%)"
+            label={t('financial.paramJoursModal.expectedRateLabel')}
             error={errors.taux_mp_prevu}
-            description="Pourcentage de matière première (optionnel)"
+            description={t('financial.paramJoursModal.expectedRateDescription')}
             className="mb-4"
           >
             <FormInput
@@ -318,14 +324,15 @@ export function ParamJoursFormModal({
               onChange={handleInputChange}
               min="0"
               max="100"
-              placeholder="Ex: 25.50"
+              placeholder={t('financial.paramJoursModal.expectedRatePlaceholder')}
               disabled={isSubmitting}
               className="h-9"
             />
           </FormField>
 
           <FormField
-            label="Commentaire"
+            label={t('financial.paramJoursModal.commentLabel')}
+            description={t('financial.paramJoursModal.commentDescription')}
             className="mb-6 col-span-2"
           >
             <textarea
@@ -334,14 +341,14 @@ export function ParamJoursFormModal({
               onChange={handleInputChange}
               className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
               rows={3}
-              placeholder="Commentaires ou notes sur ce paramètre..."
+              placeholder={t('financial.paramJoursModal.commentPlaceholder')}
               disabled={isSubmitting}
             />
           </FormField>
 
           <FormActions>
             <Button
-              label="Annuler"
+              label={t('common.cancel')}
               color="#6B7280"
               onClick={handleCancel}
               type="button"
@@ -349,7 +356,7 @@ export function ParamJoursFormModal({
               size="sm"
             />
             <Button
-              label={isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+              label={isSubmitting ? t('financial.paramJoursModal.saving') : t('common.save')}
               icon="Save"
               color="var(--color-primary)"
               type="submit"

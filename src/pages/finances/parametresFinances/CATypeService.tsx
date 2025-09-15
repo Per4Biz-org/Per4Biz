@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useMenu } from '../../../context/MenuContext';
@@ -36,6 +37,7 @@ interface CATypeService {
 }
 
 const CATypeService: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [typesService, setTypesService] = useState<CATypeService[]>([]);
@@ -74,7 +76,7 @@ const CATypeService: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des types de service:', error);
       addToast({
-        label: 'Erreur lors de la récupération des types de service',
+        label: t('financial.errorFetchingServiceTypes', 'Erreur lors de la récupération des types de service'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -157,18 +159,22 @@ const CATypeService: React.FC = () => {
       setIsModalOpen(false);
       setSelectedTypeService(null);
       addToast({
-        label: `Type de service ${selectedTypeService ? 'modifié' : 'créé'} avec succès`,
+        label: selectedTypeService ? 
+          t('financial.serviceTypeUpdated', 'Type de service modifié avec succès') : 
+          t('financial.serviceTypeCreated', 'Type de service créé avec succès'),
         icon: 'Check',
         color: '#22c55e'
       });
     } catch (error: any) {
       console.error('Erreur lors de la sauvegarde:', error);
       
-      let errorMessage = `Erreur lors de la ${selectedTypeService ? 'modification' : 'création'} du type de service`;
+      let errorMessage = selectedTypeService ? 
+        t('financial.errorUpdatingServiceType', 'Erreur lors de la modification du type de service') :
+        t('financial.errorCreatingServiceType', 'Erreur lors de la création du type de service');
       
       // Gestion des erreurs de contrainte d'unicité
       if (error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
-        errorMessage = 'Ce code existe déjà pour cette entité. Veuillez utiliser un code unique.';
+        errorMessage = t('financial.duplicateCodeError', 'Ce code existe déjà pour cette entité. Veuillez utiliser un code unique.');
       }
       
       addToast({
@@ -198,14 +204,14 @@ const CATypeService: React.FC = () => {
 
         await fetchTypesService();
         addToast({
-          label: `Le type de service "${typeService.libelle}" a été supprimé avec succès`,
+          label: t('financial.serviceTypeDeleted', `Le type de service "${typeService.libelle}" a été supprimé avec succès`),
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression du type de service',
+          label: t('financial.errorDeletingServiceType', 'Erreur lors de la suppression du type de service'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -215,38 +221,38 @@ const CATypeService: React.FC = () => {
 
   const columns: Column<CATypeService>[] = [
     {
-      label: 'Entité',
+      label: t('financial.entity', 'Entité'),
       accessor: 'entite',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Code',
+      label: t('financial.code', 'Code'),
       accessor: 'code',
       sortable: true
     },
     {
-      label: 'Libellé',
+      label: t('financial.label', 'Libellé'),
       accessor: 'libelle',
       sortable: true
     },
     {
-      label: 'Description',
+      label: t('financial.description', 'Description'),
       accessor: 'description',
       render: (value) => value || '-'
     },
     {
-      label: 'Sous-catégorie',
+      label: t('financial.subcategory', 'Sous-catégorie'),
       accessor: 'sous_categorie',
       render: (value) => value ? `${value.code} - ${value.libelle}` : '-'
     },
     {
-      label: 'Ordre',
+      label: t('financial.order', 'Ordre'),
       accessor: 'ordre_affichage',
       align: 'center',
       sortable: true
     },
     {
-      label: 'Horaires',
+      label: t('financial.schedule', 'Horaires'),
       accessor: 'heure_debut',
       align: 'center',
       render: (value, row) => {
@@ -257,7 +263,7 @@ const CATypeService: React.FC = () => {
       }
     },
     {
-      label: 'Actif',
+      label: t('financial.active', 'Actif'),
       accessor: 'actif',
       align: 'center',
       render: (value) => (
@@ -269,7 +275,7 @@ const CATypeService: React.FC = () => {
       )
     },
     {
-      label: 'Date de modification',
+      label: t('financial.modificationDate', 'Date de modification'),
       accessor: 'updated_at',
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
     }
@@ -277,13 +283,13 @@ const CATypeService: React.FC = () => {
 
   const actions = [
     {
-      label: 'Éditer',
+      label: t('common.edit', 'Éditer'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: t('common.delete', 'Supprimer'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -293,13 +299,13 @@ const CATypeService: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Types de Services CA"}
-        description="Gérez les types de services pour le calcul du chiffre d'affaires par entité"
+        title={loading || profilLoading ? t('common.loading', 'Chargement...') : t('financial.caTypeServiceTitle', 'Types de Services CA')}
+        description={t('financial.caTypeServiceDescription', 'Gérez les types de services pour le calcul du chiffre d\'affaires par entité')}
         className={styles.header}
       >
         <div className="mb-6">
           <Button
-            label="Ajouter un type de service"
+            label={t('financial.addServiceType', 'Ajouter un type de service')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
@@ -308,7 +314,7 @@ const CATypeService: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Chargement des types de service...</p>
+            <p className="text-gray-500">{t('common.loading', 'Chargement...')}</p>
           </div>
         ) : (
           <DataTable
@@ -316,8 +322,8 @@ const CATypeService: React.FC = () => {
             data={typesService}
             actions={actions}
             defaultRowsPerPage={10}
-            emptyTitle="Aucun type de service"
-            emptyMessage="Aucun type de service n'a été créé pour le moment."
+            emptyTitle={t('financial.noServiceTypes', 'Aucun type de service')}
+            emptyMessage={t('financial.noServiceTypesMessage', 'Aucun type de service n\'a été créé pour le moment.')}
           />
         )}
 

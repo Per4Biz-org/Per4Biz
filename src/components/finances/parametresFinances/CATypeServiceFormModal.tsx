@@ -73,7 +73,43 @@ export function CATypeServiceFormModal({
   const [selectedCategorie, setSelectedCategorie] = useState<string>('');
   const [errors, setErrors] = useState<Partial<Record<keyof CATypeServiceFormData, string>>>({});
   const { profil } = useProfil();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  // Traduções diretas para garantir funcionamento
+  const modalTranslations = {
+    fr: {
+      selectEntity: "Sélectionner une entité",
+      selectEntityFirst: "Sélectionner d'abord une entité",
+      selectCategory: "Sélectionner une catégorie", 
+      selectCategoryFirst: "Sélectionner d'abord une catégorie",
+      selectSubcategory: "Sélectionner une sous-catégorie",
+      noCategoryAvailable: "Aucune catégorie disponible pour cette entité",
+      noSubcategoryAvailable: "Aucune sous-catégorie disponible pour cette catégorie"
+    },
+    pt: {
+      selectEntity: "Selecionar uma entidade",
+      selectEntityFirst: "Selecionar primeiro uma entidade",
+      selectCategory: "Selecionar uma categoria",
+      selectCategoryFirst: "Selecionar primeiro uma categoria", 
+      selectSubcategory: "Selecionar uma subcategoria",
+      noCategoryAvailable: "Nenhuma categoria disponível para esta entidade",
+      noSubcategoryAvailable: "Nenhuma subcategoria disponível para esta categoria"
+    },
+    en: {
+      selectEntity: "Select an entity",
+      selectEntityFirst: "Select an entity first",
+      selectCategory: "Select a category",
+      selectCategoryFirst: "Select a category first",
+      selectSubcategory: "Select a subcategory", 
+      noCategoryAvailable: "No category available for this entity",
+      noSubcategoryAvailable: "No subcategory available for this category"
+    }
+  };
+  
+  const getModalText = (key: keyof typeof modalTranslations.fr) => {
+    const lang = i18n.language as keyof typeof modalTranslations;
+    return modalTranslations[lang]?.[key] || modalTranslations.fr[key];
+  };
 
   // Charger les entités
   useEffect(() => {
@@ -301,10 +337,10 @@ export function CATypeServiceFormModal({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CATypeServiceFormData, string>> = {};
 
-    if (!formData.code.trim()) newErrors.code = 'Le code est requis';
-    if (!formData.libelle.trim()) newErrors.libelle = 'Le libellé est requis';
-    if (!formData.id_entite) newErrors.id_entite = 'L\'entité est requise';
-    if (!formData.id_flux_sous_categorie) newErrors.id_flux_sous_categorie = 'La sous-catégorie est requise';
+    if (!formData.code.trim()) newErrors.code = t('financial.serviceTypeModal.codeRequired');
+    if (!formData.libelle.trim()) newErrors.libelle = t('financial.serviceTypeModal.labelRequired');
+    if (!formData.id_entite) newErrors.id_entite = t('financial.serviceTypeModal.entityRequired');
+    if (!formData.id_flux_sous_categorie) newErrors.id_flux_sous_categorie = t('financial.serviceTypeModal.subcategoryRequired');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -336,7 +372,8 @@ export function CATypeServiceFormModal({
       actif: true,
       id_entite: '',
       heure_debut: '',
-      heure_fin: ''
+      heure_fin: '',
+      id_flux_sous_categorie: ''
     });
     setErrors({});
     onClose();
@@ -364,7 +401,7 @@ export function CATypeServiceFormModal({
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">
-            {initialData ? 'Modifier un type de service' : 'Ajouter un type de service'}
+            {initialData ? t('financial.serviceTypeModal.editTitle') : t('financial.serviceTypeModal.addTitle')}
           </h2>
           <button
             onClick={handleCancel}
@@ -379,59 +416,59 @@ export function CATypeServiceFormModal({
 
         <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
           <FormField
-            label="Entité"
+            label={t('financial.serviceTypeModal.entityLabel')}
             required
             error={errors.id_entite}
-            description="Entité à laquelle ce type de service est associé"
+            description={t('financial.serviceTypeModal.entityDescription')}
             className="mb-2"
           >
             <Dropdown
               options={entiteOptions}
               value={formData.id_entite}
               onChange={handleEntiteChange}
-              label={t('common.selectEntity')}
+              label={getModalText('selectEntity')}
               size="sm"
               disabled={isSubmitting}
             />
           </FormField>
 
           <FormField
-            label="Code"
+            label={t('financial.serviceTypeModal.codeLabel')}
             required
             error={errors.code}
-            description="Code unique du type de service"
+            description={t('financial.serviceTypeModal.codeDescription')}
             className="mb-2"
           >
             <FormInput
               name="code"
               value={formData.code}
               onChange={handleInputChange}
-              placeholder="Ex: petit_dej, dejeuner, diner"
+              placeholder={t('financial.serviceTypeModal.codePlaceholder')}
               disabled={isSubmitting}
               className="h-9"
             />
           </FormField>
 
           <FormField
-            label="Libellé"
+            label={t('financial.serviceTypeModal.labelLabel')}
             required
             error={errors.libelle}
-            description="Nom du type de service"
+            description={t('financial.serviceTypeModal.labelDescription')}
             className="mb-2"
           >
             <FormInput
               name="libelle"
               value={formData.libelle}
               onChange={handleInputChange}
-              placeholder="Ex: Petit-déjeuner, Déjeuner, Dîner"
+              placeholder={t('financial.serviceTypeModal.labelPlaceholder')}
               disabled={isSubmitting}
               className="h-9"
             />
           </FormField>
 
           <FormField
-            label="Ordre d'affichage"
-            description="Position dans la liste (0 = premier)"
+            label={t('financial.serviceTypeModal.displayOrderLabel')}
+            description={t('financial.serviceTypeModal.displayOrderDescription')}
             className="mb-2"
           >
             <FormInput
@@ -446,8 +483,8 @@ export function CATypeServiceFormModal({
           </FormField>
 
           <FormField
-            label="Heure de début"
-            description="Heure de début du service (format HH:MM)"
+            label={t('financial.serviceTypeModal.startTimeLabel')}
+            description={t('financial.serviceTypeModal.startTimeDescription')}
             className="mb-2"
           >
             <FormInput
@@ -461,8 +498,8 @@ export function CATypeServiceFormModal({
           </FormField>
 
           <FormField
-            label="Heure de fin"
-            description="Heure de fin du service (format HH:MM)"
+            label={t('financial.serviceTypeModal.endTimeLabel')}
+            description={t('financial.serviceTypeModal.endTimeDescription')}
             className="mb-2"
           >
             <FormInput
@@ -476,8 +513,8 @@ export function CATypeServiceFormModal({
           </FormField>
 
           <FormField
-            label="Catégorie de flux"
-            description="Catégorie pour filtrer les sous-catégories"
+            label={t('financial.serviceTypeModal.flowCategoryLabel')}
+            description={t('financial.serviceTypeModal.flowCategoryDescription')}
             className="mb-2"
           >
             <Dropdown
@@ -486,10 +523,10 @@ export function CATypeServiceFormModal({
               onChange={handleCategorieChange}
               label={
                 !formData.id_entite 
-                  ? "Sélectionner d'abord une entité" 
+                  ? getModalText('selectEntityFirst')
                   : categorieOptions.length === 0 
-                    ? "Aucune catégorie disponible pour cette entité" 
-                    : "Sélectionner une catégorie"
+                    ? getModalText('noCategoryAvailable')
+                    : getModalText('selectCategory')
               }
               size="sm"
               disabled={!formData.id_entite || isSubmitting || categorieOptions.length === 0}
@@ -497,9 +534,9 @@ export function CATypeServiceFormModal({
           </FormField>
 
           <FormField
-            label="Sous-catégorie de flux"
+            label={t('financial.serviceTypeModal.flowSubcategoryLabel')}
             required
-            description="Sous-catégorie associée à ce type de service"
+            description={t('financial.serviceTypeModal.flowSubcategoryDescription')}
             error={errors.id_flux_sous_categorie}
             className="mb-2"
           >
@@ -509,10 +546,10 @@ export function CATypeServiceFormModal({
               onChange={handleSousCategorieChange}
               label={
                 !selectedCategorie 
-                  ? "Sélectionner d'abord une catégorie" 
+                  ? getModalText('selectCategoryFirst')
                   : sousCategorieOptions.length === 0 
-                    ? "Aucune sous-catégorie disponible pour cette catégorie" 
-                    : "Sélectionner une sous-catégorie"
+                    ? getModalText('noSubcategoryAvailable')
+                    : getModalText('selectSubcategory')
               }
               size="sm"
               disabled={!selectedCategorie || isSubmitting || sousCategorieOptions.length === 0}
@@ -520,23 +557,22 @@ export function CATypeServiceFormModal({
           </FormField>
 
           <FormField
-            label="Statut"
-            description="Activer ou désactiver ce type de service"
+            label={t('financial.serviceTypeModal.statusLabel')}
+            description={t('financial.serviceTypeModal.statusDescription')}
             className="mb-2 col-span-2"
           >
             <Toggle
               checked={formData.actif}
               onChange={handleToggleChange}
-              label={formData.actif ? 'Actif' : 'Inactif'}
+              label={formData.actif ? t('financial.serviceTypeModal.activeStatus') : t('financial.serviceTypeModal.inactiveStatus')}
               icon="Check"
               disabled={isSubmitting}
-              size="sm"
             />
           </FormField>
 
           <FormField
-            label="Description"
-            description="Description optionnelle du type de service"
+            label={t('financial.serviceTypeModal.descriptionLabel')}
+            description={t('financial.serviceTypeModal.descriptionDescription')}
             className="mb-4 col-span-2"
           >
             <textarea
@@ -545,14 +581,14 @@ export function CATypeServiceFormModal({
               onChange={handleInputChange}
               className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
               rows={2}
-              placeholder="Description détaillée du type de service..."
+              placeholder={t('financial.serviceTypeModal.descriptionPlaceholder')}
               disabled={isSubmitting}
             />
           </FormField>
 
           <FormActions>
             <Button
-              label="Annuler"
+              label={t('common.cancel')}
               color="#6B7280"
               onClick={handleCancel}
               type="button"
@@ -560,7 +596,7 @@ export function CATypeServiceFormModal({
               size="sm"
             />
             <Button
-              label={isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+              label={isSubmitting ? t('financial.serviceTypeModal.saving') : t('common.save')}
               icon="Save"
               color="var(--color-primary)"
               type="submit"

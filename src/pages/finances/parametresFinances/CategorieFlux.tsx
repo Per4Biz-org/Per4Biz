@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useMenu } from '../../../context/MenuContext';
@@ -36,6 +37,7 @@ interface CategorieFlux {
 }
 
 const CategorieFlux: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [categoriesFlux, setCategoriesFlux] = useState<CategorieFlux[]>([]);
@@ -77,7 +79,7 @@ const CategorieFlux: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des catégories de flux:', error);
       addToast({
-        label: 'Erreur lors de la récupération des catégories de flux',
+        label: t('financial.errorFetchingCategorieFlux', 'Erreur lors de la récupération des catégories de flux'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -197,7 +199,7 @@ const CategorieFlux: React.FC = () => {
       setIsModalOpen(false);
       setSelectedCategorie(null);
       addToast({
-        label: `Catégorie de flux ${selectedCategorie ? 'modifiée' : 'créée'} avec succès`,
+        label: selectedCategorie ? t('financial.categorieFluxUpdated', 'Catégorie de flux modifiée avec succès') : t('financial.categorieFluxCreated', 'Catégorie de flux créée avec succès'),
         icon: 'Check',
         color: '#22c55e'
       });
@@ -230,14 +232,14 @@ const CategorieFlux: React.FC = () => {
 
         await fetchCategoriesFlux();
         addToast({
-          label: `La catégorie de flux "${categorie.libelle}" a été supprimée avec succès`,
+          label: t('financial.categorieFluxDeleted', `La catégorie de flux "${categorie.libelle}" a été supprimée avec succès`),
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la suppression de la catégorie de flux',
+          label: t('financial.errorDeletingCategorieFlux', 'Erreur lors de la suppression de la catégorie de flux'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -251,7 +253,7 @@ const CategorieFlux: React.FC = () => {
 
   // Préparer les options pour le dropdown des natures de flux
   const natureFluxOptions: DropdownOption[] = [
-    { value: '', label: 'Toutes les natures de flux' },
+    { value: '', label: t('financial.allNatureFlux', 'Toutes les natures de flux') },
     ...naturesFlux.map(nature => ({
       value: nature.id,
       label: `${nature.code} - ${nature.libelle}`
@@ -260,22 +262,22 @@ const CategorieFlux: React.FC = () => {
 
   const columns: Column<CategorieFlux>[] = [
     {
-      label: 'Entité',
+      label: t('financial.entity', 'Entité'),
       accessor: 'entite',
       render: (value) => value ? `${value.code} - ${value.libelle}` : 'Global (toutes les entités)'
     },
     {
-      label: 'Code',
+      label: t('financial.code', 'Code'),
       accessor: 'code',
       sortable: true
     },
     {
-      label: 'Libellé',
+      label: t('financial.label', 'Libellé'),
       accessor: 'libelle',
       sortable: true
     },
     {
-      label: 'Type',
+      label: t('common.type', 'Type'),
       accessor: 'type_flux',
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -286,12 +288,12 @@ const CategorieFlux: React.FC = () => {
       )
     },
     {
-      label: 'Nature de flux',
+      label: t('financial.natureFlux', 'Nature de flux'),
       accessor: 'nature_flux',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Couleur',
+      label: t('common.color', 'Couleur'),
       accessor: 'couleur',
       align: 'center',
       render: (value) => value ? (
@@ -303,12 +305,12 @@ const CategorieFlux: React.FC = () => {
       ) : '-'
     },
     {
-      label: 'Ordre',
+      label: t('financial.order', 'Ordre'),
       accessor: 'ordre_affichage',
       align: 'center'
     },
     {
-      label: 'Actif',
+      label: t('financial.active', 'Actif'),
       accessor: 'actif',
       align: 'center',
       render: (value) => (
@@ -323,13 +325,13 @@ const CategorieFlux: React.FC = () => {
 
   const actions = [
     {
-      label: 'Éditer',
+      label: t('common.edit', 'Éditer'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Supprimer',
+      label: t('common.delete', 'Supprimer'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -339,13 +341,13 @@ const CategorieFlux: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Catégories de Flux"}
-        description="Gérez les catégories de flux financiers de votre organisation"
+        title={loading || profilLoading ? t('common.loading', 'Chargement...') : t('financial.categorieFluxTitle', 'Catégories de Flux')}
+        description={t('financial.categorieFluxDescription', 'Gérez les catégories de flux financiers de votre organisation')}
         className={styles.header}
       >
         <div className="mb-6 flex justify-between items-center">
           <Button
-            label="Créer une catégorie de flux"
+            label={t('financial.addCategorieFlux', 'Créer une catégorie de flux')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
@@ -383,7 +385,7 @@ const CategorieFlux: React.FC = () => {
             <div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">
-                  {selectedCategorie ? 'Modifier une catégorie de flux' : 'Créer une catégorie de flux'}
+                  {selectedCategorie ? t('financial.categorieFluxModal.editTitle') : t('financial.categorieFluxModal.addTitle')}
                 </h2>
                 <button
                   onClick={() => {

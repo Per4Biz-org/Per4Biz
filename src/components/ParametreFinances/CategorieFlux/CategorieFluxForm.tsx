@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
 import { Form, FormField, FormInput, FormActions } from '../../ui/form';
@@ -61,6 +62,7 @@ export function CategorieFluxForm({
   const [filteredNaturesFlux, setFilteredNaturesFlux] = useState<NatureFlux[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof CategorieFluxFormData, string>>>({});
   const { profil } = useProfil();
+  const { t } = useTranslation();
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
@@ -179,10 +181,10 @@ export function CategorieFluxForm({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CategorieFluxFormData, string>> = {};
 
-    if (!formData.code.trim()) newErrors.code = 'Le code est requis';
-    if (!formData.libelle.trim()) newErrors.libelle = 'Le libellé est requis';
-    if (!formData.type_flux.trim()) newErrors.type_flux = 'Le type de flux est requis';
-    if (!formData.nature_flux_id.trim()) newErrors.nature_flux_id = 'La nature de flux est requise';
+    if (!formData.code.trim()) newErrors.code = t('financial.categorieFluxModal.codeRequired');
+    if (!formData.libelle.trim()) newErrors.libelle = t('financial.categorieFluxModal.labelRequired');
+    if (!formData.type_flux.trim()) newErrors.type_flux = t('financial.categorieFluxModal.flowTypeRequired');
+    if (!formData.nature_flux_id.trim()) newErrors.nature_flux_id = t('financial.categorieFluxModal.flowNatureRequired');
     // id_entite peut être null pour une catégorie globale
 
     setErrors(newErrors);
@@ -204,7 +206,7 @@ export function CategorieFluxForm({
   };
 
   const entiteOptions: DropdownOption[] = [
-    { value: '', label: 'Global (toutes les entités)' },
+    { value: '', label: t('financial.categorieFluxModal.globalEntity') },
     ...entites.map(entite => ({
       value: entite.id,
       label: `${entite.code} - ${entite.libelle}`
@@ -217,91 +219,96 @@ export function CategorieFluxForm({
   }));
 
   const typeFluxOptions: DropdownOption[] = [
-    { value: '', label: 'Choisir un type' },
-    { value: 'produit', label: 'Produit' },
-    { value: 'charge', label: 'Charge' }
+    { value: '', label: t('financial.categorieFluxModal.flowTypePlaceholder') },
+    { value: 'produit', label: t('financial.categorieFluxModal.flowTypeProduct') },
+    { value: 'charge', label: t('financial.categorieFluxModal.flowTypeCharge') }
   ];
 
   return (
     <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
       <FormField
-        label="Entité"
+        label={t('financial.categorieFluxModal.entityLabel')}
         error={errors.id_entite}
-        description="Laissez vide pour une catégorie globale applicable à toutes les entités"
+        description={t('financial.categorieFluxModal.entityDescription')}
         className="mb-3"
       >
         <Dropdown
           options={entiteOptions}
           value={formData.id_entite}
           onChange={handleEntiteChange}
-          label="Sélectionner une entité"
+          label={t('financial.categorieFluxModal.entityPlaceholder')}
           size="sm"
         />
       </FormField>
 
       <FormField
-        label="Code"
+        label={t('financial.categorieFluxModal.codeLabel')}
         required
         error={errors.code}
+        description={t('financial.categorieFluxModal.codeDescription')}
         className="mb-3"
       >
         <FormInput
           name="code"
           value={formData.code}
           onChange={handleInputChange}
-          placeholder="Ex: VENTE, ACHAT"
+          placeholder={t('financial.categorieFluxModal.codePlaceholder')}
           className="h-9"
         />
       </FormField>
 
       <FormField
-        label="Libellé"
+        label={t('financial.categorieFluxModal.labelLabel')}
         required
         error={errors.libelle}
+        description={t('financial.categorieFluxModal.labelDescription')}
         className="mb-3"
       >
         <FormInput
           name="libelle"
           value={formData.libelle}
           onChange={handleInputChange}
-          placeholder="Ex: Ventes de produits"
+          placeholder={t('financial.categorieFluxModal.labelPlaceholder')}
           className="h-9"
         />
       </FormField>
 
       <FormField
-        label="Type de flux"
+        label={t('financial.categorieFluxModal.flowTypeLabel')}
         required
         error={errors.type_flux}
+        description={t('financial.categorieFluxModal.flowTypeDescription')}
         className="mb-3"
       >
         <Dropdown
           options={typeFluxOptions}
           value={formData.type_flux}
           onChange={(value) => setFormData(prev => ({ ...prev, type_flux: value as 'produit' | 'charge' | '' }))}
-          label="Choisir un type"
+          label={t('financial.categorieFluxModal.flowTypePlaceholder')}
           size="sm"
         />
       </FormField>
 
       <FormField
-        label="Nature de flux"
+        label={t('financial.categorieFluxModal.flowNatureLabel')}
         required
         error={errors.nature_flux_id}
+        description={t('financial.categorieFluxModal.flowNatureDescription')}
         className="mb-3"
       >
         <Dropdown
           options={natureFluxOptions}
           value={formData.nature_flux_id}
           onChange={handleNatureFluxChange}
-          label="Sélectionner une Nature de flux"
+          label={t('financial.categorieFluxModal.flowNaturePlaceholder')}
           size="sm"
           disabled={natureFluxOptions.length === 0}
         />
       </FormField>
 
       <FormField
-        label="Couleur"
+        label={t('financial.categorieFluxModal.colorLabel')}
+        description={t('financial.categorieFluxModal.colorDescription')}
         className="mb-3"
       >
         <ColorPicker
@@ -311,7 +318,8 @@ export function CategorieFluxForm({
       </FormField>
 
       <FormField
-        label="Ordre d'affichage"
+        label={t('financial.categorieFluxModal.displayOrderLabel')}
+        description={t('financial.categorieFluxModal.displayOrderDescription')}
         className="mb-3"
       >
         <FormInput
@@ -326,19 +334,21 @@ export function CategorieFluxForm({
       </FormField>
 
       <FormField
-        label="Statut"
+        label={t('financial.categorieFluxModal.statusLabel')}
+        description={t('financial.categorieFluxModal.statusDescription')}
         className="mb-3"
       >
         <Toggle
           checked={formData.actif}
           onChange={handleToggleChange}
-          label={formData.actif ? 'Actif' : 'Inactif'}
+          label={formData.actif ? t('financial.categorieFluxModal.activeStatus') : t('financial.categorieFluxModal.inactiveStatus')}
           size="sm"
         />
       </FormField>
 
       <FormField
-        label="Description"
+        label={t('financial.categorieFluxModal.descriptionLabel')}
+        description={t('financial.categorieFluxModal.descriptionDescription')}
         className="mb-3 col-span-2"
       >
         <textarea
@@ -347,20 +357,20 @@ export function CategorieFluxForm({
           onChange={handleInputChange}
           className="w-full p-2 text-sm border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
           rows={2}
-          placeholder="Description optionnelle de la catégorie..."
+          placeholder={t('financial.categorieFluxModal.descriptionPlaceholder')}
         />
       </FormField>
 
       <FormActions>
         <Button
-          label="Annuler"
+          label={t('common.cancel')}
           size="sm"
           color="#6B7280"
           onClick={onCancel}
           type="button"
         />
         <Button
-          label={isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+          label={isSubmitting ? t('financial.categorieFluxModal.saving') : t('common.save')}
           size="sm"
           icon="Save"
           color="var(--color-primary)"

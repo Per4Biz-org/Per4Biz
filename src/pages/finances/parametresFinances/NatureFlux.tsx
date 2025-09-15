@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useMenu } from '../../../context/MenuContext';
@@ -28,6 +29,7 @@ interface NatureFlux {
 }
 
 const NatureFlux: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [naturesFlux, setNaturesFlux] = useState<NatureFlux[]>([]);
@@ -61,7 +63,7 @@ const NatureFlux: React.FC = () => {
     } catch (error) {
       console.error('Erreur lors de la récupération des natures de flux:', error);
       addToast({
-        label: 'Erreur lors de la récupération des natures de flux',
+        label: t('financial.errorFetchingNatureFlux', 'Erreur lors de la récupération des natures de flux'),
         icon: 'AlertTriangle',
         color: '#ef4444'
       });
@@ -147,7 +149,7 @@ const NatureFlux: React.FC = () => {
       setIsModalOpen(false);
       setSelectedNature(null);
       addToast({
-        label: `Nature de flux ${selectedNature ? 'modifiée' : 'créée'} avec succès`,
+        label: selectedNature ? t('financial.natureFluxUpdated', 'Nature de flux modifiée avec succès') : t('financial.natureFluxCreated', 'Nature de flux créée avec succès'),
         icon: 'Check',
         color: '#22c55e'
       });
@@ -180,14 +182,14 @@ const NatureFlux: React.FC = () => {
 
         await fetchNaturesFlux();
         addToast({
-          label: `La nature de flux "${nature.libelle}" a été désactivée avec succès`,
+          label: t('financial.natureFluxDeleted', `La nature de flux "${nature.libelle}" a été désactivée avec succès`),
           icon: 'Check',
           color: '#22c55e'
         });
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         addToast({
-          label: 'Erreur lors de la désactivation de la nature de flux',
+          label: t('financial.errorDeletingNatureFlux', 'Erreur lors de la désactivation de la nature de flux'),
           icon: 'AlertTriangle',
           color: '#ef4444'
         });
@@ -197,27 +199,27 @@ const NatureFlux: React.FC = () => {
 
   const columns: Column<NatureFlux>[] = [
     {
-      label: 'Entité',
+      label: t('financial.entity', 'Entité'),
       accessor: 'entite',
       render: (value) => value ? `${value.code} - ${value.libelle}` : 'Global (toutes les entités)'
     },
     {
-      label: 'Code',
+      label: t('financial.code', 'Code'),
       accessor: 'code',
       sortable: true
     },
     {
-      label: 'Libellé',
+      label: t('financial.label', 'Libellé'),
       accessor: 'libelle',
       sortable: true
     },
     {
-      label: 'Description',
+      label: t('financial.description', 'Description'),
       accessor: 'description',
       render: (value) => value || '-'
     },
     {
-      label: 'Salarié',
+      label: t('financial.employee', 'Salarié'),
       accessor: 'salarie',
       align: 'center',
       render: (value) => (
@@ -229,7 +231,7 @@ const NatureFlux: React.FC = () => {
       )
     },
     {
-      label: 'Actif',
+      label: t('financial.active', 'Actif'),
       accessor: 'actif',
       align: 'center',
       render: (value) => (
@@ -241,7 +243,7 @@ const NatureFlux: React.FC = () => {
       )
     },
     {
-      label: 'Date de création',
+      label: t('table.creationDate', 'Date de création'),
       accessor: 'created_at',
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
     }
@@ -249,13 +251,13 @@ const NatureFlux: React.FC = () => {
 
   const actions = [
     {
-      label: 'Éditer',
+      label: t('common.edit', 'Éditer'),
       icon: 'edit',
       color: 'var(--color-primary)',
       onClick: handleEdit
     },
     {
-      label: 'Désactiver',
+      label: t('common.delete', 'Désactiver'),
       icon: 'delete',
       color: '#ef4444',
       onClick: handleDelete
@@ -265,13 +267,13 @@ const NatureFlux: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Natures de Flux"}
-        description="Gérez les natures de flux financiers de votre organisation"
+        title={loading || profilLoading ? t('common.loading', 'Chargement...') : t('financial.natureFluxTitle', 'Natures de Flux')}
+        description={t('financial.natureFluxDescription', 'Gérez les natures de flux financiers de votre organisation')}
         className={styles.header}
       >
         <div className="mb-6">
           <Button
-            label="Créer une nature de flux"
+            label={t('financial.addNatureFlux', 'Créer une nature de flux')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}
@@ -300,7 +302,7 @@ const NatureFlux: React.FC = () => {
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">
-                  {selectedNature ? 'Modifier une nature de flux' : 'Créer une nature de flux'}
+                  {selectedNature ? t('financial.natureFluxModal.editTitle') : t('financial.natureFluxModal.addTitle')}
                 </h2>
                 <button
                   onClick={() => {

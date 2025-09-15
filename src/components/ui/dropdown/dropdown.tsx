@@ -38,6 +38,7 @@ export function Dropdown({
 
   const selectedOption = options.find(option => option.value === value);
   const IconComponent = icon ? icons[icon] : null;
+  
 
   const style = color ? {
     '--dropdown-color': color,

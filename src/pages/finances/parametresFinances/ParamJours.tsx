@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useMenu } from '../../../context/MenuContext';
@@ -28,6 +29,7 @@ interface ParamJours {
 }
 
 const ParamJours: React.FC = () => {
+  const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil, loading: profilLoading } = useProfil();
   const [parametres, setParametres] = useState<ParamJours[]>([]);
@@ -262,13 +264,13 @@ const ParamJours: React.FC = () => {
   return (
     <div className={styles.container}>
       <PageSection
-        title={loading || profilLoading ? "Chargement..." : "Paramètres Jours d'Ouverture"}
-        description="Configurez les jours d'ouverture et les taux de matière première par entité et par mois"
+        title={loading || profilLoading ? t('common.loading', 'Chargement...') : t('financial.paramJoursTitle', 'Paramètres Jours d\'Ouverture')}
+        description={t('financial.paramJoursDescription', 'Configurez les jours d\'ouverture et les taux de matière première par entité et par mois')}
         className={styles.header}
       >
         <div className="mb-6">
           <Button
-            label="Ajouter un paramètre"
+            label={t('financial.addParamJours', 'Ajouter un paramètre')}
             icon="Plus"
             color="var(--color-primary)"
             onClick={() => setIsModalOpen(true)}

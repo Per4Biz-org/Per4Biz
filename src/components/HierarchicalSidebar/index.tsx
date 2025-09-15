@@ -57,7 +57,19 @@ const getMenuStructure = (t: any): MenuSection[] => [
           { id: 'suivi-ca-reel', label: t('sidebar.finance.revenueTracking'), path: '/finances/suivi-ca-reel', icon: FileText },
           { id: 'suivi-ca-budget', label: t('sidebar.finance.budgetTracking'), path: '/finances/suivi-ca-budget', icon: FileText },
           { id: 'budget-depense', label: t('sidebar.finance.expenseBudget'), path: '/finances/budget-depense', icon: FileText },
-          { id: 'param-finances', label: t('sidebar.finance.settings'), path: '/finances/parametres-finances', icon: Settings }
+          { 
+            id: 'param-finances', 
+            label: t('sidebar.finance.settings'), 
+            icon: Settings,
+            children: [
+              { id: 'param-finances-home', label: t('sidebar.finance.parametersOverview', 'Vue d\'ensemble'), path: '/finances/parametres-finances', icon: Home },
+              { id: 'ca-type-service', label: t('sidebar.finance.caTypeService', 'Types de Service CA'), path: '/finances/ca-type-service', icon: Settings },
+              { id: 'nature-flux', label: t('sidebar.finance.natureFlux', 'Nature des Flux'), path: '/finances/nature-flux', icon: Settings },
+              { id: 'categorie-flux', label: t('sidebar.finance.categorieFlux', 'Catégories des Flux'), path: '/finances/categorie-flux', icon: Settings },
+              { id: 'sous-categorie-flux', label: t('sidebar.finance.sousCategorieFlux', 'Sous-catégories des Flux'), path: '/finances/sous-categorie-flux', icon: Settings },
+              { id: 'param-jours', label: t('sidebar.finance.paramJours', 'Paramètres des Jours'), path: '/finances/param-jours', icon: Settings }
+            ]
+          }
         ]
       },
       {
@@ -113,7 +125,8 @@ const HierarchicalSidebar: React.FC<HierarchicalSidebarProps> = ({ onExpandChang
     'gestion-financiere': false, // Começar fechado 
     'gestion-bancaire': false,
     'gestion-employes': false,
-    'parametres-global': false
+    'parametres-global': false,
+    'param-finances': false // Parâmetros financeiros fechados por padrão
   });
   const navigate = useNavigate();
   const location = useLocation();
