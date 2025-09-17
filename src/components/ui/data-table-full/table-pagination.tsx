@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../button';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import styles from './data-table-full.module.css';
 
 interface TablePaginationProps {
@@ -24,51 +24,45 @@ export function TablePagination({
   return (
     <div className={styles.pagination}>
       <div className={styles.paginationInfo}>
-        {displayedRange}
+        <span className="text-sm text-gray-600">
+          {displayedRange}
+        </span>
       </div>
 
       <div className={styles.paginationControls}>
-        <Button
-          size="sm"
-          icon="ChevronsLeft"
-          label=""
-          onClick={() => handlePageChange(1)}
-          disabled={currentPage === 1}
-        />
-        <Button
-          size="sm"
-          icon="ChevronLeft"
-          label=""
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        />
-      
         <select
-          className="mx-2 px-2 py-1 border rounded"
+          className="text-sm border border-gray-300 rounded px-2 py-1 bg-white text-gray-700 focus:outline-none focus:border-blue-500"
           value={rowsPerPage === -1 ? 'all' : rowsPerPage}
           onChange={(e) => handleRowsPerPageChange(e.target.value === 'all' ? -1 : Number(e.target.value))}
         >
           {rowsPerPageOptions.map(option => (
             <option key={option} value={option === 'all' ? 'all' : option}>
-              {option === 'all' ? 'Tout afficher' : `${option} par page`}
+              {option === 'all' ? 'Todos' : `${option}`}
             </option>
           ))}
         </select>
 
-        <Button
-          size="sm"
-          icon="ChevronRight"
-          label=""
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        />
-        <Button
-          size="sm"
-          icon="ChevronsRight"
-          label=""
-          onClick={() => handlePageChange(totalPages)}
-          disabled={currentPage === totalPages}
-        />
+        <div className="flex items-center">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          
+          <span className="mx-3 text-sm text-gray-700">
+            {currentPage} / {totalPages}
+          </span>
+          
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

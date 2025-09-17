@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import { MenuProvider } from './context/MenuContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProfilProvider } from './context/ProfilContext'
+import { EntiteProvider } from './context/EntiteContext'
 import { PrivateRoute } from './components/PrivateRoute'
 import { FEATURES } from '@/config/features'
 
@@ -66,7 +67,8 @@ function App() {
   return (
     <AuthProvider>
       <ProfilProvider>
-        <MenuProvider>
+        <EntiteProvider>
+          <MenuProvider>
           <BrowserRouter>
           <Routes>
             {/* 🔓 Login sempre disponível */}
@@ -217,7 +219,8 @@ function App() {
             )}
           </Routes>
         </BrowserRouter>
-        </MenuProvider>
+          </MenuProvider>
+        </EntiteProvider>
       </ProfilProvider>
     </AuthProvider>
   )

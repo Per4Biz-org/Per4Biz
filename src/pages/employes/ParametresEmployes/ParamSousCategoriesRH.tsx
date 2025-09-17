@@ -449,7 +449,7 @@ const ParamSousCategoriesRH: React.FC = () => {
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('common.yes', 'Sim') : t('common.no', 'Não')}
         </span>
       )
     },
@@ -466,7 +466,7 @@ const ParamSousCategoriesRH: React.FC = () => {
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('common.yes', 'Sim') : t('common.no', 'Não')}
         </span>
       )
     },
@@ -483,7 +483,7 @@ const ParamSousCategoriesRH: React.FC = () => {
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('common.yes', 'Sim') : t('common.no', 'Não')}
         </span>
       )
     },
@@ -600,7 +600,7 @@ const ParamSousCategoriesRH: React.FC = () => {
                 <Toggle
                   checked={formData.soumis_charge_patronale}
                   onChange={handleToggleChange('soumis_charge_patronale')}
-                  label={formData.soumis_charge_patronale ? 'Oui' : 'Non'}
+                  label={formData.soumis_charge_patronale ? t('common.yes', 'Sim') : t('common.no', 'Não')}
                   icon="Building"
                   disabled={isSubmitting}
                 />
@@ -637,7 +637,7 @@ const ParamSousCategoriesRH: React.FC = () => {
                 <Toggle
                   checked={formData.soumis_charge_salariale}
                   onChange={handleToggleChange('soumis_charge_salariale')}
-                  label={formData.soumis_charge_salariale ? 'Oui' : 'Non'}
+                  label={formData.soumis_charge_salariale ? t('common.yes', 'Sim') : t('common.no', 'Não')}
                   icon="Users"
                   disabled={isSubmitting}
                 />

@@ -50,6 +50,8 @@ export function DataTable<T extends { id: string | number }>({
   }>({ key: null, direction: 'asc' });
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number>(-1);
+  const [isKeyboardNavActive, setIsKeyboardNavActive] = useState(false);
 
   // Tri des données
   const sortedData = useMemo(() => {
@@ -93,7 +95,71 @@ export function DataTable<T extends { id: string | number }>({
   const handleRowsPerPageChange = useCallback((newRowsPerPage: number) => {
     setRowsPerPage(newRowsPerPage);
     setCurrentPage(1);
+    setSelectedRowIndex(-1);
   }, []);
+
+  // Navegação por teclado
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!isKeyboardNavActive || paginatedData.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedRowIndex(prev => 
+          prev < paginatedData.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedRowIndex(prev => prev > 0 ? prev - 1 : prev);
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (currentPage > 1) {
+          handlePageChange(currentPage - 1);
+          setSelectedRowIndex(0);
+        }
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        if (currentPage < totalPages) {
+          handlePageChange(currentPage + 1);
+          setSelectedRowIndex(0);
+        }
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedRowIndex >= 0 && actions && actions.length > 0) {
+          actions[0].onClick(paginatedData[selectedRowIndex]);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setSelectedRowIndex(-1);
+        setIsKeyboardNavActive(false);
+        break;
+    }
+  }, [isKeyboardNavActive, paginatedData, selectedRowIndex, currentPage, totalPages, handlePageChange, actions]);
+
+  // Event listeners para navegação por teclado
+  React.useEffect(() => {
+    if (isKeyboardNavActive) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [handleKeyDown, isKeyboardNavActive]);
+
+  // Reset selection quando dados mudam
+  React.useEffect(() => {
+    setSelectedRowIndex(-1);
+  }, [data, currentPage, rowsPerPage]);
+
+  const handleTableClick = useCallback(() => {
+    setIsKeyboardNavActive(true);
+    if (selectedRowIndex === -1 && paginatedData.length > 0) {
+      setSelectedRowIndex(0);
+    }
+  }, [selectedRowIndex, paginatedData.length]);
 
   const displayedRange = useMemo(() => {
     if (rowsPerPage === -1) {
@@ -121,7 +187,18 @@ export function DataTable<T extends { id: string | number }>({
       <div className={styles.dataCount}>
         {data.length} {data.length > 1 ? 'éléments' : 'élément'}
       </div>
-      <table className={`${styles.table} ${compact ? styles.compact : ''}`}>
+      <div 
+        className="relative focus:outline-none"
+        tabIndex={0}
+        onClick={handleTableClick}
+        onFocus={handleTableClick}
+      >
+        {isKeyboardNavActive && (
+          <div className="absolute top-2 right-2 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded z-10">
+            ↑↓ navegar • ←→ páginas • Enter ação • Esc sair
+          </div>
+        )}
+        <table className={`${styles.table} ${compact ? styles.compact : ''}`}>
         <thead className={styles.header}>
           <tr>
             {columns.map(column => (
@@ -152,7 +229,13 @@ export function DataTable<T extends { id: string | number }>({
           {paginatedData.map((row, index) => (
             <tr 
               key={row.id} 
-              className={`${styles.row} ${customRowClassName ? customRowClassName(row, index) : ''}`}
+              className={`${styles.row} ${customRowClassName ? customRowClassName(row, index) : ''} ${
+                selectedRowIndex === index && isKeyboardNavActive ? styles.selectedRow : ''
+              }`}
+              onClick={() => {
+                setSelectedRowIndex(index);
+                setIsKeyboardNavActive(true);
+              }}
             >
               {columns.map(column => (
                 <td
@@ -187,91 +270,51 @@ export function DataTable<T extends { id: string | number }>({
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
 
       {shouldShowPagination && (
         <div className={styles.pagination}>
-          <div className={styles.paginationLeft}>
           <div className={styles.paginationInfo}>
-            {displayedRange}
+            <span className="text-sm text-gray-600">
+              {displayedRange}
+            </span>
           </div>
-            <div className={styles.rowsPerPageContainer}>
-              <span className={styles.rowsPerPageLabel}>Linhas por página:</span>
+
+          <div className={styles.paginationControls}>
             <select
-                className={styles.rowsPerPageSelect}
+              className="text-sm border border-gray-300 rounded px-2 py-1 bg-white text-gray-700 focus:outline-none focus:border-blue-500"
               value={rowsPerPage === -1 ? 'all' : rowsPerPage}
               onChange={(e) => handleRowsPerPageChange(e.target.value === 'all' ? -1 : Number(e.target.value))}
             >
               {rowsPerPageOptions.map(option => (
                 <option key={option} value={option === 'all' ? 'all' : option}>
-                    {option === 'all' ? 'Todos' : option.toString()}
+                  {option === 'all' ? 'Todos' : option.toString()}
                 </option>
               ))}
             </select>
+
+            <div className="flex items-center">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              
+              <span className="mx-3 text-sm text-gray-700">
+                {currentPage} / {totalPages}
+              </span>
+              
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-          </div>
-
-          <div className={styles.paginationControls}>
-            <button
-              className={`${styles.paginationButton} ${currentPage === 1 ? styles.disabled : ''}`}
-              onClick={() => handlePageChange(1)}
-              disabled={currentPage === 1}
-              title="Primeira página"
-            >
-              <ChevronsLeft size={16} />
-            </button>
-            
-            <button
-              className={`${styles.paginationButton} ${currentPage === 1 ? styles.disabled : ''}`}
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              title="Página anterior"
-            >
-              <ChevronLeft size={16} />
-            </button>
-
-            <div className={styles.pageNumbers}>
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNumber;
-                if (totalPages <= 5) {
-                  pageNumber = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNumber = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNumber = totalPages - 4 + i;
-                } else {
-                  pageNumber = currentPage - 2 + i;
-                }
-
-                return (
-                  <button
-                    key={pageNumber}
-                    className={`${styles.pageNumber} ${currentPage === pageNumber ? styles.active : ''}`}
-                    onClick={() => handlePageChange(pageNumber)}
-                  >
-                    {pageNumber}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              className={`${styles.paginationButton} ${currentPage === totalPages ? styles.disabled : ''}`}
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              title="Próxima página"
-            >
-              <ChevronRight size={16} />
-            </button>
-            
-            <button
-              className={`${styles.paginationButton} ${currentPage === totalPages ? styles.disabled : ''}`}
-              onClick={() => handlePageChange(totalPages)}
-              disabled={currentPage === totalPages}
-              title="Última página"
-            >
-              <ChevronsRight size={16} />
-            </button>
           </div>
         </div>
       )}

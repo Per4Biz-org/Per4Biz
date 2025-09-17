@@ -2,16 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
-import { Form, FormField, FormInput, FormActions } from '../../ui/form';
+import { useEntite } from '../../../context/EntiteContext';
+import { Form, FormField, FormFieldWithIcon, FormInput, FormActions } from '../../ui/form';
 import { Toggle } from '../../ui/toggle';
 import { Dropdown, DropdownOption } from '../../ui/dropdown';
 import { Button } from '../../ui/button';
 
-interface Entite {
-  id: string;
-  code: string;
-  libelle: string;
-}
 
 interface CategorieFlux {
   id: string;
@@ -24,7 +20,6 @@ interface SousCategorieFluxFormData {
   code: string;
   libelle: string;
   id_categorie: string;
-  id_entite: string;
   description?: string;
   ordre_affichage: number;
   actif: boolean;
@@ -42,7 +37,6 @@ export function SousCategorieFluxForm({
     code: '',
     libelle: '',
     id_categorie: '',
-    id_entite: '',
     description: '',
     ordre_affichage: 0,
     actif: true
@@ -53,28 +47,16 @@ export function SousCategorieFluxForm({
 }: SousCategorieFluxFormProps) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState<SousCategorieFluxFormData>(initialData);
-  const [entites, setEntites] = useState<Entite[]>([]);
   const [categoriesFlux, setCategoriesFlux] = useState<CategorieFlux[]>([]);
   const [filteredCategoriesFlux, setFilteredCategoriesFlux] = useState<CategorieFlux[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof SousCategorieFluxFormData, string>>>({});
   const { profil } = useProfil();
+  const { selectedEntiteId } = useEntite();
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!profil?.com_contrat_client_id) return;
-
-      // Récupérer les entités
-      const { data: entitesData } = await supabase
-        .from('com_entite')
-        .select('id, code, libelle')
-        .eq('actif', true)
-        .eq('com_contrat_client_id', profil.com_contrat_client_id)
-        .order('libelle');
-
-      if (entitesData) {
-        setEntites(entitesData);
-      }
 
       // Récupérer les catégories de flux
       const { data: categoriesData } = await supabase
@@ -91,38 +73,32 @@ export function SousCategorieFluxForm({
       setDataLoaded(true);
     };
 
-    fetchData();
-  }, [profil?.com_contrat_client_id]);
+    if (selectedEntiteId) {
+      fetchData();
+    }
+  }, [profil?.com_contrat_client_id, selectedEntiteId]);
 
   // Filtrer les catégories de flux selon l'entité sélectionnée et gérer l'initialisation
   useEffect(() => {
-    if (!dataLoaded) return;
+    if (!dataLoaded || !selectedEntiteId) return;
 
-    // Filtrer les catégories de flux:
-    // - Si une entité est sélectionnée, inclure les catégories spécifiques à cette entité ET les catégories globales
-    // - Si aucune entité n'est sélectionnée (mode global), n'inclure que les catégories globales
-    let filtered = [];
-    if (formData.id_entite) {
-      filtered = categoriesFlux.filter(categorie => 
-        categorie.id_entite === formData.id_entite || categorie.id_entite === null
-      );
-    } else {
-      filtered = categoriesFlux.filter(categorie => categorie.id_entite === null);
-    }
+    // Filtrer les catégories de flux pour l'entité sélectionnée
+    const filtered = categoriesFlux.filter(categorie => 
+      categorie.id_entite === selectedEntiteId || categorie.id_entite === null
+    );
 
-      setFilteredCategoriesFlux(filtered);
+    setFilteredCategoriesFlux(filtered);
       
-      // En mode édition, vérifier si la catégorie sélectionnée existe dans les données filtrées
-      // Si ce n'est pas le cas ET que ce n'est pas l'initialisation, alors réinitialiser
-      if (formData.id_categorie && 
-          !filtered.find(categorie => categorie.id === formData.id_categorie) &&
-          initialData?.id_categorie !== formData.id_categorie) {
-        setFormData(prev => ({
-          ...prev,
-          id_categorie: ''
-        }));
-      }
-  }, [formData.id_entite, categoriesFlux, formData.id_categorie, dataLoaded, initialData?.id_categorie]);
+    // En mode édition, vérifier si la catégorie sélectionnée existe dans les données filtrées
+    if (formData.id_categorie && 
+        !filtered.find(categorie => categorie.id === formData.id_categorie) &&
+        initialData?.id_categorie !== formData.id_categorie) {
+      setFormData(prev => ({
+        ...prev,
+        id_categorie: ''
+      }));
+    }
+  }, [selectedEntiteId, categoriesFlux, formData.id_categorie, dataLoaded, initialData?.id_categorie]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -146,19 +122,6 @@ export function SousCategorieFluxForm({
     }));
   };
 
-  const handleEntiteChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      id_entite: value,
-      id_categorie: '' // Réinitialiser la catégorie quand l'entité change
-    }));
-    if (errors.id_entite) {
-      setErrors(prev => ({
-        ...prev,
-        id_entite: undefined
-      }));
-    }
-  };
 
   const handleCategorieChange = (value: string) => {
     setFormData(prev => ({
@@ -188,43 +151,55 @@ export function SousCategorieFluxForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    await onSubmit(formData);
+    
+    if (!selectedEntiteId) {
+      console.error('Nenhuma entidade selecionada');
+      return;
+    }
+    
+    await onSubmit({
+      ...formData,
+      id_entite: selectedEntiteId
+    });
   };
 
-  const entiteOptions: DropdownOption[] = [
-    { value: '', label: t('parametersFinances.subCategoryFlux.globalAllEntities') },
-    ...entites.map(entite => ({
-      value: entite.id,
-      label: `${entite.code} - ${entite.libelle}`
-    }))
-  ];
 
   const categorieOptions: DropdownOption[] = filteredCategoriesFlux.map(categorie => ({
     value: categorie.id,
     label: `${categorie.code} - ${categorie.libelle}`
   }));
 
+  if (!selectedEntiteId) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-gray-500 mb-4">
+          <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m0 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Entidade Necessária</h3>
+        <p className="text-gray-600 mb-4">
+          Por favor selecione uma entidade no header antes de criar uma subcategoria de fluxo.
+        </p>
+        <Button
+          label="Fechar"
+          size="sm"
+          color="#6B7280"
+          onClick={onCancel}
+        />
+      </div>
+    );
+  }
+
   return (
     <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
-      <FormField
-        label={t('parametersFinances.subCategoryFlux.form.entity')}
-        error={errors.id_entite}
-        description={t('parametersFinances.subCategoryFlux.form.entityDescription')}
-        className="mb-3"
-      >
-        <Dropdown
-          options={entiteOptions}
-          value={formData.id_entite}
-          onChange={handleEntiteChange}
-          label={t('parametersFinances.subCategoryFlux.form.selectEntity')}
-          size="sm"
-        />
-      </FormField>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('parametersFinances.subCategoryFlux.form.fluxCategory')}
         required
         error={errors.id_categorie}
+        description={t('parametersFinances.subCategoryFlux.form.categoryDescription')}
+        fieldType="category"
         className="mb-3"
       >
         <Dropdown
@@ -235,12 +210,14 @@ export function SousCategorieFluxForm({
           size="sm"
           disabled={categorieOptions.length === 0}
         />
-      </FormField>
+      </FormFieldWithIcon>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('parametersFinances.subCategoryFlux.form.code')}
         required
         error={errors.code}
+        description={t('parametersFinances.subCategoryFlux.form.codeDescription')}
+        fieldType="code"
         className="mb-3"
       >
         <FormInput
@@ -250,12 +227,14 @@ export function SousCategorieFluxForm({
           placeholder={t('parametersFinances.subCategoryFlux.form.codeExample')}
           className="h-9"
         />
-      </FormField>
+      </FormFieldWithIcon>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('parametersFinances.subCategoryFlux.form.label')}
         required
         error={errors.libelle}
+        description={t('parametersFinances.subCategoryFlux.form.labelDescription')}
+        fieldType="label"
         className="mb-3"
       >
         <FormInput
@@ -265,10 +244,12 @@ export function SousCategorieFluxForm({
           placeholder={t('parametersFinances.subCategoryFlux.form.labelExample')}
           className="h-9"
         />
-      </FormField>
+      </FormFieldWithIcon>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('parametersFinances.subCategoryFlux.form.displayOrder')}
+        description={t('parametersFinances.subCategoryFlux.form.displayOrderDescription')}
+        fieldType="order"
         className="mb-3"
       >
         <FormInput
@@ -280,10 +261,12 @@ export function SousCategorieFluxForm({
           step="1"
           className="h-9"
         />
-      </FormField>
+      </FormFieldWithIcon>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('parametersFinances.subCategoryFlux.form.status')}
+        description={t('parametersFinances.subCategoryFlux.form.statusDescription')}
+        fieldType="status"
         className="mb-3"
       >
         <Toggle
@@ -292,10 +275,12 @@ export function SousCategorieFluxForm({
           label={formData.actif ? t('parametersFinances.subCategoryFlux.form.activeStatus') : t('parametersFinances.subCategoryFlux.form.inactiveStatus')}
           size="sm"
         />
-      </FormField>
+      </FormFieldWithIcon>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('parametersFinances.subCategoryFlux.form.description')}
+        description={t('parametersFinances.subCategoryFlux.form.descriptionDescription')}
+        fieldType="description"
         className="mb-3 col-span-2"
       >
         <textarea
@@ -306,7 +291,7 @@ export function SousCategorieFluxForm({
           rows={2}
           placeholder={t('parametersFinances.subCategoryFlux.form.descriptionPlaceholder')}
         />
-      </FormField>
+      </FormFieldWithIcon>
 
       <FormActions>
         <Button

@@ -226,7 +226,7 @@ const NatureFlux: React.FC = () => {
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('common.yes', 'Sim') : t('common.no', 'Não')}
         </span>
       )
     },
@@ -238,7 +238,7 @@ const NatureFlux: React.FC = () => {
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('common.yes', 'Sim') : t('common.no', 'Não')}
         </span>
       )
     },

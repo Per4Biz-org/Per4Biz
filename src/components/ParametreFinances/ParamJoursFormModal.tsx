@@ -2,18 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { useProfil } from '../../context/ProfilContext';
-import { Form, FormField, FormInput, FormActions } from '../ui/form';
+import { useEntite } from '../../context/EntiteContext';
+import { Form, FormField, FormFieldWithIcon, FormInput, FormActions } from '../ui/form';
 import { Dropdown, DropdownOption } from '../ui/dropdown';
 import { Button } from '../ui/button';
 
-interface Entite {
-  id: string;
-  code: string;
-  libelle: string;
-}
 
 interface ParamJoursFormData {
-  id_entite: string;
   annee: number;
   mois: number;
   nb_jours_ouverts: number;
@@ -37,46 +32,23 @@ export function ParamJoursFormModal({
   isSubmitting = false
 }: ParamJoursFormModalProps) {
   const { profil } = useProfil();
+  const { selectedEntiteId } = useEntite();
   const { t } = useTranslation();
   const [formData, setFormData] = useState<ParamJoursFormData>({
-    id_entite: '',
     annee: new Date().getFullYear(),
     mois: new Date().getMonth() + 1,
     nb_jours_ouverts: 0,
     taux_mp_prevu: undefined,
     commentaire: ''
   });
-  const [entites, setEntites] = useState<Entite[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof ParamJoursFormData, string>>>({});
 
-  // Charger les entités
-  useEffect(() => {
-    const fetchEntites = async () => {
-      if (!profil?.com_contrat_client_id) return;
 
-      const { data } = await supabase
-        .from('com_entite')
-        .select('id, code, libelle')
-        .eq('actif', true)
-        .eq('com_contrat_client_id', profil.com_contrat_client_id)
-        .order('libelle');
-
-      if (data) {
-        setEntites(data);
-      }
-    };
-
-    if (isOpen) {
-      fetchEntites();
-    }
-  }, [isOpen, profil?.com_contrat_client_id]);
-
-  // Réinitialiser le formulaire quand la modale s'ouvre/ferme ou que les données initiales changent
+  // Réinitialiser le formulaire quand a modal s'ouvre/ferme ou que as dados iniciais mudam
   useEffect(() => {
     if (isOpen) {
       if (initialData) {
         setFormData({
-          id_entite: initialData.id_entite,
           annee: initialData.annee,
           mois: initialData.mois,
           nb_jours_ouverts: initialData.nb_jours_ouverts,
@@ -85,7 +57,6 @@ export function ParamJoursFormModal({
         });
       } else {
         setFormData({
-          id_entite: '',
           annee: new Date().getFullYear(),
           mois: new Date().getMonth() + 1,
           nb_jours_ouverts: 0,
@@ -122,18 +93,6 @@ export function ParamJoursFormModal({
     }
   };
 
-  const handleEntiteChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      id_entite: value
-    }));
-    if (errors.id_entite) {
-      setErrors(prev => ({
-        ...prev,
-        id_entite: undefined
-      }));
-    }
-  };
 
   const handleMoisChange = (value: string) => {
     setFormData(prev => ({
@@ -151,7 +110,6 @@ export function ParamJoursFormModal({
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof ParamJoursFormData, string>> = {};
 
-    if (!formData.id_entite) newErrors.id_entite = t('financial.paramJoursModal.entityRequired');
     if (!formData.annee || formData.annee < 2000 || formData.annee > 2100) {
       newErrors.annee = t('financial.paramJoursModal.yearRequired');
     }
@@ -173,8 +131,13 @@ export function ParamJoursFormModal({
     e.preventDefault();
     if (!validateForm()) return;
     
+    if (!selectedEntiteId) {
+      console.error('Nenhuma entidade selecionada');
+      return;
+    }
+
     await onSubmit({
-      id_entite: formData.id_entite,
+      id_entite: selectedEntiteId,
       annee: formData.annee,
       mois: formData.mois,
       nb_jours_ouverts: formData.nb_jours_ouverts,
@@ -185,7 +148,6 @@ export function ParamJoursFormModal({
 
   const handleCancel = () => {
     setFormData({
-      id_entite: '',
       annee: new Date().getFullYear(),
       mois: new Date().getMonth() + 1,
       nb_jours_ouverts: 0,
@@ -195,11 +157,6 @@ export function ParamJoursFormModal({
     setErrors({});
     onClose();
   };
-
-  const entiteOptions: DropdownOption[] = entites.map(entite => ({
-    value: entite.id,
-    label: `${entite.code} - ${entite.libelle}`
-  }));
 
   const moisOptions: DropdownOption[] = [
     { value: '1', label: t('financial.months.january') },
@@ -217,6 +174,38 @@ export function ParamJoursFormModal({
   ];
 
   if (!isOpen) return null;
+
+  // Verificar se há entidade selecionada
+  if (!selectedEntiteId) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-red-600">Entidade Necessária</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">
+              Por favor selecione uma entidade no header antes de criar parâmetros de dias.
+            </p>
+            <Button
+              label="Fechar"
+              size="sm"
+              color="#6B7280"
+              onClick={onClose}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -237,29 +226,12 @@ export function ParamJoursFormModal({
         </div>
 
         <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
-          <FormField
-            label={t('financial.paramJoursModal.entityLabel')}
-            required
-            error={errors.id_entite}
-            description={t('financial.paramJoursModal.entityDescription')}
-            className="mb-4"
-          >
-            <Dropdown
-              options={entiteOptions}
-              value={formData.id_entite}
-              onChange={handleEntiteChange}
-              label={t('financial.paramJoursModal.entityPlaceholder')}
-              size="sm"
-              disabled={isSubmitting}
-            />
-          </FormField>
-
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.paramJoursModal.yearLabel')}
             required
             error={errors.annee}
             description={t('financial.paramJoursModal.yearDescription')}
-            className="mb-4"
+            fieldType="time"
           >
             <FormInput
               name="annee"
@@ -271,14 +243,14 @@ export function ParamJoursFormModal({
               disabled={isSubmitting}
               className="h-9"
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.paramJoursModal.monthLabel')}
             required
             error={errors.mois}
             description={t('financial.paramJoursModal.monthDescription')}
-            className="mb-4"
+            fieldType="time"
           >
             <Dropdown
               options={moisOptions}
@@ -288,14 +260,14 @@ export function ParamJoursFormModal({
               size="sm"
               disabled={isSubmitting}
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.paramJoursModal.openDaysLabel')}
             required
             error={errors.nb_jours_ouverts}
             description={t('financial.paramJoursModal.openDaysDescription')}
-            className="mb-4"
+            fieldType="order"
           >
             <FormInput
               name="nb_jours_ouverts"
@@ -308,13 +280,13 @@ export function ParamJoursFormModal({
               disabled={isSubmitting}
               className="h-9"
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.paramJoursModal.expectedRateLabel')}
             error={errors.taux_mp_prevu}
             description={t('financial.paramJoursModal.expectedRateDescription')}
-            className="mb-4"
+            fieldType="flowType"
           >
             <FormInput
               name="taux_mp_prevu"
@@ -328,12 +300,13 @@ export function ParamJoursFormModal({
               disabled={isSubmitting}
               className="h-9"
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.paramJoursModal.commentLabel')}
             description={t('financial.paramJoursModal.commentDescription')}
-            className="mb-6 col-span-2"
+            fieldType="description"
+            className="col-span-2"
           >
             <textarea
               name="commentaire"
@@ -344,7 +317,7 @@ export function ParamJoursFormModal({
               placeholder={t('financial.paramJoursModal.commentPlaceholder')}
               disabled={isSubmitting}
             />
-          </FormField>
+          </FormFieldWithIcon>
 
           <FormActions>
             <Button

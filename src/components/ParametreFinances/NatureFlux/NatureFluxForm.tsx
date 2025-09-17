@@ -2,22 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
-import { Form, FormField, FormInput, FormActions } from '../../ui/form';
+import { useEntite } from '../../../context/EntiteContext';
+import { Form, FormField, FormFieldWithIcon, FormInput, FormActions } from '../../ui/form';
 import { Toggle } from '../../ui/toggle';
 import { Dropdown, DropdownOption } from '../../ui/dropdown';
 import { Button } from '../../ui/button';
-
-interface Entite {
-  id: string;
-  code: string;
-  libelle: string;
-}
 
 interface NatureFluxFormData {
   code: string;
   libelle: string;
   description?: string;
-  id_entite: string | null;
   actif: boolean;
   salarie: boolean;
 }
@@ -34,7 +28,6 @@ export function NatureFluxForm({
     code: '',
     libelle: '',
     description: '',
-    id_entite: null,
     actif: true,
     salarie: false
   },
@@ -43,29 +36,11 @@ export function NatureFluxForm({
   isSubmitting = false
 }: NatureFluxFormProps) {
   const [formData, setFormData] = useState<NatureFluxFormData>(initialData);
-  const [entites, setEntites] = useState<Entite[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof NatureFluxFormData, string>>>({});
   const { profil } = useProfil();
+  const { selectedEntiteId } = useEntite();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchEntites = async () => {
-      if (!profil?.com_contrat_client_id) return;
-
-      const { data } = await supabase
-        .from('com_entite')
-        .select('id, code, libelle')
-        .eq('actif', true)
-        .eq('com_contrat_client_id', profil.com_contrat_client_id)
-        .order('libelle');
-
-      if (data) {
-        setEntites(data);
-      }
-    };
-
-    fetchEntites();
-  }, [profil?.com_contrat_client_id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -96,18 +71,6 @@ export function NatureFluxForm({
     }));
   };
 
-  const handleEntiteChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      id_entite: value === '' ? null : value
-    }));
-    if (errors.id_entite) {
-      setErrors(prev => ({
-        ...prev,
-        id_entite: undefined
-      }));
-    }
-  };
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof NatureFluxFormData, string>> = {};
@@ -124,45 +87,51 @@ export function NatureFluxForm({
     e.preventDefault();
     if (!validateForm()) return;
     
-    // Préparer les données en convertissant les chaînes vides en null pour les UUID
+    if (!selectedEntiteId) {
+      console.error('Nenhuma entidade selecionada');
+      return;
+    }
+    
     const submitData = {
       ...formData,
-      id_entite: formData.id_entite === '' ? null : formData.id_entite
+      id_entite: selectedEntiteId
     };
     
     await onSubmit(submitData);
   };
 
-  const entiteOptions: DropdownOption[] = [
-    { value: '', label: t('financial.natureFluxModal.globalEntity') },
-    ...entites.map(entite => ({
-      value: entite.id,
-      label: `${entite.code} - ${entite.libelle}`
-    }))
-  ];
+
+  if (!selectedEntiteId) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-gray-500 mb-4">
+          <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m0 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Entidade Necessária</h3>
+        <p className="text-gray-600 mb-4">
+          Por favor selecione uma entidade no header antes de criar uma natureza de fluxo.
+        </p>
+        <Button
+          label="Fechar"
+          size="sm"
+          color="#6B7280"
+          onClick={onCancel}
+        />
+      </div>
+    );
+  }
 
   return (
     <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
-      <FormField
-        label={t('financial.natureFluxModal.entityLabel')}
-        error={errors.id_entite}
-        description={t('financial.natureFluxModal.entityDescription')}
-        className="mb-3"
-      >
-        <Dropdown
-          options={entiteOptions}
-          value={formData.id_entite || ''}
-          onChange={handleEntiteChange}
-          label={t('financial.natureFluxModal.entityPlaceholder')}
-          size="sm"
-        />
-      </FormField>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('financial.natureFluxModal.codeLabel')}
         required
         error={errors.code}
         description={t('financial.natureFluxModal.codeDescription')}
+        fieldType="code"
         className="mb-3"
       >
         <FormInput
@@ -173,13 +142,14 @@ export function NatureFluxForm({
           placeholder={t('financial.natureFluxModal.codePlaceholder')}
           className="h-9"
         />
-      </FormField>
+      </FormFieldWithIcon>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('financial.natureFluxModal.labelLabel')}
         required
         error={errors.libelle}
         description={t('financial.natureFluxModal.labelDescription')}
+        fieldType="label"
         className="mb-3"
       >
         <FormInput
@@ -189,11 +159,12 @@ export function NatureFluxForm({
           placeholder={t('financial.natureFluxModal.labelPlaceholder')}
           className="h-9"
         />
-      </FormField>
+      </FormFieldWithIcon>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('financial.natureFluxModal.employeeLabel')}
         description={t('financial.natureFluxModal.employeeDescription')}
+        fieldType="employee"
         className="mb-3"
       >
         <Toggle
@@ -203,11 +174,12 @@ export function NatureFluxForm({
           icon="Users"
           size="sm"
         />
-      </FormField>
+      </FormFieldWithIcon>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('financial.natureFluxModal.statusLabel')}
         description={t('financial.natureFluxModal.statusDescription')}
+        fieldType="status"
         className="mb-3"
       >
         <Toggle
@@ -216,11 +188,12 @@ export function NatureFluxForm({
           label={formData.actif ? t('financial.natureFluxModal.activeStatus') : t('financial.natureFluxModal.inactiveStatus')}
           size="sm"
         />
-      </FormField>
+      </FormFieldWithIcon>
 
-      <FormField
+      <FormFieldWithIcon
         label={t('financial.natureFluxModal.descriptionLabel')}
         description={t('financial.natureFluxModal.descriptionDescription')}
+        fieldType="description"
         className="mb-3 col-span-2"
       >
         <textarea
@@ -231,7 +204,7 @@ export function NatureFluxForm({
           rows={2}
           placeholder={t('financial.natureFluxModal.descriptionPlaceholder')}
         />
-      </FormField>
+      </FormFieldWithIcon>
 
       <FormActions>
         <Button

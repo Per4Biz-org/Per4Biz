@@ -180,7 +180,7 @@ export function ModePaiementFormModal({
             <Toggle
               checked={formData.paiement_caisse}
               onChange={handlePaiementCaisseToggleChange}
-              label={formData.paiement_caisse ? 'Oui' : 'Non'}
+              label={formData.paiement_caisse ? t('common.yes', 'Sim') : t('common.no', 'Não')}
               icon="CreditCard"
               disabled={isSubmitting}
               size="sm"

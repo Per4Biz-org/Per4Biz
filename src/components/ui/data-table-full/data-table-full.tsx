@@ -69,6 +69,8 @@ export function DataTableFull<T extends { id: string | number }, U extends { id:
   const [loadingMap, setLoadingMap] = useState<Map<string | number, boolean>>(new Map());
   const [isDuplicateMotherRows, setIsDuplicateMotherRows] = useState<boolean>(duplicateMotherRowsForExport);
   const [isShowSubtotal, setIsShowSubtotal] = useState<boolean>(showSubtotals);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number>(-1);
+  const [isKeyboardNavActive, setIsKeyboardNavActive] = useState(false);
 
   // Réinitialiser l'état du composant quand l'option de duplication change
   useEffect(() => {

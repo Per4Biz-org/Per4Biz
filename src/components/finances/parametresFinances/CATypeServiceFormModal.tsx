@@ -2,16 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../../lib/supabase';
 import { useProfil } from '../../../context/ProfilContext';
-import { Form, FormField, FormInput, FormActions } from '../../ui/form';
+import { useEntite } from '../../../context/EntiteContext';
+import { Form, FormField, FormFieldWithIcon, FormInput, FormActions } from '../../ui/form';
 import { Toggle } from '../../ui/toggle';
 import { Dropdown, DropdownOption } from '../../ui/dropdown';
 import { Button } from '../../ui/button';
 
-interface Entite {
-  id: string;
-  code: string;
-  libelle: string;
-}
 
 interface CategorieFlux {
   id: string;
@@ -33,7 +29,6 @@ interface CATypeServiceFormData {
   description?: string;
   ordre_affichage: number;
   actif: boolean;
-  id_entite: string;
   heure_debut?: string;
   heure_fin?: string;
   id_flux_sous_categorie?: string;
@@ -60,12 +55,10 @@ export function CATypeServiceFormModal({
     description: '',
     ordre_affichage: 0,
     actif: true,
-    id_entite: '',
     heure_debut: '',
     heure_fin: '',
     id_flux_sous_categorie: ''
   });
-  const [entites, setEntites] = useState<Entite[]>([]);
   const [sousCategories, setSousCategories] = useState<SousCategorieFlux[]>([]);
   const [filteredSousCategories, setFilteredSousCategories] = useState<SousCategorieFlux[]>([]);
   const [categories, setCategories] = useState<CategorieFlux[]>([]);
@@ -73,6 +66,7 @@ export function CATypeServiceFormModal({
   const [selectedCategorie, setSelectedCategorie] = useState<string>('');
   const [errors, setErrors] = useState<Partial<Record<keyof CATypeServiceFormData, string>>>({});
   const { profil } = useProfil();
+  const { selectedEntiteId } = useEntite();
   const { t, i18n } = useTranslation();
   
   // Traduções diretas para garantir funcionamento
@@ -111,23 +105,8 @@ export function CATypeServiceFormModal({
     return modalTranslations[lang]?.[key] || modalTranslations.fr[key];
   };
 
-  // Charger les entités
+  // Charger les données
   useEffect(() => {
-    const fetchEntites = async () => {
-      if (!profil?.com_contrat_client_id) return;
-
-      const { data } = await supabase
-        .from('com_entite')
-        .select('id, code, libelle')
-        .eq('actif', true)
-        .eq('com_contrat_client_id', profil.com_contrat_client_id)
-        .order('libelle');
-
-      if (data) {
-        setEntites(data);
-      }
-    };
-    
     const fetchCategories = async () => {
       if (!profil?.com_contrat_client_id) return;
 
@@ -169,19 +148,18 @@ export function CATypeServiceFormModal({
       }
     };
 
-    if (isOpen) {
-      fetchEntites();
+    if (isOpen && selectedEntiteId) {
       fetchCategories();
       fetchSousCategories();
     }
-  }, [isOpen, profil?.com_contrat_client_id]);
+  }, [isOpen, selectedEntiteId, profil?.com_contrat_client_id]);
 
   // Filtrer les catégories en fonction de l'entité sélectionnée
   useEffect(() => {
-    if (formData.id_entite) {
+    if (selectedEntiteId) {
       // Filtrer les catégories qui appartiennent à cette entité OU qui sont globales
       const filtered = categories.filter(cat => 
-        cat.id_entite === formData.id_entite || cat.id_entite === null
+        cat.id_entite === selectedEntiteId || cat.id_entite === null
       );
       setFilteredCategories(filtered);
 
@@ -202,7 +180,7 @@ export function CATypeServiceFormModal({
       setSelectedCategorie('');
       setFilteredSousCategories([]);
     }
-  }, [formData.id_entite, categories]);
+  }, [selectedEntiteId, categories, selectedCategorie, formData.id_flux_sous_categorie]);
 
   // Filtrer les sous-catégories en fonction de la catégorie sélectionnée
   useEffect(() => {
@@ -242,7 +220,6 @@ export function CATypeServiceFormModal({
           description: initialData.description || '',
           ordre_affichage: initialData.ordre_affichage,
           actif: initialData.actif,
-          id_entite: initialData.id_entite,
           heure_debut: initialData.heure_debut || '',
           heure_fin: initialData.heure_fin || '',
           id_flux_sous_categorie: initialData.id_flux_sous_categorie || '',
@@ -262,7 +239,6 @@ export function CATypeServiceFormModal({
           description: '',
           ordre_affichage: 0,
           actif: true,
-          id_entite: '',
           heure_debut: '',
           heure_fin: '',
           id_flux_sous_categorie: ''
@@ -304,18 +280,6 @@ export function CATypeServiceFormModal({
     }));
   };
 
-  const handleEntiteChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      id_entite: value
-    }));
-    if (errors.id_entite) {
-      setErrors(prev => ({
-        ...prev,
-        id_entite: undefined
-      }));
-    }
-  };
 
   const handleCategorieChange = (value: string) => {
     setSelectedCategorie(value);
@@ -339,7 +303,6 @@ export function CATypeServiceFormModal({
 
     if (!formData.code.trim()) newErrors.code = t('financial.serviceTypeModal.codeRequired');
     if (!formData.libelle.trim()) newErrors.libelle = t('financial.serviceTypeModal.labelRequired');
-    if (!formData.id_entite) newErrors.id_entite = t('financial.serviceTypeModal.entityRequired');
     if (!formData.id_flux_sous_categorie) newErrors.id_flux_sous_categorie = t('financial.serviceTypeModal.subcategoryRequired');
 
     setErrors(newErrors);
@@ -350,13 +313,17 @@ export function CATypeServiceFormModal({
     e.preventDefault();
     if (!validateForm()) return;
     
+    if (!selectedEntiteId) {
+      console.error('Nenhuma entidade selecionada');
+      return;
+    }
+    
     await onSubmit({
+      ...formData,
+      id_entite: selectedEntiteId,
       code: formData.code.trim(),
       libelle: formData.libelle.trim(),
       description: formData.description?.trim() || undefined,
-      ordre_affichage: formData.ordre_affichage,
-      actif: formData.actif,
-      id_entite: formData.id_entite,
       heure_debut: formData.heure_debut?.trim() || undefined,
       heure_fin: formData.heure_fin?.trim() || undefined,
       id_flux_sous_categorie: formData.id_flux_sous_categorie || undefined
@@ -370,7 +337,6 @@ export function CATypeServiceFormModal({
       description: '',
       ordre_affichage: 0,
       actif: true,
-      id_entite: '',
       heure_debut: '',
       heure_fin: '',
       id_flux_sous_categorie: ''
@@ -379,10 +345,6 @@ export function CATypeServiceFormModal({
     onClose();
   };
 
-  const entiteOptions: DropdownOption[] = entites.map(entite => ({
-    value: entite.id,
-    label: `${entite.code} - ${entite.libelle}`
-  }));
 
   const categorieOptions: DropdownOption[] = filteredCategories.map(categorie => ({
     value: categorie.id,
@@ -395,6 +357,37 @@ export function CATypeServiceFormModal({
   }));
 
   if (!isOpen) return null;
+
+  if (!selectedEntiteId) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-red-600">Entidade Necessária</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">
+              Por favor selecione uma entidade no header antes de criar tipos de serviço.
+            </p>
+            <Button
+              label="Fechar"
+              size="sm"
+              color="#6B7280"
+              onClick={onClose}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -415,28 +408,13 @@ export function CATypeServiceFormModal({
         </div>
 
         <Form size={100} columns={2} onSubmit={handleSubmit} className="text-sm">
-          <FormField
-            label={t('financial.serviceTypeModal.entityLabel')}
-            required
-            error={errors.id_entite}
-            description={t('financial.serviceTypeModal.entityDescription')}
-            className="mb-2"
-          >
-            <Dropdown
-              options={entiteOptions}
-              value={formData.id_entite}
-              onChange={handleEntiteChange}
-              label={getModalText('selectEntity')}
-              size="sm"
-              disabled={isSubmitting}
-            />
-          </FormField>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.serviceTypeModal.codeLabel')}
             required
             error={errors.code}
             description={t('financial.serviceTypeModal.codeDescription')}
+            fieldType="code"
             className="mb-2"
           >
             <FormInput
@@ -447,13 +425,14 @@ export function CATypeServiceFormModal({
               disabled={isSubmitting}
               className="h-9"
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.serviceTypeModal.labelLabel')}
             required
             error={errors.libelle}
             description={t('financial.serviceTypeModal.labelDescription')}
+            fieldType="label"
             className="mb-2"
           >
             <FormInput
@@ -464,11 +443,12 @@ export function CATypeServiceFormModal({
               disabled={isSubmitting}
               className="h-9"
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.serviceTypeModal.displayOrderLabel')}
             description={t('financial.serviceTypeModal.displayOrderDescription')}
+            fieldType="order"
             className="mb-2"
           >
             <FormInput
@@ -480,11 +460,12 @@ export function CATypeServiceFormModal({
               disabled={isSubmitting}
               className="h-9"
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.serviceTypeModal.startTimeLabel')}
             description={t('financial.serviceTypeModal.startTimeDescription')}
+            fieldType="time"
             className="mb-2"
           >
             <FormInput
@@ -495,11 +476,12 @@ export function CATypeServiceFormModal({
               disabled={isSubmitting}
               className="h-9"
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.serviceTypeModal.endTimeLabel')}
             description={t('financial.serviceTypeModal.endTimeDescription')}
+            fieldType="time"
             className="mb-2"
           >
             <FormInput
@@ -510,11 +492,12 @@ export function CATypeServiceFormModal({
               disabled={isSubmitting}
               className="h-9"
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.serviceTypeModal.flowCategoryLabel')}
             description={t('financial.serviceTypeModal.flowCategoryDescription')}
+            fieldType="category"
             className="mb-2"
           >
             <Dropdown
@@ -522,22 +505,21 @@ export function CATypeServiceFormModal({
               value={selectedCategorie}
               onChange={handleCategorieChange}
               label={
-                !formData.id_entite 
-                  ? getModalText('selectEntityFirst')
-                  : categorieOptions.length === 0 
-                    ? getModalText('noCategoryAvailable')
-                    : getModalText('selectCategory')
+                categorieOptions.length === 0 
+                  ? getModalText('noCategoryAvailable')
+                  : getModalText('selectCategory')
               }
               size="sm"
-              disabled={!formData.id_entite || isSubmitting || categorieOptions.length === 0}
+              disabled={isSubmitting || categorieOptions.length === 0}
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.serviceTypeModal.flowSubcategoryLabel')}
             required
             description={t('financial.serviceTypeModal.flowSubcategoryDescription')}
             error={errors.id_flux_sous_categorie}
+            fieldType="subcategory"
             className="mb-2"
           >
             <Dropdown
@@ -554,11 +536,12 @@ export function CATypeServiceFormModal({
               size="sm"
               disabled={!selectedCategorie || isSubmitting || sousCategorieOptions.length === 0}
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.serviceTypeModal.statusLabel')}
             description={t('financial.serviceTypeModal.statusDescription')}
+            fieldType="status"
             className="mb-2 col-span-2"
           >
             <Toggle
@@ -568,11 +551,12 @@ export function CATypeServiceFormModal({
               icon="Check"
               disabled={isSubmitting}
             />
-          </FormField>
+          </FormFieldWithIcon>
 
-          <FormField
+          <FormFieldWithIcon
             label={t('financial.serviceTypeModal.descriptionLabel')}
             description={t('financial.serviceTypeModal.descriptionDescription')}
+            fieldType="description"
             className="mb-4 col-span-2"
           >
             <textarea
@@ -584,7 +568,7 @@ export function CATypeServiceFormModal({
               placeholder={t('financial.serviceTypeModal.descriptionPlaceholder')}
               disabled={isSubmitting}
             />
-          </FormField>
+          </FormFieldWithIcon>
 
           <FormActions>
             <Button
