@@ -115,8 +115,8 @@ export const getBudgetMotherColumns = (t?: any): Column<BudgetMensuel>[] => [
         value.type_flux === 'produit' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
       }`}>
         {value.type_flux === 'produit' 
-          ? (t ? t('parametersFinances.budgetTracking.table.types.product') : 'Produit')
-          : (t ? t('parametersFinances.budgetTracking.table.types.charge') : 'Charge')
+          ? (t ? t('common.product', 'Produto') : 'Produto')
+          : (t ? t('common.expense', 'Despesa') : 'Despesa')
         }
       </span>
     )

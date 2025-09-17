@@ -14,7 +14,15 @@
     "confirm": "Confirm",
     "close": "Close",
     "select": "Select",
-    "selectEntity": "Select an entity"
+    "selectEntity": "Select an entity",
+    "all": "All",
+    "searchBy": "Search by",
+    "product": "Product",
+    "expense": "Expense", 
+    "type": "Type",
+    "yes": "Yes",
+    "no": "No",
+    "locale": "en"
   },
   "auth": {
     "login": "Login",
@@ -413,7 +421,29 @@
       "entityRequired": "Entity is required",
       "subcategoryRequired": "Subcategory is required",
       "saving": "Saving..."
-    }
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    },
+    "year": "Year",
+    "month": "Month",
+    "openDays": "Open days",
+    "day": "day",
+    "days": "days",
+    "plannedRate": "Planned rate (%)",
+    "comment": "Comment",
+    "creationDate": "Creation date"
   },
   "employee": {
     "matricule": "Employee ID",

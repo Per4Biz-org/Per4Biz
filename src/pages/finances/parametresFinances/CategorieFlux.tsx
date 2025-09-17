@@ -283,7 +283,7 @@ const CategorieFlux: React.FC = () => {
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value === 'produit' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
         }`}>
-          {value === 'produit' ? 'Produit' : 'Charge'}
+          {value === 'produit' ? t('common.product', 'Produto') : t('common.expense', 'Despesa')}
         </span>
       )
     },
@@ -317,7 +317,7 @@ const CategorieFlux: React.FC = () => {
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          {value ? 'Oui' : 'Non'}
+          {value ? t('common.yes', 'Sim') : t('common.no', 'Não')}
         </span>
       )
     }

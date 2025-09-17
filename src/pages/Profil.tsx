@@ -11,9 +11,6 @@ import { User, Mail, Calendar, Phone, Hash, Edit, Save, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { supabase } from '../lib/supabase';
-import PTFlag from 'country-flag-icons/react/3x2/PT';
-import GBFlag from 'country-flag-icons/react/3x2/GB';
-import FRFlag from 'country-flag-icons/react/3x2/FR';
 
 const Profil: React.FC = () => {
   const { t } = useTranslation();
@@ -176,184 +173,134 @@ const Profil: React.FC = () => {
     );
   }
 
-  // Lógica para as bandeiras
-  const { i18n } = useTranslation();
-  const languages = [
-    { code: 'pt', component: PTFlag, name: 'Português' },
-    { code: 'en', component: GBFlag, name: 'English' },
-    { code: 'fr', component: FRFlag, name: 'Français' }
-  ];
-
-  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
-
-  const changeLanguage = (languageCode: string) => {
-    i18n.changeLanguage(languageCode);
-    setShowLanguageMenu(false); // Fecha o menu após selecionar
-  };
-
-  // Encontra o idioma atual
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
-
-  // Fecha o menu quando clica fora
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (showLanguageMenu && !target.closest('.language-dropdown')) {
-        setShowLanguageMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showLanguageMenu]);
 
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
-      <PageSection>
-        <div className="flex items-center gap-4 mb-2">
-          <h1 className="text-4xl font-bold text-gray-900">{t('pages.profile.title')}</h1>
-          
-          {/* Seletor de idiomas - dropdown com bandeira */}
-          <div className="relative language-dropdown">
-            {/* Bandeira atual - clicável */}
-            <div
-              onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-              className="cursor-pointer transition-all duration-300 hover:scale-105 flex items-center"
-              style={{
-                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
-              }}
-              title={`${currentLanguage.name} - Clique para trocar idioma`}
-            >
-              <currentLanguage.component 
-                style={{ 
-                  width: '28px', 
-                  height: '21px',
-                  borderRadius: '4px'
-                }} 
-              />
-            </div>
-
-            {/* Menu dropdown */}
-            {showLanguageMenu && (
-              <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 min-w-[120px]">
-                {languages.map((language) => {
-                  const FlagComponent = language.component;
-                  return (
-                    <div
-                      key={language.code}
-                      onClick={() => changeLanguage(language.code)}
-                      className={`
-                        flex items-center gap-3 px-3 py-2 cursor-pointer transition-all duration-200
-                        hover:bg-blue-50 hover:scale-105
-                        ${i18n.language === language.code ? 'bg-blue-100' : ''}
-                      `}
-                      title={language.name}
-                    >
-                      <FlagComponent 
-                        style={{ 
-                          width: '20px', 
-                          height: '15px',
-                          borderRadius: '2px',
-                          border: '1px solid rgba(0,0,0,0.1)'
-                        }} 
-                      />
-                      <span className="text-sm font-medium text-gray-700">
-                        {language.name}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        {/* Header empresarial */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between bg-white rounded-lg px-8 py-6 shadow-sm border border-gray-200">
+            <h1 className="text-3xl font-bold text-gray-900">
+              {t('pages.profile.title')}
+            </h1>
           </div>
+          <p className="text-lg text-gray-600 mt-3">
+            {t('pages.profile.subtitle')}
+          </p>
         </div>
-        <p className="text-lg text-gray-600 mb-12">
-          {t('pages.profile.subtitle')}
-        </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Colonne de gauche - Avatar et infos principales */}
-          <div className="flex flex-col items-center p-8 bg-white rounded-xl shadow-sm">
-            <div className="w-32 h-32 bg-blue-500 rounded-full flex items-center justify-center mb-6">
-              <User className="w-16 h-16 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900">{profil?.prenom} {profil?.nom}</h2>
-            <p className="text-gray-600 mb-2">Code: {profil?.code_user}</p>
-            <p className="text-gray-600 mb-6">Utilisateur</p>
-            
-            {!isEditing ? (
-              <Button
-                label={t('pages.profile.editProfile')}
-                icon="Edit"
-                color="var(--color-primary)"
-                className="w-full"
-                onClick={() => setIsEditing(true)}
-              />
-            ) : (
-              <div className="flex gap-2 w-full">
-                <Button
-                  label={t('common.cancel')}
-                  icon="X"
-                  color="#6b7280"
-                  className="flex-1"
-                  onClick={handleCancel}
-                  disabled={isSubmitting}
-                />
-                <Button
-                  label={isSubmitting ? t('pages.profile.saving') : t('common.save')}
-                  icon="Save"
-                  color="var(--color-primary)"
-                  className="flex-1"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Card do usuário */}
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+            <div className="flex flex-col items-center p-8">
+              <div className="relative mb-6">
+                <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                  <User className="w-12 h-12 text-white" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                </div>
               </div>
-            )}
+              <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                {profil?.prenom} {profil?.nom}
+              </h2>
+              <div className="flex items-center gap-2 mb-1">
+                <Hash className="w-4 h-4 text-gray-500" />
+                <p className="text-gray-600 font-medium">{profil?.code_user}</p>
+              </div>
+              <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 mb-6">
+                Utilizador
+              </span>
+            
+              {!isEditing ? (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  <Edit className="w-4 h-4" />
+                  {t('pages.profile.editProfile')}
+                </button>
+              ) : (
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={handleCancel}
+                    disabled={isSubmitting}
+                    className="flex-1 bg-gray-500 hover:bg-gray-600 disabled:opacity-50 text-white font-semibold py-3 px-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    <X className="w-4 h-4" />
+                    {t('common.cancel')}
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-semibold py-3 px-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    <Save className="w-4 h-4" />
+                    {isSubmitting ? t('pages.profile.saving') : t('common.save')}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Colonne de droite - Informations détaillées */}
-          <div className="bg-white rounded-xl shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-              <User className="text-blue-500" />
-              {t('pages.profile.personalInfo')}
-            </h2>
+          {/* Card de informações detalhadas */}
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <User className="w-5 h-5 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {t('pages.profile.personalInfo')}
+                </h2>
+              </div>
+            </div>
+            <div className="p-6">
 
             {!isEditing ? (
               <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <Hash className="w-6 h-6 text-gray-400 mt-1" />
-                  <div>
-                    <p className="text-gray-600">{t('pages.profile.userCode')}</p>
-                    <p className="text-lg font-medium">{profil?.code_user}</p>
+                <div className="border-l-4 border-blue-500 pl-4 py-2">
+                  <div className="flex items-center gap-3">
+                    <Hash className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">{t('pages.profile.userCode')}</p>
+                      <p className="text-lg font-semibold text-gray-900">{profil?.code_user}</p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <User className="w-6 h-6 text-gray-400 mt-1" />
-                  <div>
-                    <p className="text-gray-600">{t('pages.profile.fullName')}</p>
-                    <p className="text-lg font-medium">{profil?.prenom} {profil?.nom}</p>
+                <div className="border-l-4 border-blue-500 pl-4 py-2">
+                  <div className="flex items-center gap-3">
+                    <User className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">{t('pages.profile.fullName')}</p>
+                      <p className="text-lg font-semibold text-gray-900">{profil?.prenom} {profil?.nom}</p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <Phone className="w-6 h-6 text-gray-400 mt-1" />
-                  <div>
-                    <p className="text-gray-600">{t('pages.profile.phone')}</p>
-                    <p className="text-lg font-medium">{profil?.telephone || t('pages.profile.notSpecified')}</p>
+                <div className="border-l-4 border-blue-500 pl-4 py-2">
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">{t('pages.profile.phone')}</p>
+                      <p className="text-lg font-semibold text-gray-900">{profil?.telephone || t('pages.profile.notSpecified')}</p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <Calendar className="w-6 h-6 text-gray-400 mt-1" />
-                  <div>
-                    <p className="text-gray-600">{t('pages.profile.memberSince')}</p>
-                    <p className="text-lg font-medium">
-                      {profil?.created_at && format(new Date(profil.created_at), 
-                        'd MMMM yyyy', 
-                        { locale: fr })}
-                    </p>
+                <div className="border-l-4 border-blue-500 pl-4 py-2">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">{t('pages.profile.memberSince')}</p>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {profil?.created_at && format(new Date(profil.created_at), 
+                          'd MMMM yyyy', 
+                          { locale: fr })}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -364,7 +311,6 @@ const Profil: React.FC = () => {
                   required
                   error={formErrors.code_user}
                   description={t('pages.profile.form.userCodeDescription')}
-                  className="mb-4"
                 >
                   <FormInput
                     name="code_user"
@@ -380,7 +326,6 @@ const Profil: React.FC = () => {
                   label={t('pages.profile.form.firstName')}
                   required
                   error={formErrors.prenom}
-                  className="mb-4"
                 >
                   <FormInput
                     name="prenom"
@@ -396,7 +341,6 @@ const Profil: React.FC = () => {
                   label={t('pages.profile.form.lastName')}
                   required
                   error={formErrors.nom}
-                  className="mb-4"
                 >
                   <FormInput
                     name="nom"
@@ -411,7 +355,6 @@ const Profil: React.FC = () => {
                 <FormField
                   label={t('pages.profile.phone')}
                   error={formErrors.telephone}
-                  className="mb-6"
                 >
                   <FormInput
                     name="telephone"
@@ -425,11 +368,12 @@ const Profil: React.FC = () => {
                 </FormField>
               </Form>
             )}
+            </div>
           </div>
         </div>
 
         <ToastContainer toasts={toasts} onClose={closeToast} />
-      </PageSection>
+      </div>
     </div>
   );
 };

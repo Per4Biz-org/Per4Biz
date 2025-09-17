@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, pt, enUS } from 'date-fns/locale';
 import { useMenu } from '../../../context/MenuContext';
 import { useProfil } from '../../../context/ProfilContext';
 import { supabase } from '../../../lib/supabase';
@@ -191,58 +191,63 @@ const ParamJours: React.FC = () => {
   };
 
   const getMonthName = (monthNumber: number): string => {
-    const months = [
-      'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+    const monthKeys = [
+      'january', 'february', 'march', 'april', 'may', 'june',
+      'july', 'august', 'september', 'october', 'november', 'december'
     ];
-    return months[monthNumber - 1] || monthNumber.toString();
+    
+    const monthKey = monthKeys[monthNumber - 1];
+    return monthKey ? t(`financial.months.${monthKey}`) : monthNumber.toString();
   };
 
   const columns: Column<ParamJours>[] = [
     {
-      label: 'Entité',
+      label: t('financial.entity', 'Entité'),
       accessor: 'entite',
       render: (value) => `${value.code} - ${value.libelle}`
     },
     {
-      label: 'Année',
+      label: t('financial.year', 'Année'),
       accessor: 'annee',
       sortable: true,
       align: 'center'
     },
     {
-      label: 'Mois',
+      label: t('financial.month', 'Mois'),
       accessor: 'mois',
       sortable: true,
       render: (value) => getMonthName(value)
     },
     {
-      label: 'Jours ouverts',
+      label: t('financial.openDays', 'Jours ouverts'),
       accessor: 'nb_jours_ouverts',
       align: 'center',
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value === 0 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
         }`}>
-          {value} jour{value > 1 ? 's' : ''}
+          {value} {value === 1 ? t('financial.day', 'jour') : t('financial.days', 'jours')}
         </span>
       )
     },
     {
-      label: 'Taux MP prévu (%)',
+      label: t('financial.plannedRate', 'Taux MP prévu (%)'),
       accessor: 'taux_mp_prevu',
       align: 'center',
       render: (value) => value ? `${Number(value).toFixed(2)}%` : '-'
     },
     {
-      label: 'Commentaire',
+      label: t('financial.comment', 'Commentaire'),
       accessor: 'commentaire',
       render: (value) => value || '-'
     },
     {
-      label: 'Date de création',
+      label: t('financial.creationDate', 'Date de création'),
       accessor: 'created_at',
-      render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
+      render: (value) => {
+        const currentLocale = t('common.locale') === 'pt' ? pt : t('common.locale') === 'en' ? enUS : fr;
+        return format(new Date(value), 'dd/MM/yyyy', { locale: currentLocale });
+      }
     }
   ];
 

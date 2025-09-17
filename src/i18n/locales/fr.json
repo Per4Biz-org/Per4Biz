@@ -16,7 +16,13 @@
     "select": "Sélectionner",
     "selectEntity": "Sélectionner une entité",
     "all": "Tous les",
-    "searchBy": "Rechercher par"
+    "searchBy": "Rechercher par",
+    "product": "Produit",
+    "expense": "Charge",
+    "type": "Type",
+    "yes": "Oui",
+    "no": "Non",
+    "locale": "fr"
   },
   "auth": {
     "login": "Connexion",
@@ -341,7 +347,29 @@
     "description": "Description",
     "amount": "Montant",
     "balance": "Solde",
-    "reference": "Référence"
+    "reference": "Référence",
+    "months": {
+      "january": "Janvier",
+      "february": "Février",
+      "march": "Mars",
+      "april": "Avril",
+      "may": "Mai",
+      "june": "Juin",
+      "july": "Juillet",
+      "august": "Août",
+      "september": "Septembre",
+      "october": "Octobre",
+      "november": "Novembre",
+      "december": "Décembre"
+    },
+    "year": "Année",
+    "month": "Mois",
+    "openDays": "Jours ouverts",
+    "day": "jour",
+    "days": "jours",
+    "plannedRate": "Taux MP prévu (%)",
+    "comment": "Commentaire",
+    "creationDate": "Date de création"
   },
   "employee": {
     "matricule": "Matricule",
