@@ -1,4 +1,4 @@
-import { Home, User, Settings, Mail, FileText, Users, CreditCard, Landmark } from 'lucide-react';
+import { Home, User, Settings, Mail, FileText, Users, CreditCard, Landmark, LayoutDashboard } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FEATURES } from '@/config/features';
 
@@ -16,7 +16,7 @@ const handleLogout = async () => {
 };
 
 export const menuItemsAccueil = [
-  { icon: Home, label: 'Accueil', path: '/', featureFlag: 'ENABLE_ACCUEIL' },
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/', featureFlag: 'ENABLE_ACCUEIL' },
   { icon: CreditCard, label: 'Gestion Financière', path: '/finances', separator: true, featureFlag: 'ENABLE_FINANCES' },
   { icon: Landmark, label: 'Gestion Bancaire', path: '/banques', featureFlag: 'ENABLE_BANQUES' },
   { icon: Users, label: 'Gestion Employés', path: '/employes', featureFlag: 'ENABLE_EMPLOYES' },
@@ -48,7 +48,7 @@ export const menuItemsParametreGlobalImport = [
 ];
 
 export const menuItemsGestionFinanciere = [
-  { icon: Home, label: 'Gestion Financière', path: '/finances', featureFlag: 'ENABLE_FINANCES' },
+  { icon: LayoutDashboard, label: 'Visão Geral', path: '/finances', featureFlag: 'ENABLE_FINANCES' },
   { icon: CreditCard, label: 'Mes Factures', path: '/finances/mes-factures', featureFlag: 'ENABLE_MES_FACTURES' },
   { icon: FileText, label: 'Fermeture Caisse', path: '/finances/fermeture-caisse', separator: true, featureFlag: 'ENABLE_FERMETURE_CAISSE' },
   { icon: FileText, label: 'Suivi CA Réel', path: '/finances/suivi-ca-reel', separator: true, featureFlag: 'ENABLE_SUIVI_CA_REEL' },

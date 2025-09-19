@@ -63,6 +63,11 @@ import CategorieFlux from './pages/finances/parametresFinances/CategorieFlux'
 // Lazy loading du composant MesFactures
 const MesFacturesLazy = React.lazy(() => import('./pages/finances/factures/MesFactures'))
 
+// 🏢 Company Roles System - Direct imports to debug lazy loading issue
+import CompanyRolesPage from './pages/CompanyRoles/index'
+import EmployeeRolesPage from './pages/EmployeeRoles/index'
+import PermissionsDashboardPage from './pages/PermissionsDashboard/index'
+
 function App() {
   return (
     <AuthProvider>
@@ -216,6 +221,35 @@ function App() {
             )}
             {FEATURES.ENABLE_CATEGORIE_FLUX && (
               <Route path="/finances/categorie-flux" element={<PrivateRoute><Layout><CategorieFlux /></Layout></PrivateRoute>} />
+            )}
+
+            {/* 🏢 Sistema de Company Roles */}
+            {FEATURES.ENABLE_COMPANY_ROLES && (
+              <Route path="/company/roles" element={
+                <PrivateRoute>
+                  <Layout>
+                    <CompanyRolesPage />
+                  </Layout>
+                </PrivateRoute>
+              } />
+            )}
+            {FEATURES.ENABLE_PERMISSIONS_DASHBOARD && (
+              <Route path="/company/permissions/dashboard" element={
+                <PrivateRoute>
+                  <Layout>
+                    <PermissionsDashboardPage />
+                  </Layout>
+                </PrivateRoute>
+              } />
+            )}
+            {FEATURES.ENABLE_EMPLOYEE_ROLES_MANAGEMENT && (
+              <Route path="/employees/:employeeId/roles" element={
+                <PrivateRoute>
+                  <Layout>
+                    <EmployeeRolesPage />
+                  </Layout>
+                </PrivateRoute>
+              } />
             )}
           </Routes>
         </BrowserRouter>

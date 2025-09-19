@@ -1,0 +1,230 @@
+{
+    "company-roles": {
+        "title": "Gestion des Rôles d'Entreprise",
+        "subtitle": "Gérer les rôles et permissions pour les employés de l'entreprise",
+        "createCompanyRole": "Créer un Rôle d'Entreprise",
+        "createBranchRole": "Créer un Rôle de Filiale",
+        "editRole": "Modifier le Rôle",
+        "deleteRole": "Supprimer le Rôle",
+        "cloneRole": "Cloner le Rôle",
+        "viewRole": "Voir le Rôle",
+        "assignRole": "Attribuer le Rôle",
+        "removeRole": "Retirer le Rôle",
+        "manageEmployeeRoles": "Gérer les Rôles de l'Employé",
+        "permissionsMatrix": "Matrice des Permissions",
+        "auditLog": "Audit des Permissions",
+        "dashboard": "Tableau de Bord des Permissions",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce rôle? Cela affectera {{count}} employés.",
+        "searchRole": "Rechercher un rôle...",
+        "filterByContext": "Contexte:",
+        "filterByBranch": "Filiale:",
+        "allBranches": "Toutes",
+        "company": "Entreprise",
+        "branch": "Filiale",
+        "newRole": "Nouveau",
+        "actions": "Actions",
+        "users": "Utilisateurs",
+        "status": "Statut",
+        "active": "Actif",
+        "inactive": "Inactif",
+        "systemRole": "Rôle Système",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "pageOf": "Page {{page}} sur {{total}}",
+        "success": {
+            "created": "Rôle créé avec succès pour l'entreprise",
+            "updated": "Rôle d'entreprise mis à jour avec succès",
+            "deleted": "Rôle supprimé de l'entreprise",
+            "cloned": "Rôle cloné avec succès",
+            "assigned": "Rôle attribué à l'employé avec succès",
+            "removed": "Rôle retiré de l'employé",
+            "transferred": "Employé transféré avec succès"
+        },
+        "errors": {
+            "loadFailed": "Erreur lors du chargement des rôles de l'entreprise",
+            "createFailed": "Erreur lors de la création du rôle d'entreprise",
+            "updateFailed": "Erreur lors de la mise à jour du rôle",
+            "deleteFailed": "Erreur lors de la suppression du rôle",
+            "cloneFailed": "Erreur lors du clonage du rôle",
+            "assignFailed": "Erreur lors de l'attribution du rôle",
+            "removeFailed": "Erreur lors de la suppression du rôle",
+            "insufficientPermissions": "Vous n'avez pas la permission de gérer les rôles de l'entreprise",
+            "branchNotFound": "Filiale non trouvée dans cette entreprise",
+            "employeeNotFound": "Employé non trouvé dans l'entreprise",
+            "roleInUse": "Ce rôle est utilisé par {{count}} employés",
+            "maxRolesExceeded": "L'employé a déjà le nombre maximum de rôles autorisés",
+            "justificationRequired": "La justification est obligatoire pour les rôles temporaires",
+            "invalidContextType": "Type de contexte invalide",
+            "roleNameExists": "Un rôle avec ce nom existe déjà",
+            "saveFailed": "Erreur lors de la sauvegarde"
+        },
+        "employee": {
+            "name": "Employé:",
+            "email": "Email:",
+            "company": "Entreprise:",
+            "mainBranch": "Filiale Principale:",
+            "joinDate": "Date d'Embauche:",
+            "context": "Contexte",
+            "expires": "Expire",
+            "permanent": "-",
+            "back": "Retour",
+            "saveChanges": "Enregistrer les Modifications",
+            "roleAssignments": "Attributions de Rôles",
+            "assignedRoles": "rôles attribués",
+            "noRoles": "Aucun rôle attribué",
+            "noRolesDescription": "Cet employé n'a aucun rôle attribué pour le moment."
+        },
+        "context": {
+            "company": "Entreprise",
+            "branch": "Filiale",
+            "department": "Département",
+            "team": "Équipe",
+            "unknown": "Inconnu"
+        },
+        "role": {
+            "system": "Système",
+            "createdAt": "Créé le",
+            "updatedAt": "Mis à jour le",
+            "noRoles": "Aucun rôle trouvé"
+        },
+        "permissions": {
+            "count": "permissions",
+            "active": "actives",
+            "matrix": {
+                "title": "Matrice des Permissions",
+                "changesCount": "modifications en attente",
+                "enableAll": "Activer Toutes",
+                "disableAll": "Désactiver Toutes",
+                "totalActive": "permissions actives au total",
+                "clearChanges": "Effacer les Modifications"
+            }
+        },
+        "listing": {
+            "title": "Gestion des Rôles",
+            "subtitle": "Gérer les rôles et permissions de l'entreprise",
+            "searchPlaceholder": "Rechercher des rôles...",
+            "resultsCount": "résultats",
+            "searchResults": "pour \"{{term}}\"",
+            "noSearchResults": "Aucun rôle trouvé pour votre recherche",
+            "noRoles": "Aucun rôle créé encore",
+            "tableViewComingSoon": "Vue tableau bientôt disponible"
+        },
+        "filters": {
+            "allContexts": "Tous les Contextes",
+            "company": "Entreprise",
+            "branch": "Filiale",
+            "department": "Département",
+            "team": "Équipe",
+            "showSystemRoles": "Afficher les rôles système",
+            "filterByContext": "Filtrer par contexte"
+        },
+        "viewModes": {
+            "grid": "Grille",
+            "table": "Tableau"
+        },
+        "pagination": {
+            "showing": "Affichage de {{from}} à {{to}} sur {{total}} résultats",
+            "page": "Page",
+            "of": "de"
+        },
+        "modal": {
+            "createTitle": "Créer un Nouveau Rôle",
+            "editTitle": "Modifier le Rôle",
+            "basicInfo": "Informations de Base",
+            "permissions": "Permissions",
+            "assignRoles": "Attribuer des Rôles",
+            "availableRoles": "Rôles Disponibles",
+            "noAvailableRoles": "Aucun rôle disponible pour attribution"
+        },
+        "actions": {
+            "view": "Voir",
+            "edit": "Modifier",
+            "delete": "Supprimer",
+            "cancel": "Annuler",
+            "save": "Enregistrer",
+            "create": "Créer",
+            "createRole": "Créer un Rôle",
+            "refresh": "Actualiser",
+            "assignRole": "Attribuer un Rôle",
+            "removeRole": "Retirer le Rôle",
+            "assignSelected": "Attribuer les Sélectionnés",
+            "saving": "Enregistrement..."
+        },
+        "fields": {
+            "name": "Nom",
+            "description": "Description",
+            "contextType": "Type de Contexte",
+            "contextId": "ID du Contexte",
+            "assignedBy": "Attribué par",
+            "justification": "Justification"
+        },
+        "placeholders": {
+            "name": "Saisissez le nom du rôle...",
+            "description": "Décrivez les responsabilités de ce rôle...",
+            "contextId": "Saisissez l'ID du contexte...",
+            "assignedBy": "Nom de la personne qui attribue...",
+            "justification": "Raison de cette attribution..."
+        },
+        "limits": {
+            "characters": "caractères"
+        },
+        "validation": {
+            "nameRequired": "Le nom est obligatoire",
+            "nameMinLength": "Le nom doit avoir au moins 2 caractères",
+            "nameMaxLength": "Le nom doit avoir au maximum 100 caractères",
+            "descriptionMaxLength": "La description doit avoir au maximum 500 caractères",
+            "contextIdRequired": "L'ID du contexte est obligatoire",
+            "permissionsRequired": "Au moins une permission doit être sélectionnée"
+        },
+        "confirmations": {
+            "deleteRole": "Êtes-vous sûr de vouloir supprimer ce rôle?",
+            "removeRole": "Êtes-vous sûr de vouloir retirer ce rôle de l'employé?",
+            "discardChanges": "Abandonner les modifications non sauvegardées?"
+        },
+        "assignment": {
+            "assignedAt": "Attribué le",
+            "assignedBy": "Attribué par",
+            "justification": "Justification"
+        },
+        "modules": {
+            "usuarios": {
+                "name": "Gestion des Utilisateurs",
+                "permissions": {
+                    "criar": "Créer des utilisateurs",
+                    "editar": "Modifier des utilisateurs",
+                    "excluir": "Supprimer des utilisateurs",
+                    "visualizar": "Voir les utilisateurs",
+                    "gerenciarRoles": "Gérer les rôles"
+                }
+            },
+            "financeiro": {
+                "name": "Gestion Financière",
+                "permissions": {
+                    "criarTransacao": "Créer des transactions",
+                    "editarTransacao": "Modifier des transactions",
+                    "excluirTransacao": "Supprimer des transactions",
+                    "visualizarRelatorios": "Voir les rapports",
+                    "gerenciarOrcamentos": "Gérer les budgets",
+                    "aprovarTransacoes": "Approuver les transactions"
+                }
+            },
+            "configuracoes": {
+                "name": "Paramètres",
+                "permissions": {
+                    "gerenciarEmpresa": "Gérer l'entreprise",
+                    "gerenciarFiliais": "Gérer les filiales",
+                    "configurarSistema": "Configurer le système",
+                    "gerenciarIntegracoes": "Gérer les intégrations"
+                }
+            },
+            "auditoria": {
+                "name": "Audit",
+                "permissions": {
+                    "visualizarLogs": "Voir les logs",
+                    "exportarRelatorios": "Exporter les rapports",
+                    "configurarAlertas": "Configurer les alertes"
+                }
+            }
+        }
+    }
+}

@@ -55,4 +55,9 @@ export const FEATURES = {
   ENABLE_TRANSLATION: true,
   SHOW_ADVANCED_MENU: true,
   ENABLE_STATS_PAGE: true,
+
+  // 🏢 Sistema de Company Roles
+  ENABLE_COMPANY_ROLES: true,
+  ENABLE_EMPLOYEE_ROLES_MANAGEMENT: true,
+  ENABLE_PERMISSIONS_DASHBOARD: true,
 }

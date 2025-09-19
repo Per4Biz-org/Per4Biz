@@ -1,0 +1,320 @@
+{
+    "company-roles": {
+        "title": "Gerenciamento de Papéis Empresariais",
+        "subtitle": "Gerir papéis e permissões para funcionários da empresa",
+        "createCompanyRole": "Criar Papel para Empresa",
+        "createBranchRole": "Criar Papel para Filial",
+        "editRole": "Editar Papel",
+        "deleteRole": "Excluir Papel",
+        "cloneRole": "Clonar Papel",
+        "viewRole": "Ver Papel",
+        "assignRole": "Atribuir Papel",
+        "removeRole": "Remover Papel",
+        "manageEmployeeRoles": "Gerir Papéis do Funcionário",
+        "permissionsMatrix": "Matriz de Permissões",
+        "auditLog": "Auditoria de Permissões",
+        "dashboard": "Dashboard de Permissões",
+        "confirmDelete": "Tem certeza que deseja excluir este papel? Isso afetará {{count}} funcionários.",
+        "searchRole": "Buscar papel...",
+        "filterByContext": "Contexto:",
+        "filterByBranch": "Filial:",
+        "allBranches": "Todas",
+        "company": "Empresa",
+        "branch": "Filial",
+        "newRole": "Novo",
+        "actions": "Ações",
+        "users": "Usuários",
+        "status": "Status",
+        "active": "Ativo",
+        "inactive": "Inativo",
+        "systemRole": "Papel do Sistema",
+        "previous": "Anterior",
+        "next": "Próxima",
+        "pageOf": "Página {{page}} de {{total}}",
+        "success": {
+            "created": "Papel criado com sucesso para a empresa",
+            "updated": "Papel empresarial atualizado com sucesso",
+            "deleted": "Papel removido da empresa",
+            "cloned": "Papel clonado com sucesso",
+            "assigned": "Papel atribuído ao funcionário com sucesso",
+            "removed": "Papel removido do funcionário",
+            "transferred": "Funcionário transferido com sucesso"
+        },
+        "errors": {
+            "loadFailed": "Erro ao carregar papéis da empresa",
+            "createFailed": "Erro ao criar papel empresarial",
+            "updateFailed": "Erro ao atualizar papel",
+            "deleteFailed": "Erro ao excluir papel",
+            "cloneFailed": "Erro ao clonar papel",
+            "assignFailed": "Erro ao atribuir papel",
+            "removeFailed": "Erro ao remover papel",
+            "insufficientPermissions": "Você não tem permissão para gerir papéis da empresa",
+            "branchNotFound": "Filial não encontrada nesta empresa",
+            "employeeNotFound": "Funcionário não encontrado na empresa",
+            "roleInUse": "Este papel está sendo usado por {{count}} funcionários",
+            "maxRolesExceeded": "Funcionário já possui o máximo de papéis permitidos",
+            "justificationRequired": "Justificativa é obrigatória para papéis temporários",
+            "invalidContextType": "Tipo de contexto inválido",
+            "roleNameExists": "Já existe um papel com este nome"
+        },
+        "fields": {
+            "roleName": "Nome do Papel",
+            "description": "Descrição",
+            "company": "Empresa",
+            "branch": "Filial",
+            "permissions": "Permissões",
+            "employees": "Funcionários",
+            "assignedAt": "Atribuído em",
+            "assignedBy": "Atribuído por",
+            "expiresAt": "Expira em",
+            "justification": "Justificativa",
+            "contextType": "Contexto de Aplicação",
+            "selectBranch": "Selecione uma filial...",
+            "selectRole": "Escolha um papel...",
+            "temporaryRole": "Papel temporário (definir expiração)",
+            "expirationDate": "Data de Expiração",
+            "basicInfo": "Informações Básicas",
+            "systemPermissions": "Permissões do Sistema",
+            "specialPermissions": "Permissões Especiais",
+            "addPermission": "Adicionar",
+            "currentRoles": "Papéis Atuais",
+            "addNewRole": "Adicionar Novo Papel",
+            "applyTo": "Aplicar em:"
+        },
+        "contexts": {
+            "COMPANY": "Empresa (Todas as filiais)",
+            "BRANCH": "Filial Específica"
+        },
+        "modules": {
+            "users": "Gestão de Usuários",
+            "roles": "Papéis",
+            "branches": "Gestão de Filiais",
+            "sales": "Vendas",
+            "finance": "Financeiro",
+            "inventory": "Estoque",
+            "reports": "Relatórios",
+            "settings": "Configurações"
+        },
+        "permissions": {
+            "create": "Criar",
+            "read": "Ler",
+            "update": "Atualizar",
+            "delete": "Deletar",
+            "approve": "Aprovar",
+            "view": "Ver",
+            "export": "Exportar",
+            "manage": "Gerir",
+            "viewPerformance": "Ver Performance",
+            "viewAllTeams": "Ver Todas Equipas"
+        },
+        "dashboard": {
+            "title": "Dashboard de Permissões",
+            "generalStats": "Estatísticas Gerais",
+            "totalEmployees": "Total de Funcionários:",
+            "activeRoles": "Papéis Ativos:",
+            "branches": "Filiais:",
+            "uniquePermissions": "Permissões Únicas:",
+            "roleDistribution": "Distribuição de Papéis por Filial",
+            "mostUsedRoles": "Papéis Mais Utilizados",
+            "alerts": "Alertas e Recomendações",
+            "expiringRoles": "{{count}} papéis temporários expiram nos próximos 7 dias",
+            "employeesWithoutRoles": "{{count}} funcionários sem papel atribuído",
+            "unusedRoles": "Papel \"{{roleName}}\" não utilizado há {{days}} dias",
+            "exportReport": "Exportar Relatório",
+            "configure": "Configurar",
+            "fullReport": "Relatório Completo",
+            "refresh": "Atualizar"
+        },
+        "audit": {
+            "title": "Auditoria de Permissões",
+            "filters": "Filtros:",
+            "period": "Período:",
+            "from": "até",
+            "branch": "Filial:",
+            "employee": "Funcionário:",
+            "action": "Ação:",
+            "role": "Papel:",
+            "all": "Todos",
+            "filter": "Filtrar",
+            "dateTime": "Data/Hora",
+            "user": "Usuário",
+            "details": "Detalhes",
+            "created": "Criou",
+            "updated": "Editou",
+            "deleted": "Removeu",
+            "assigned": "Atribuiu",
+            "removed": "Removeu",
+            "expired": "Expirou",
+            "blocked": "Bloqueou",
+            "exportExcel": "Exportar Excel"
+        },
+        "employee": {
+            "name": "Funcionário:",
+            "email": "Email:",
+            "company": "Empresa:",
+            "mainBranch": "Filial Principal:",
+            "joinDate": "Admissão:",
+            "context": "Contexto",
+            "expires": "Expira",
+            "permanent": "-",
+            "back": "Voltar",
+            "saveChanges": "Salvar Mudanças",
+            "roleAssignments": "Atribuições de Papéis",
+            "assignedRoles": "papéis atribuídos",
+            "noRoles": "Nenhum papel atribuído",
+            "noRolesDescription": "Este funcionário não possui papéis atribuídos ainda."
+        },
+        "context": {
+            "company": "Empresa",
+            "branch": "Filial",
+            "department": "Departamento",
+            "team": "Equipe",
+            "unknown": "Desconhecido"
+        },
+        "role": {
+            "system": "Sistema",
+            "createdAt": "Criado em",
+            "updatedAt": "Atualizado em",
+            "noRoles": "Nenhum papel encontrado"
+        },
+        "permissions": {
+            "count": "permissões",
+            "active": "ativas",
+            "matrix": {
+                "title": "Matriz de Permissões",
+                "changesCount": "alterações pendentes",
+                "enableAll": "Ativar Todas",
+                "disableAll": "Desativar Todas",
+                "totalActive": "permissões ativas no total",
+                "clearChanges": "Limpar Alterações"
+            }
+        },
+        "listing": {
+            "title": "Gerenciamento de Papéis",
+            "subtitle": "Gerir papéis e permissões da empresa",
+            "searchPlaceholder": "Buscar papéis...",
+            "resultsCount": "resultados",
+            "searchResults": "para \"{{term}}\"",
+            "noSearchResults": "Nenhum papel encontrado para sua busca",
+            "noRoles": "Nenhum papel criado ainda",
+            "tableViewComingSoon": "Visualização em tabela em breve"
+        },
+        "filters": {
+            "allContexts": "Todos os Contextos",
+            "company": "Empresa",
+            "branch": "Filial",
+            "department": "Departamento",
+            "team": "Equipe",
+            "showSystemRoles": "Mostrar papéis do sistema",
+            "filterByContext": "Filtrar por contexto"
+        },
+        "viewModes": {
+            "grid": "Grade",
+            "table": "Tabela"
+        },
+        "pagination": {
+            "showing": "Mostrando {{from}} a {{to}} de {{total}} resultados",
+            "page": "Página",
+            "of": "de"
+        },
+        "modal": {
+            "createTitle": "Criar Novo Papel",
+            "editTitle": "Editar Papel",
+            "basicInfo": "Informações Básicas",
+            "permissions": "Permissões",
+            "assignRoles": "Atribuir Papéis",
+            "availableRoles": "Papéis Disponíveis",
+            "noAvailableRoles": "Nenhum papel disponível para atribuição"
+        },
+        "actions": {
+            "view": "Visualizar",
+            "edit": "Editar",
+            "delete": "Excluir",
+            "cancel": "Cancelar",
+            "save": "Salvar",
+            "create": "Criar",
+            "createRole": "Criar Papel",
+            "refresh": "Atualizar",
+            "assignRole": "Atribuir Papel",
+            "removeRole": "Remover Papel",
+            "assignSelected": "Atribuir Selecionados",
+            "saving": "Salvando..."
+        },
+        "fields": {
+            "name": "Nome",
+            "description": "Descrição",
+            "contextType": "Tipo de Contexto",
+            "contextId": "ID do Contexto",
+            "assignedBy": "Atribuído por",
+            "justification": "Justificativa"
+        },
+        "placeholders": {
+            "name": "Digite o nome do papel...",
+            "description": "Descreva as responsabilidades deste papel...",
+            "contextId": "Digite o ID do contexto...",
+            "assignedBy": "Nome de quem está atribuindo...",
+            "justification": "Motivo para esta atribuição..."
+        },
+        "limits": {
+            "characters": "caracteres"
+        },
+        "validation": {
+            "nameRequired": "Nome é obrigatório",
+            "nameMinLength": "Nome deve ter pelo menos 2 caracteres",
+            "nameMaxLength": "Nome deve ter no máximo 100 caracteres",
+            "descriptionMaxLength": "Descrição deve ter no máximo 500 caracteres",
+            "contextIdRequired": "ID do contexto é obrigatório",
+            "permissionsRequired": "Pelo menos uma permissão deve ser selecionada"
+        },
+        "confirmations": {
+            "deleteRole": "Tem certeza que deseja excluir este papel?",
+            "removeRole": "Tem certeza que deseja remover este papel do funcionário?",
+            "discardChanges": "Descartar alterações não salvas?"
+        },
+        "assignment": {
+            "assignedAt": "Atribuído em",
+            "assignedBy": "Atribuído por",
+            "justification": "Justificativa"
+        },
+        "modules": {
+            "usuarios": {
+                "name": "Gestão de Usuários",
+                "permissions": {
+                    "criar": "Criar usuários",
+                    "editar": "Editar usuários",
+                    "excluir": "Excluir usuários",
+                    "visualizar": "Visualizar usuários",
+                    "gerenciarRoles": "Gerenciar papéis"
+                }
+            },
+            "financeiro": {
+                "name": "Gestão Financeira",
+                "permissions": {
+                    "criarTransacao": "Criar transações",
+                    "editarTransacao": "Editar transações",
+                    "excluirTransacao": "Excluir transações",
+                    "visualizarRelatorios": "Visualizar relatórios",
+                    "gerenciarOrcamentos": "Gerenciar orçamentos",
+                    "aprovarTransacoes": "Aprovar transações"
+                }
+            },
+            "configuracoes": {
+                "name": "Configurações",
+                "permissions": {
+                    "gerenciarEmpresa": "Gerenciar empresa",
+                    "gerenciarFiliais": "Gerenciar filiais",
+                    "configurarSistema": "Configurar sistema",
+                    "gerenciarIntegracoes": "Gerenciar integrações"
+                }
+            },
+            "auditoria": {
+                "name": "Auditoria",
+                "permissions": {
+                    "visualizarLogs": "Visualizar logs",
+                    "exportarRelatorios": "Exportar relatórios",
+                    "configurarAlertas": "Configurar alertas"
+                }
+            }
+        }
+    }
+}

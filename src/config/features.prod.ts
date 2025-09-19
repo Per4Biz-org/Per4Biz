@@ -55,4 +55,9 @@ export const FEATURES = {
   ENABLE_TRANSLATION: false,
   SHOW_ADVANCED_MENU: false,
   ENABLE_STATS_PAGE: false,
+
+  // 🏢 Sistema de Company Roles (ativar em produção quando pronto)
+  ENABLE_COMPANY_ROLES: false, // Mudar para true quando pronto para produção
+  ENABLE_EMPLOYEE_ROLES_MANAGEMENT: false,
+  ENABLE_PERMISSIONS_DASHBOARD: false,
 }

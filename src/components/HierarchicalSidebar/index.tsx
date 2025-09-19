@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, ChevronDown, ChevronRight, Grid3X3, User, Globe, Shield, CreditCard, Users, Settings, FileText, Home, Landmark, Bell, Key } from 'lucide-react';
+import { Menu, ChevronDown, ChevronRight, LayoutGrid, User, Globe, Shield, CreditCard, Users, Settings, FileText, Home, Landmark, Bell, Key } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
@@ -35,10 +35,8 @@ const getMenuStructure = (t: any): MenuSection[] => [
       {
         id: 'dashboards',
         label: t('sidebar.dashboards'),
-        icon: Grid3X3,
-        children: [
-          { id: 'accueil', label: t('sidebar.home'), path: '/', icon: Home }
-        ]
+        icon: LayoutGrid,
+        path: '/'
       }
     ]
   },
@@ -169,12 +167,12 @@ const HierarchicalSidebar: React.FC<HierarchicalSidebarProps> = ({ onExpandChang
       <div key={item.id}>
         <div
           onClick={() => handleItemClick(item)}
-          className={`flex items-center py-2 px-3 ${indentClass} text-sm cursor-pointer hover:bg-[rgba(255,255,255,0.1)] rounded-md mx-2 ${
-            isActive(item.path) ? 'bg-[rgba(255,255,255,0.2)] text-white' : 'text-white'
+          className={`flex items-center py-2 px-3 ${indentClass} text-sm cursor-pointer hover:bg-white/15 rounded-lg mx-2 transition-all duration-200 ${
+            isActive(item.path) ? 'bg-white/20 text-white shadow-sm' : 'text-white/90 hover:text-white'
           } ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {item.icon && level === 0 && (
-            <item.icon size={16} className="mr-2 text-white" />
+            <item.icon size={18} className="mr-2 text-white" />
           )}
           
           {level > 0 && (
@@ -212,31 +210,99 @@ const HierarchicalSidebar: React.FC<HierarchicalSidebarProps> = ({ onExpandChang
 
   if (!isExpanded) {
     return (
-      <nav className="w-16 h-screen border-r border-blue-600 fixed left-0 top-0 bg-[#4169E1] shadow-sm">
-        <div className="p-4">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="p-2 rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors"
-          >
-            <Menu size={20} className="text-white" />
-          </button>
+      <nav className="w-16 h-screen border-r border-blue-600/20 fixed left-0 top-0 bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-800 shadow-xl backdrop-blur-sm rounded-r-lg">
+        <div className="flex flex-col h-full">
+          {/* Logo Section */}
+          <div className="p-4 flex justify-center">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+              <span className="text-white font-bold text-lg">P</span>
+            </div>
+          </div>
+
+          {/* Menu Button */}
+          <div className="p-3 flex justify-center">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-2 rounded-lg hover:bg-white/15 transition-all duration-200"
+            >
+              <Menu size={18} className="text-white" />
+            </button>
+          </div>
+
+          {/* Separator */}
+          <div className="flex justify-center py-2">
+            <div className="flex flex-col space-y-1">
+              <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+              <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+              <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+            </div>
+          </div>
+
+          {/* Main Menu Icons */}
+          <div className="flex-1 flex flex-col items-center space-y-5 px-3">
+            {menuStructure.map((section) =>
+              section.items.map((item) => {
+                if (item.icon) {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleItemClick(item)}
+                      className={`p-3 rounded-xl hover:bg-white/15 transition-all duration-200 ${
+                        isActive(item.path) ? 'bg-white/20' : ''
+                      }`}
+                      title={item.label}
+                    >
+                      <Icon size={22} className="text-white" />
+                    </button>
+                  );
+                }
+                return null;
+              })
+            )}
+          </div>
+
+          {/* Bottom Separator */}
+          <div className="flex justify-center py-2">
+            <div className="flex flex-col space-y-1">
+              <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+              <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+              <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+            </div>
+          </div>
+
+          {/* Settings Icon */}
+          <div className="p-3 flex justify-center">
+            <button
+              onClick={() => navigate('/parametres-global')}
+              className="p-3 rounded-xl hover:bg-white/15 transition-all duration-200"
+              title="Configurações"
+            >
+              <Settings size={22} className="text-white" />
+            </button>
+          </div>
         </div>
       </nav>
     );
   }
 
   return (
-    <nav className="w-64 h-screen border-r border-blue-600 fixed left-0 top-0 bg-[#4169E1] shadow-sm flex flex-col">
+    <nav className="w-64 h-screen border-r border-blue-600/20 fixed left-0 top-0 bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-800 shadow-xl flex flex-col backdrop-blur-sm rounded-r-lg">
       {/* Header */}
-      <div className="p-4 flex items-center border-b border-[rgba(255,255,255,0.2)] flex-shrink-0">
+      <div className="p-4 flex items-center flex-shrink-0">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-2 rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+          className="p-2 rounded-lg hover:bg-white/15 transition-all duration-200"
         >
-          <Menu size={20} className="text-white" />
+          <Menu size={22} className="text-white" />
         </button>
-        <Link to="/" className="ml-3 text-lg font-semibold text-white hover:text-gray-100 transition-colors">
-          {t('navigation.appName')}
+        <Link to="/" className="ml-3 flex items-center hover:opacity-80 transition-opacity">
+          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm mr-3">
+            <span className="text-white font-bold text-sm">P</span>
+          </div>
+          <span className="text-lg font-semibold text-white">
+            Per4Biz
+          </span>
         </Link>
       </div>
 
@@ -248,7 +314,7 @@ const HierarchicalSidebar: React.FC<HierarchicalSidebarProps> = ({ onExpandChang
             {/* Section Label */}
             {section.label && (
               <div className="px-4 mb-2">
-                <span className="text-xs font-medium text-white opacity-60 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-white/70 uppercase tracking-wider">
                   {section.label}
                 </span>
               </div>

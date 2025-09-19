@@ -551,99 +551,114 @@ const MesFactures: React.FC = () => {
   ];
 
   return (
-    <div className={styles.container}>
-      <PageSection
-        title={loading || profilLoading ? t('common.loading', 'Chargement...') : t('pages.finances.myInvoices', 'Mes Factures')} 
-        description={t('pages.finances.invoicesSubtitle', 'Consultez et gérez vos factures d\'achat')}
-        className={styles.header}>
-        <div className="mb-6">
-          <div className="flex items-end justify-between">
-            <FilterSection
-              filters={filterConfigs} 
-              values={filters}
-              onChange={handleFilterChange}
-              requireSelection={true}
-              className="flex items-end gap-3"
-            />
-            
-            <div className="flex gap-2 ml-6">
-              {(() => {
-                const { canSearch, tooltipMessage } = getSearchRequirements();
-                return (
-                  <Button
-                    label={isSearching ? t('table.searchInProgress', 'Recherche en cours...') : t('invoices.showInvoices')}
-                    icon="Search"
-                    color="var(--color-primary)"
-                    onClick={handleSearch}
-                    disabled={isSearching || !canSearch}
-                    tooltip={!canSearch ? tooltipMessage : undefined}
-                  />
-                );
-              })()}
-              
-              {(() => {
-                const { canCreate, tooltipMessage } = getNewInvoiceRequirements();
-                return (
-                  <Button
-                    label={t('pages.finances.newInvoice', 'Nouvelle facture')}
-                    icon="Plus"
-                    color="var(--color-primary)"
-                    onClick={() => {
-                      const selectedEntityId = getSelectedEntityId();
-                      if (selectedEntityId) {
-                        setSelectedFactureId(undefined);
-                        setIsEditModalOpen(true);
-                      } else {
-                        addToast({
-                          label: t('messages.selectEntityBeforeCreate'),
-                          icon: 'AlertTriangle',
-                          color: '#f59e0b'
-                        });
-                      }
-                    }}
-                    disabled={!canCreate}
-                    tooltip={!canCreate ? tooltipMessage : undefined}
-                  />
-                );
-              })()}
-            </div>
-          </div>
-
-          <div className="mt-2 text-sm text-gray-600">
-            {searchPerformed && factures.length > 0 ? (
-              <span>{t('messages.invoicesFound', { count: filteredFactures.length })}</span>
-            ) : searchPerformed ? (
-              <span>{t('messages.noInvoicesFound')}</span>
-            ) : (
-              <span>{t('messages.useFiltersAbove')}</span>
-            )}
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Header simples */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {loading || profilLoading ? t('common.loading', 'Chargement...') : t('pages.finances.myInvoices', 'Mes Factures')}
+          </h1>
+          <p className="text-gray-600">
+            {t('pages.finances.invoicesSubtitle', 'Visualize e gira as suas facturas de compra')}
+          </p>
         </div>
 
-        {loading && !searchPerformed ? (
-          <div className="flex justify-center items-center h-64"> 
-            <p className="text-gray-500">{t('messages.loadingInvoices')}</p>
-          </div>
-        ) : !searchPerformed ? (
-          <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="text-center p-6">
-              <p className="text-gray-500 mb-2">{t('messages.selectEntityAndSearch')}</p>
-              <p className="text-gray-400 text-sm">{t('messages.noSearchPerformed')}</p>
+        {/* Container principal */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          {/* Filtros e botões */}
+          <div className="mb-6">
+            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4">
+              <div className="flex flex-wrap items-end gap-4">
+                <FilterSection
+                  filters={filterConfigs}
+                  values={filters}
+                  onChange={handleFilterChange}
+                  requireSelection={true}
+                  className="flex flex-wrap items-end gap-4"
+                />
+              </div>
+
+              <div className="flex gap-2 xl:flex-shrink-0">
+                {(() => {
+                  const { canSearch, tooltipMessage } = getSearchRequirements();
+                  return (
+                    <Button
+                      label={isSearching ? t('table.searchInProgress', 'Recherche en cours...') : t('invoices.showInvoices')}
+                      icon="Search"
+                      color="var(--color-primary)"
+                      onClick={handleSearch}
+                      disabled={isSearching || !canSearch}
+                      tooltip={!canSearch ? tooltipMessage : undefined}
+                    />
+                  );
+                })()}
+
+                {(() => {
+                  const { canCreate, tooltipMessage } = getNewInvoiceRequirements();
+                  return (
+                    <Button
+                      label={t('pages.finances.newInvoice', 'Nouvelle facture')}
+                      icon="Plus"
+                      color="var(--color-primary)"
+                      onClick={() => {
+                        const selectedEntityId = getSelectedEntityId();
+                        if (selectedEntityId) {
+                          setSelectedFactureId(undefined);
+                          setIsEditModalOpen(true);
+                        } else {
+                          addToast({
+                            label: t('messages.selectEntityBeforeCreate'),
+                            icon: 'AlertTriangle',
+                            color: '#f59e0b'
+                          });
+                        }
+                      }}
+                      disabled={!canCreate}
+                      tooltip={!canCreate ? tooltipMessage : undefined}
+                    />
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Status info */}
+            <div className="mt-4 text-sm text-gray-600">
+              {searchPerformed && factures.length > 0 ? (
+                <span>{t('messages.invoicesFound', { count: filteredFactures.length })}</span>
+              ) : searchPerformed ? (
+                <span>{t('messages.noInvoicesFound')}</span>
+              ) : (
+                <span>{t('messages.useFiltersAbove')}</span>
+              )}
             </div>
           </div>
-        ) : (
-          <DataTable
-            columns={columns}
-            data={filteredFactures}
-            actions={actions}
-            defaultRowsPerPage={10}
-            emptyTitle={t('messages.noInvoices', 'Aucune facture')}
-            emptyMessage={t('messages.noInvoicesCreated', 'Aucune facture d\'achat n\'a été créée pour le moment.')}
-          />
-        )}
+
+          {/* Resultados */}
+          {loading && !searchPerformed ? (
+            <div className="flex justify-center items-center h-64">
+              <p className="text-gray-500">{t('messages.loadingInvoices')}</p>
+            </div>
+          ) : !searchPerformed ? (
+            <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="text-center p-6">
+                <p className="text-gray-500 mb-2">{t('messages.selectEntityAndSearch')}</p>
+                <p className="text-gray-400 text-sm">{t('messages.noSearchPerformed')}</p>
+              </div>
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={filteredFactures}
+              actions={actions}
+              defaultRowsPerPage={10}
+              emptyTitle={t('messages.noInvoices', 'Aucune facture')}
+              emptyMessage={t('messages.noInvoicesCreated', 'Aucune facture d\'achat n\'a été créée pour le moment.')}
+            />
+          )}
+        </div>
 
         <ToastContainer toasts={toasts} onClose={closeToast} />
-        
+
         {/* Modale d'édition/création de facture */}
         <EditFactureAchatModal
           isOpen={isEditModalOpen}
@@ -653,7 +668,7 @@ const MesFactures: React.FC = () => {
           entiteId={getSelectedEntityId()}
           factureId={selectedFactureId}
         />
-      </PageSection>
+      </div>
     </div>
   );
 };

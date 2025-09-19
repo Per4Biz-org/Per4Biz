@@ -176,199 +176,247 @@ const Profil: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        {/* Header empresarial */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between bg-white rounded-lg px-8 py-6 shadow-sm border border-gray-200">
-            <h1 className="text-3xl font-bold text-gray-900">
-              {t('pages.profile.title')}
-            </h1>
-          </div>
-          <p className="text-lg text-gray-600 mt-3">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Header moderno */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">
+            {t('pages.profile.title')}
+          </h1>
+          <p className="text-sm text-slate-600">
             {t('pages.profile.subtitle')}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Card do usuário */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div className="flex flex-col items-center p-8">
-              <div className="relative mb-6">
-                <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
-                  <User className="w-12 h-12 text-white" />
+        <div className="space-y-6">
+          {/* Card principal do perfil */}
+          <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6">
+            <div className="flex items-start gap-6">
+              {/* Avatar */}
+              <div className="relative flex-shrink-0">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <User className="w-10 h-10 text-white" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white">
+                  <div className="w-2 h-2 bg-white rounded-full ml-1 mt-1"></div>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
-                {profil?.prenom} {profil?.nom}
-              </h2>
-              <div className="flex items-center gap-2 mb-1">
-                <Hash className="w-4 h-4 text-gray-500" />
-                <p className="text-gray-600 font-medium">{profil?.code_user}</p>
-              </div>
-              <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 mb-6">
-                Utilizador
-              </span>
-            
-              {!isEditing ? (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
-                >
-                  <Edit className="w-4 h-4" />
-                  {t('pages.profile.editProfile')}
-                </button>
-              ) : (
-                <div className="flex gap-3 w-full">
-                  <button
-                    onClick={handleCancel}
-                    disabled={isSubmitting}
-                    className="flex-1 bg-gray-500 hover:bg-gray-600 disabled:opacity-50 text-white font-semibold py-3 px-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
-                  >
-                    <X className="w-4 h-4" />
-                    {t('common.cancel')}
-                  </button>
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-semibold py-3 px-4 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
-                  >
-                    <Save className="w-4 h-4" />
-                    {isSubmitting ? t('pages.profile.saving') : t('common.save')}
-                  </button>
+
+              {/* Informações principais */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 truncate">
+                      {profil?.prenom} {profil?.nom}
+                    </h2>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Hash className="w-4 h-4 text-slate-500" />
+                      <p className="text-slate-600 font-medium">{profil?.code_user}</p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                    Utilizador
+                  </span>
                 </div>
-              )}
+
+                {/* Informações de contato */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-slate-500" />
+                    <span className="text-slate-600">{profil?.telephone || t('pages.profile.notSpecified')}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-slate-500" />
+                    <span className="text-slate-600">
+                      {profil?.created_at && format(new Date(profil.created_at), 'd MMM yyyy', { locale: fr })}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Botão de edição */}
+                {!isEditing ? (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-all duration-200 hover:scale-105"
+                  >
+                    <Edit className="w-4 h-4" />
+                    {t('pages.profile.editProfile')}
+                  </button>
+                ) : (
+                  <div className="flex gap-3 mt-4">
+                    <button
+                      onClick={handleCancel}
+                      disabled={isSubmitting}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-slate-500 hover:bg-slate-600 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-all duration-200"
+                    >
+                      <X className="w-4 h-4" />
+                      {t('common.cancel')}
+                    </button>
+                    <button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-all duration-200"
+                    >
+                      <Save className="w-4 h-4" />
+                      {isSubmitting ? t('pages.profile.saving') : t('common.save')}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Card de informações detalhadas */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 rounded-lg">
-                  <User className="w-5 h-5 text-blue-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900">
-                  {t('pages.profile.personalInfo')}
-                </h2>
-              </div>
+          <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
+                {isEditing ? 'Editar Informações' : 'Informações Detalhadas'}
+              </h3>
+              <p className="text-sm text-slate-600">
+                {isEditing ? 'Atualize os seus dados pessoais' : 'Detalhes da sua conta e informações pessoais'}
+              </p>
             </div>
-            <div className="p-6">
 
             {!isEditing ? (
+              /* Visualização das informações */
               <div className="space-y-6">
-                <div className="border-l-4 border-blue-500 pl-4 py-2">
-                  <div className="flex items-center gap-3">
-                    <Hash className="w-4 h-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">{t('pages.profile.userCode')}</p>
-                      <p className="text-lg font-semibold text-gray-900">{profil?.code_user}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Código do Utilizador */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Hash className="w-4 h-4 text-blue-600" />
+                      <label className="text-sm font-semibold text-slate-700">{t('pages.profile.userCode')}</label>
+                    </div>
+                    <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl">
+                      <p className="text-sm font-medium text-slate-900">{profil?.code_user}</p>
                     </div>
                   </div>
-                </div>
 
-                <div className="border-l-4 border-blue-500 pl-4 py-2">
-                  <div className="flex items-center gap-3">
-                    <User className="w-4 h-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">{t('pages.profile.fullName')}</p>
-                      <p className="text-lg font-semibold text-gray-900">{profil?.prenom} {profil?.nom}</p>
+                  {/* Nome Completo */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="w-4 h-4 text-blue-600" />
+                      <label className="text-sm font-semibold text-slate-700">{t('pages.profile.fullName')}</label>
+                    </div>
+                    <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl">
+                      <p className="text-sm font-medium text-slate-900">{profil?.prenom} {profil?.nom}</p>
                     </div>
                   </div>
-                </div>
 
-                <div className="border-l-4 border-blue-500 pl-4 py-2">
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-4 h-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">{t('pages.profile.phone')}</p>
-                      <p className="text-lg font-semibold text-gray-900">{profil?.telephone || t('pages.profile.notSpecified')}</p>
+                  {/* Telefone */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Phone className="w-4 h-4 text-blue-600" />
+                      <label className="text-sm font-semibold text-slate-700">{t('pages.profile.phone')}</label>
+                    </div>
+                    <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl">
+                      <p className="text-sm font-medium text-slate-900">{profil?.telephone || t('pages.profile.notSpecified')}</p>
                     </div>
                   </div>
-                </div>
 
-                <div className="border-l-4 border-blue-500 pl-4 py-2">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-4 h-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">{t('pages.profile.memberSince')}</p>
-                      <p className="text-lg font-semibold text-gray-900">
-                        {profil?.created_at && format(new Date(profil.created_at), 
-                          'd MMMM yyyy', 
-                          { locale: fr })}
+                  {/* Membro desde */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                      <label className="text-sm font-semibold text-slate-700">{t('pages.profile.memberSince')}</label>
+                    </div>
+                    <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl">
+                      <p className="text-sm font-medium text-slate-900">
+                        {profil?.created_at && format(new Date(profil.created_at), 'd MMMM yyyy', { locale: fr })}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <Form size={100} onSubmit={handleSubmit}>
-                <FormField
-                  label={t('pages.profile.userCode')}
-                  required
-                  error={formErrors.code_user}
-                  description={t('pages.profile.form.userCodeDescription')}
-                >
-                  <FormInput
-                    name="code_user"
-                    value={formData.code_user}
-                    onChange={handleInputChange}
-                    placeholder={t('pages.profile.form.userCodePlaceholder')}
-                    disabled={isSubmitting}
-                    error={!!formErrors.code_user}
-                  />
-                </FormField>
+              /* Formulário de edição */
 
-                <FormField
-                  label={t('pages.profile.form.firstName')}
-                  required
-                  error={formErrors.prenom}
-                >
-                  <FormInput
-                    name="prenom"
-                    value={formData.prenom}
-                    onChange={handleInputChange}
-                    placeholder={t('pages.profile.form.firstNamePlaceholder')}
-                    disabled={isSubmitting}
-                    error={!!formErrors.prenom}
-                  />
-                </FormField>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Grid de campos */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Código de Utilizador */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      {t('pages.profile.userCode')} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      name="code_user"
+                      value={formData.code_user}
+                      onChange={handleInputChange}
+                      placeholder={t('pages.profile.form.userCodePlaceholder')}
+                      disabled={isSubmitting}
+                      className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        formErrors.code_user ? 'border-red-500 ring-2 ring-red-200' : ''
+                      }`}
+                    />
+                    {formErrors.code_user && (
+                      <p className="text-sm text-red-600">{formErrors.code_user}</p>
+                    )}
+                  </div>
 
-                <FormField
-                  label={t('pages.profile.form.lastName')}
-                  required
-                  error={formErrors.nom}
-                >
-                  <FormInput
-                    name="nom"
-                    value={formData.nom}
-                    onChange={handleInputChange}
-                    placeholder={t('pages.profile.form.lastNamePlaceholder')}
-                    disabled={isSubmitting}
-                    error={!!formErrors.nom}
-                  />
-                </FormField>
+                  {/* Telefone */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      {t('pages.profile.phone')}
+                    </label>
+                    <input
+                      name="telephone"
+                      type="tel"
+                      value={formData.telephone}
+                      onChange={handleInputChange}
+                      placeholder={t('pages.profile.form.phonePlaceholder')}
+                      disabled={isSubmitting}
+                      className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        formErrors.telephone ? 'border-red-500 ring-2 ring-red-200' : ''
+                      }`}
+                    />
+                    {formErrors.telephone && (
+                      <p className="text-sm text-red-600">{formErrors.telephone}</p>
+                    )}
+                  </div>
 
-                <FormField
-                  label={t('pages.profile.phone')}
-                  error={formErrors.telephone}
-                >
-                  <FormInput
-                    name="telephone"
-                    type="tel"
-                    value={formData.telephone}
-                    onChange={handleInputChange}
-                    placeholder={t('pages.profile.form.phonePlaceholder')}
-                    disabled={isSubmitting}
-                    error={!!formErrors.telephone}
-                  />
-                </FormField>
-              </Form>
+                  {/* Primeiro Nome */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      {t('pages.profile.form.firstName')} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      name="prenom"
+                      value={formData.prenom}
+                      onChange={handleInputChange}
+                      placeholder={t('pages.profile.form.firstNamePlaceholder')}
+                      disabled={isSubmitting}
+                      className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        formErrors.prenom ? 'border-red-500 ring-2 ring-red-200' : ''
+                      }`}
+                    />
+                    {formErrors.prenom && (
+                      <p className="text-sm text-red-600">{formErrors.prenom}</p>
+                    )}
+                  </div>
+
+                  {/* Último Nome */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      {t('pages.profile.form.lastName')} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      name="nom"
+                      value={formData.nom}
+                      onChange={handleInputChange}
+                      placeholder={t('pages.profile.form.lastNamePlaceholder')}
+                      disabled={isSubmitting}
+                      className={`w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        formErrors.nom ? 'border-red-500 ring-2 ring-red-200' : ''
+                      }`}
+                    />
+                    {formErrors.nom && (
+                      <p className="text-sm text-red-600">{formErrors.nom}</p>
+                    )}
+                  </div>
+                </div>
+              </form>
             )}
-            </div>
           </div>
         </div>
 
