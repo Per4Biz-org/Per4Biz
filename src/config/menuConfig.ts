@@ -1,4 +1,4 @@
-import { Home, User, Settings, Mail, FileText, Users, CreditCard, Landmark, LayoutDashboard } from 'lucide-react';
+import { Home, User, Settings, Mail, FileText, Users, CreditCard, Landmark, LayoutDashboard, Shield, UserCheck, BarChart3 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FEATURES } from '@/config/features';
 
@@ -20,12 +20,13 @@ export const menuItemsAccueil = [
   { icon: CreditCard, label: 'Gestion Financière', path: '/finances', separator: true, featureFlag: 'ENABLE_FINANCES' },
   { icon: Landmark, label: 'Gestion Bancaire', path: '/banques', featureFlag: 'ENABLE_BANQUES' },
   { icon: Users, label: 'Gestion Employés', path: '/employes', featureFlag: 'ENABLE_EMPLOYES' },
+  { icon: Shield, label: 'Administration', path: '/admin', separator: true, featureFlag: 'ENABLE_COMPANY_ROLES' },
   { icon: User, label: 'Mon Profil', path: '/profil', separator: true, featureFlag: 'ENABLE_PROFIL'},
   { icon: Settings, label: 'Paramètres', path: '/parametres-global', featureFlag: 'ENABLE_PARAMETRES_GLOBAL' },
   { icon: Mail, label: 'Contact', path: '/contact' },
-  { 
-    icon: Users, 
-    label: 'Déconnexion', 
+  {
+    icon: Users,
+    label: 'Déconnexion',
     path: '/login',
     onClick: handleLogout
   }
@@ -93,6 +94,14 @@ export const menuItemsParamGestionRH = [
   { icon: Home, label: 'Type Contrat', path: '/employes/parametres-employes/type-contrat', featureFlag: 'ENABLE_TYPE_CONTRAT' },
   { icon: Home, label: 'Param Sous-Catégories RH', path: '/employes/parametres-employes/param-sous-categories-rh', featureFlag: 'ENABLE_PARAM_SOUS_CATEGORIES_RH' },
   { icon: Home, label: 'Param Généraux', path: '/employes/parametres-employes/param-generaux', separator: true, featureFlag: 'ENABLE_PARAM_GENERAUX' }
+];
+
+// 🛡️ Menu Administração - Company Roles
+export const menuItemsAdministracao = [
+  { icon: Shield, label: 'Administração', path: '/admin', featureFlag: 'ENABLE_COMPANY_ROLES' },
+  { icon: UserCheck, label: 'Gerenciar Papéis', path: '/company/roles', separator: true, featureFlag: 'ENABLE_COMPANY_ROLES' },
+  { icon: BarChart3, label: 'Dashboard Permissões', path: '/company/permissions/dashboard', featureFlag: 'ENABLE_PERMISSIONS_DASHBOARD' },
+  { icon: Users, label: 'Funcionários', path: '/employes', featureFlag: 'ENABLE_EMPLOYES' }
 ];
 
 // Fonction utilitaire pour filtrer les éléments de menu selon les feature flags

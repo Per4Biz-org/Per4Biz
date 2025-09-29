@@ -67,6 +67,7 @@ const MesFacturesLazy = React.lazy(() => import('./pages/finances/factures/MesFa
 import CompanyRolesPage from './pages/CompanyRoles/index'
 import EmployeeRolesPage from './pages/EmployeeRoles/index'
 import PermissionsDashboardPage from './pages/PermissionsDashboard/index'
+import AdminPage from './pages/admin/index'
 
 function App() {
   return (
@@ -224,6 +225,15 @@ function App() {
             )}
 
             {/* 🏢 Sistema de Company Roles */}
+            {FEATURES.ENABLE_COMPANY_ROLES && (
+              <Route path="/admin" element={
+                <PrivateRoute>
+                  <Layout>
+                    <AdminPage />
+                  </Layout>
+                </PrivateRoute>
+              } />
+            )}
             {FEATURES.ENABLE_COMPANY_ROLES && (
               <Route path="/company/roles" element={
                 <PrivateRoute>

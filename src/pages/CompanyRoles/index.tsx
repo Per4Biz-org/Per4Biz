@@ -3,20 +3,41 @@
 // Rota: /company/roles
 // ===============================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-// Importing required components and hooks
+import { useMenu } from '../../context/MenuContext';
+import { menuItemsAdministracao } from '../../config/menuConfig';
 import { useMockCompanyRoles } from '../../hooks/useMockCompanyRoles';
 import { Role, CreateRoleRequest, UpdateRoleRequest } from '../../types/company-roles';
+import {
+  Shield,
+  Plus,
+  Search,
+  Filter,
+  Edit3,
+  Trash2,
+  Eye,
+  Users,
+  Building,
+  Crown,
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal
+} from 'lucide-react';
 
 const CompanyRolesPage: React.FC = () => {
   const { t } = useTranslation();
+  const { setMenuItems } = useMenu();
   const [showModal, setShowModal] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedContext, setSelectedContext] = useState<'COMPANY' | 'BRANCH' | 'ALL'>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
+
+  useEffect(() => {
+    setMenuItems(menuItemsAdministracao);
+  }, [setMenuItems]);
 
   // TODO: Obter companyId do contexto de autenticação
   const companyId = 1;
@@ -59,12 +80,47 @@ const CompanyRolesPage: React.FC = () => {
     // TODO: Implementar visualização detalhada
   };
 
+  const getRoleIcon = (roleName: string) => {
+    if (roleName.includes('Administrador')) return Crown;
+    if (roleName.includes('Gerente') || roleName.includes('Supervisor')) return Shield;
+    return Users;
+  };
+
+  const getRoleBadge = (contextType: string, isSystem: boolean) => {
+    if (isSystem) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+          <Shield className="w-3 h-3" />
+          Sistema
+        </span>
+      );
+    }
+
+    if (contextType === 'COMPANY') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+          <Building className="w-3 h-3" />
+          Empresa
+        </span>
+      );
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
+        <Users className="w-3 h-3" />
+        Filial
+      </span>
+    );
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Carregando papéis...</p>
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+          </div>
+          <p className="mt-4 text-slate-600 font-medium">Carregando papéis...</p>
         </div>
       </div>
     );
@@ -72,12 +128,16 @@ const CompanyRolesPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Erro ao carregar papéis da empresa</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
+        <div className="text-center bg-white rounded-2xl p-12 shadow-xl border border-slate-200/60">
+          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Shield className="w-10 h-10 text-red-500" />
+          </div>
+          <h3 className="text-xl font-semibold text-slate-900 mb-4">Erro ao carregar papéis</h3>
+          <p className="text-slate-600 mb-8">Não foi possível carregar os papéis da empresa</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200"
           >
             Tentar novamente
           </button>
@@ -87,254 +147,316 @@ const CompanyRolesPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header da Página - Seção 3.1 */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                🏢 Gerenciamento de Papéis - ABC Tecnologia
-              </h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Gerir papéis e permissões da empresa
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+      {/* Header Moderno */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200/60">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="py-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-blue-600 rounded-xl blur-sm opacity-25"></div>
+                  <div className="relative bg-gradient-to-br from-blue-600 to-blue-700 p-3 rounded-xl">
+                    <Shield className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                    Gestão de Papéis
+                  </h1>
+                  <p className="text-slate-600 mt-1 text-lg">
+                    Configure papéis e permissões empresariais
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleCreateRole}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              >
+                <Plus className="w-5 h-5" />
+                Novo Papel
+              </button>
             </div>
-            <button
-              onClick={handleCreateRole}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              ➕ Novo
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Filtros */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
+      {/* Filtros e Busca */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-slate-200/60 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Busca */}
             <div className="flex-1">
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-400">🔍</span>
-                </div>
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Buscar papel..."
+                  placeholder="Buscar papéis por nome ou descrição..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                 />
               </div>
             </div>
-            <div className="flex gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Contexto:</label>
+
+            {/* Filtro de Contexto */}
+            <div className="lg:w-48">
+              <div className="relative">
+                <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <select
                   value={selectedContext}
                   onChange={(e) => setSelectedContext(e.target.value as 'COMPANY' | 'BRANCH' | 'ALL')}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-12 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer"
                 >
-                  <option value="ALL">Todos</option>
-                  <option value="COMPANY">🏢 Empresa</option>
-                  <option value="BRANCH">🏬 Filial</option>
+                  <option value="ALL">Todos os contextos</option>
+                  <option value="COMPANY">Empresa</option>
+                  <option value="BRANCH">Filial</option>
                 </select>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Tabela de Roles - Conforme ASCII Art seção 3.1 */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Nome do Papel
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contexto
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Usuários
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedRoles.map((role) => (
-                  <tr key={role.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <span className="mr-2">
-                          {role.name.includes('Administrador') ? '👑' :
-                           role.name.includes('Gerente') ? '📊' :
-                           role.name.includes('Supervisor') ? '📝' :
-                           role.name.includes('Financeiro') ? '💰' :
-                           role.name.includes('Operador') ? '👷' :
-                           role.name.includes('Auditor') ? '🔒' : '📋'}
-                        </span>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{role.name}</div>
-                          <div className="text-sm text-gray-500">{role.description}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
-                        {role.contextType === 'COMPANY' ? '🏢 Empresa' : '🏬 Filial'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {Math.floor(Math.random() * 20) + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {role.isSystemRole ? '🔒' : '✅'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleViewRole(role)}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="Visualizar"
-                        >
-                          👁️
-                        </button>
-                        {!role.isSystemRole && (
-                          <>
-                            <button
-                              onClick={() => handleEditRole(role)}
-                              className="text-indigo-600 hover:text-indigo-900"
-                              title="Editar"
-                            >
-                              ✏️
-                            </button>
-                            <button
-                              onClick={() => handleDeleteRole(role.id)}
-                              className="text-red-600 hover:text-red-900"
-                              title="Deletar"
-                            >
-                              🗑️
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Paginação */}
-          {totalPages > 1 && (
-            <div className="bg-white px-6 py-3 border-t border-gray-200 flex items-center justify-between">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  ◀ Anterior
-                </button>
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Próxima ▶
-                </button>
-              </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Mostrando <span className="font-medium">{startIndex + 1}</span> a{' '}
-                    <span className="font-medium">{Math.min(startIndex + itemsPerPage, filteredRoles.length)}</span> de{' '}
-                    <span className="font-medium">{filteredRoles.length}</span> resultados
-                  </p>
-                </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      ◀ Anterior
-                    </button>
-                    <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                      Página {currentPage} de {totalPages}
-                    </span>
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Próxima ▶
-                    </button>
-                  </nav>
-                </div>
+            {/* Stats */}
+            <div className="flex items-center gap-6 text-sm text-slate-600">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span>{filteredRoles.length} papéis</span>
               </div>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Mensagem quando não há roles */}
+        {/* Grid de Cards dos Papéis */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+          {paginatedRoles.map((role) => {
+            const RoleIcon = getRoleIcon(role.name);
+            return (
+              <div
+                key={role.id}
+                className="group relative bg-white rounded-2xl border border-slate-200/60 hover:border-slate-300/60 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1"
+              >
+                {/* Background Pattern */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/5 to-transparent rounded-2xl"></div>
+
+                <div className="relative">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+                        <RoleIcon className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-900 text-lg leading-tight">
+                          {role.name}
+                        </h3>
+                        <p className="text-slate-500 text-sm mt-1 line-clamp-2">
+                          {role.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Actions Dropdown */}
+                    <div className="relative">
+                      <button className="p-2 rounded-lg hover:bg-slate-100 transition-colors opacity-0 group-hover:opacity-100">
+                        <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Badges */}
+                  <div className="flex items-center gap-2 mb-4">
+                    {getRoleBadge(role.contextType, role.isSystemRole)}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200">
+                      <Users className="w-3 h-3" />
+                      {Math.floor(Math.random() * 20) + 1} usuários
+                    </span>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 pt-4 border-t border-slate-100">
+                    <button
+                      onClick={() => handleViewRole(role)}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-100 transition-all duration-200"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Ver
+                    </button>
+
+                    {!role.isSystemRole && (
+                      <>
+                        <button
+                          onClick={() => handleEditRole(role)}
+                          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-100 transition-all duration-200"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                          Editar
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteRole(role.id)}
+                          className="px-4 py-2 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100 transition-all duration-200"
+                          title="Excluir papel"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Empty State */}
         {filteredRoles.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <p className="text-gray-500">Nenhum papel encontrado.</p>
+          <div className="text-center py-16">
+            <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Shield className="w-12 h-12 text-slate-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-slate-900 mb-4">
+              {searchTerm ? 'Nenhum papel encontrado' : 'Nenhum papel criado'}
+            </h3>
+            <p className="text-slate-600 mb-8 max-w-md mx-auto">
+              {searchTerm
+                ? 'Tente ajustar os filtros ou criar um novo papel'
+                : 'Comece criando papéis personalizados para organizar as permissões da sua empresa'
+              }
+            </p>
             <button
               onClick={handleCreateRole}
-              className="mt-2 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200"
             >
-              ➕ Criar primeiro papel
+              <Plus className="w-5 h-5" />
+              Criar Primeiro Papel
             </button>
+          </div>
+        )}
+
+        {/* Paginação Moderna */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-slate-600">
+              Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, filteredRoles.length)} de {filteredRoles.length} papéis
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Anterior
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-all duration-200 ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                Próxima
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Modal placeholder */}
+      {/* Modal Moderno */}
       {showModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setShowModal(false)}></div>
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  {editingRole ? 'Editar Papel' : 'Novo Papel'}
-                </h3>
-                <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
-                  ❌
-                </button>
+          <div className="flex items-center justify-center min-h-screen p-4">
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+              onClick={() => setShowModal(false)}
+            ></div>
+
+            {/* Modal */}
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto transform transition-all">
+              {/* Header */}
+              <div className="px-8 py-6 border-b border-slate-200/60">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-50 rounded-lg">
+                      <Shield className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-slate-900">
+                        {editingRole ? 'Editar Papel' : 'Novo Papel'}
+                      </h3>
+                      <p className="text-slate-600">
+                        {editingRole ? 'Modifique as configurações do papel' : 'Configure um novo papel empresarial'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all duration-200"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div className="text-center py-8">
-                <p className="text-gray-600">Modal de criação/edição de papel</p>
-                <p className="text-sm text-gray-500 mt-2">
-                  TODO: Implementar formulário completo conforme seção 3.2
-                </p>
+
+              {/* Content */}
+              <div className="px-8 py-8">
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Shield className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-slate-900 mb-4">
+                    Formulário em Desenvolvimento
+                  </h4>
+                  <p className="text-slate-600 mb-2">
+                    O formulário completo de criação/edição de papéis será implementado
+                  </p>
+                  <p className="text-sm text-slate-500">
+                    Incluirá campos para nome, descrição, contexto e permissões específicas
+                  </p>
+                </div>
               </div>
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-                >
-                  💾 Salvar
-                </button>
+
+              {/* Footer */}
+              <div className="px-8 py-6 bg-slate-50/50 rounded-b-2xl border-t border-slate-200/60">
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-6 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-all duration-200"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg"
+                  >
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Salvar Papel
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

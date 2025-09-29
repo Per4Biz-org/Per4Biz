@@ -6,7 +6,6 @@ import { useProfil } from '../context/ProfilContext';
 import { menuItemsAccueil } from '../config/menuConfig';
 import MetricCard from '../components/dashboard/MetricCard';
 import ModernLineChart from '../components/dashboard/ModernLineChart';
-import TestCompanyRolesLinks from '../components/TestCompanyRolesLinks';
 import {
   BarChart3,
   Building2,
@@ -272,10 +271,6 @@ const Accueil: React.FC = () => {
           </div>
         </section>
 
-        {/* 🏢 Seção de Teste - Company Roles */}
-        <section className="pt-4">
-          <TestCompanyRolesLinks />
-        </section>
       </div>
     </div>
   );

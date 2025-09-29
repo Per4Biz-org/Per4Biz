@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMenu } from '../../context/MenuContext';
 import { useProfil } from '../../context/ProfilContext';
+import { useEntite } from '../../context/EntiteContext';
 import { menuItemsGestionRH } from '../../config/menuConfig';
-import { supabase } from '../../lib/supabase';
+import { useHRDashboard } from '../../hooks/useHRDashboard';
 import MetricCard from '../../components/dashboard/MetricCard';
 import ModernLineChart from '../../components/dashboard/ModernLineChart';
 import {
@@ -22,90 +23,90 @@ const Employes: React.FC = () => {
   const { t } = useTranslation();
   const { setMenuItems } = useMenu();
   const { profil } = useProfil();
-  const [loading, setLoading] = useState(true);
-  const [hrData, setHrData] = useState({
-    totalEmployees: 0,
-    activeEmployees: 0,
-    monthlyBudget: 0,
-    averageSalary: 0,
-    monthlyData: []
+  const { selectedEntite, selectedEntiteId } = useEntite();
+
+  // Usar o hook personalizado para dados RH reais
+  const { data, loading, error, metrics, monthlyData, refetch } = useHRDashboard({
+    companyId: profil?.com_contrat_client_id || '',
+    entiteId: selectedEntiteId || '',
+    autoFetch: true
   });
 
   useEffect(() => {
     setMenuItems(menuItemsGestionRH);
-    fetchHRData();
-  }, [setMenuItems, profil]);
+  }, [setMenuItems]);
 
-  const fetchHRData = async () => {
-    if (!profil?.com_contrat_client_id) {
-      setLoading(false);
-      return;
+  // Recarregar dados quando a entidade mudar
+  useEffect(() => {
+    if (selectedEntiteId && refetch) {
+      console.log(`🏢 Entidade RH alterada para: ${selectedEntite?.libelle} (${selectedEntiteId})`);
+      refetch();
     }
+  }, [selectedEntiteId, refetch, selectedEntite]);
 
-    try {
-      // Simulação de dados de RH - pode ser substituído por dados reais
-      // Aqui você pode fazer queries para buscar:
-      // - Número total de funcionários
-      // - Funcionários ativos
-      // - Orçamento mensal de RH
-      // - Salário médio
-      // - Dados dos últimos 6 meses
+  // Usar dados reais ou valores padrão se ainda estiver carregando
+  const totalEmployees = metrics?.totalEmployees || 0;
+  const activeEmployees = metrics?.activeEmployees || 0;
+  const monthlyBudget = metrics?.monthlyBudget || 0;
+  const averageSalary = metrics?.averageSalary || 0;
 
-      setHrData({
-        totalEmployees: 24,
-        activeEmployees: 22,
-        monthlyBudget: 45000,
-        averageSalary: 2045,
-        monthlyData: [
-          { name: 'Jan', orcamento: 42000, funcionarios: 20 },
-          { name: 'Fev', orcamento: 43500, funcionarios: 21 },
-          { name: 'Mar', orcamento: 44200, funcionarios: 22 },
-          { name: 'Abr', orcamento: 43800, funcionarios: 21 },
-          { name: 'Mai', orcamento: 44800, funcionarios: 23 },
-          { name: 'Jun', orcamento: 45000, funcionarios: 22 }
-        ]
-      });
-    } catch (error) {
-      console.error('Erro ao carregar dados de RH:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Dados para o gráfico
+  // Dados para o gráfico usando dados reais
   const chartSeries = [
     {
       id: 'orcamento',
       label: 'Orçamento RH',
       color: '#3b82f6',
-      data: hrData.monthlyData.map(item => item.orcamento)
+      data: monthlyData.map(item => item.orcamento)
     },
     {
       id: 'funcionarios',
       label: 'Nº Funcionários',
       color: '#10b981',
-      data: hrData.monthlyData.map(item => item.funcionarios * 1000) // Escalar para visualização
+      data: monthlyData.map(item => item.funcionarios * 1000) // Escalar para visualização
     }
   ];
 
-  const chartCategories = hrData.monthlyData.map(item => item.name);
+  const chartCategories = monthlyData.map(item => item.monthName || item.month);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-full mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            {t('pages.employees.title', 'Gestão de Funcionários')}
-          </h1>
-          <p className="text-sm text-gray-600">
-            {t('pages.employees.subtitle', 'Visão geral dos recursos humanos')}
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                {t('pages.employees.title', 'Gestão de Funcionários')}
+              </h1>
+              <p className="text-sm text-gray-600">
+                {t('pages.employees.subtitle', 'Visão geral dos recursos humanos')}
+              </p>
+            </div>
+            {selectedEntite && (
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Dados filtrados por:</p>
+                <p className="text-sm font-semibold text-purple-600">
+                  {selectedEntite.code} - {selectedEntite.libelle}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">A carregar dados de RH...</p>
+            <div className="text-center">
+              <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-500">Carregando dados RH do banco...</p>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-center">
+              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <p className="text-red-600 font-medium">Erro ao carregar dados RH</p>
+              <p className="text-gray-500 text-sm mt-2">{error}</p>
+            </div>
           </div>
         ) : (
           <div className="space-y-6">
@@ -114,12 +115,12 @@ const Employes: React.FC = () => {
               <MetricCard
                 icon={Users}
                 label="Total Funcionários"
-                value={hrData.totalEmployees.toString()}
+                value={totalEmployees.toString()}
                 helper="Colaboradores registrados"
-                trendLabel="+2 este mês"
-                trendDirection="up"
+                trendLabel={totalEmployees > 0 ? "Dados do banco" : "Aguardando dados"}
+                trendDirection="neutral"
                 accent="blue"
-                trendData={[20, 21, 22, 21, 23, 24]}
+                trendData={monthlyData.slice(-6).map(item => item.funcionarios)}
                 chartColor="#3b82f6"
                 chartFill="rgba(59, 130, 246, 0.1)"
               />
@@ -127,12 +128,12 @@ const Employes: React.FC = () => {
               <MetricCard
                 icon={UserCheck}
                 label="Funcionários Ativos"
-                value={hrData.activeEmployees.toString()}
+                value={activeEmployees.toString()}
                 helper="Colaboradores em atividade"
-                trendLabel="91.7% taxa atividade"
-                trendDirection="up"
+                trendLabel={activeEmployees > 0 ? "Dados reais" : "Nenhum ativo"}
+                trendDirection={activeEmployees > 0 ? "up" : "neutral"}
                 accent="green"
-                trendData={[19, 20, 21, 20, 22, 22]}
+                trendData={monthlyData.slice(-6).map(item => Math.max(0, item.funcionarios - 1))}
                 chartColor="#10b981"
                 chartFill="rgba(16, 185, 129, 0.1)"
               />
@@ -140,12 +141,12 @@ const Employes: React.FC = () => {
               <MetricCard
                 icon={DollarSign}
                 label="Orçamento Mensal"
-                value={`EUR ${(hrData.monthlyBudget / 1000).toFixed(0)}K`}
+                value={monthlyBudget > 0 ? `EUR ${(monthlyBudget / 1000).toFixed(0)}K` : 'EUR 0K'}
                 helper="Total custos mensais RH"
-                trendLabel="+5% vs mês anterior"
-                trendDirection="up"
+                trendLabel={monthlyBudget > 0 ? "Calculado automaticamente" : "Sem dados"}
+                trendDirection="neutral"
                 accent="purple"
-                trendData={[42, 43.5, 44.2, 43.8, 44.8, 45]}
+                trendData={monthlyData.slice(-6).map(item => item.orcamento / 1000)}
                 chartColor="#8b5cf6"
                 chartFill="rgba(139, 92, 246, 0.1)"
               />
@@ -153,12 +154,12 @@ const Employes: React.FC = () => {
               <MetricCard
                 icon={TrendingUp}
                 label="Salário Médio"
-                value={`EUR ${hrData.averageSalary}`}
+                value={averageSalary > 0 ? `EUR ${averageSalary.toFixed(0)}` : 'EUR 0'}
                 helper="Remuneração média mensal"
-                trendLabel="+3.2% vs ano anterior"
-                trendDirection="up"
+                trendLabel={averageSalary > 0 ? "Baseado em contratos" : "Sem dados salariais"}
+                trendDirection="neutral"
                 accent="amber"
-                trendData={[1980, 2010, 2005, 2025, 2035, 2045]}
+                trendData={monthlyData.slice(-6).map(item => item.orcamento / Math.max(1, item.funcionarios))}
                 chartColor="#f59e0b"
                 chartFill="rgba(245, 158, 11, 0.1)"
               />
@@ -236,20 +237,20 @@ const Employes: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Funcionários</span>
                     <span className="text-sm font-semibold text-blue-600">
-                      {hrData.activeEmployees} ativos
+                      {activeEmployees} ativos
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Orçamento</span>
                     <span className="text-sm font-semibold text-purple-600">
-                      EUR {(hrData.monthlyBudget / 1000).toFixed(0)}K
+                      EUR {(monthlyBudget / 1000).toFixed(0)}K
                     </span>
                   </div>
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-semibold text-gray-900">Custo Médio</span>
                       <span className="text-sm font-bold text-gray-900">
-                        EUR {Math.round(hrData.monthlyBudget / hrData.activeEmployees)}
+                        EUR {activeEmployees > 0 ? Math.round(monthlyBudget / activeEmployees) : 0}
                       </span>
                     </div>
                   </div>

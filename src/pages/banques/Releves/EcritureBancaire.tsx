@@ -2,17 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { fr, enUS, pt } from 'date-fns/locale';
-import { useTranslation } from 'react-i18next';
-import { useMenu } from '../../../context/MenuContext';
-import { useProfil } from '../../../context/ProfilContext'; 
-import { supabase } from '../../../lib/supabase';
-import { menuItemsGestionBancaire } from '../../../config/menuConfig';
-import { PageSection } from '../../../components/ui/page-section';
-import { DataTable, Column } from '../../../components/ui/data-table';
-import { Button } from '../../../components/ui/button';
-import { ToastContainer, ToastData } from '../../../components/ui/toast';
-import { FilterSection } from '../../../components/filters/FilterSection';
-import styles from '../styles.module.css';
+
 
 interface Entite {
   id: string;
