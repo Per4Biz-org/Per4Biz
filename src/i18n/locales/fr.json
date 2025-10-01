@@ -392,6 +392,7 @@
         "errorFetchingNatureFlux": "Erreur lors de la r\u00e9cup\u00e9ration des natures de flux",
         "errorDeletingNatureFlux": "Erreur lors de la suppression de la nature de flux",
         "employee": "Salari\u00e9",
+        "status": "Statut",
         "categorieFluxTitle": "Cat\u00e9gories des Flux",
         "categorieFluxDescription": "G\u00e9rez les cat\u00e9gories des flux financiers par entit\u00e9",
         "addCategorieFlux": "Ajouter une cat\u00e9gorie de flux",
@@ -487,6 +488,33 @@
     "invoices": {
         "attachment": "PJ",
         "showInvoices": "Afficher les Factures",
+        "status": {
+            "pending": "En attente",
+            "paid": "Payé",
+            "overdue": "En retard"
+        },
+        "dashboard": {
+            "totalPending": "Total en Attente",
+            "overdueInvoices": "Factures en Retard",
+            "paidThisMonth": "Payées ce Mois",
+            "kpiValue": "€",
+            "kpiCount": "factures"
+        },
+        "actions": {
+            "markAsPaid": "Marquer comme Payé",
+            "markAsPaidConfirm": "Êtes-vous sûr de vouloir marquer cette facture comme payée ?",
+            "markAsPaidSuccess": "Facture marquée comme payée avec succès",
+            "markAsPaidError": "Erreur lors du marquage de la facture comme payée",
+            "bulkMarkAsPaid": "Marquer les Sélectionnées comme Payées",
+            "bulkMarkAsPaidConfirm": "Êtes-vous sûr de vouloir marquer {{count}} factures comme payées ?",
+            "bulkMarkAsPaidSuccess": "{{count}} factures marquées comme payées avec succès",
+            "selectInvoices": "Sélectionner des factures",
+            "selectedCount": "{{count}} sélectionnée(s)"
+        },
+        "chart": {
+            "title": "Évolution des Factures",
+            "subtitle": "Distribution par statut sur les 6 derniers mois"
+        },
         "modal": {
             "editInvoice": "Modifier une facture d'achat",
             "newInvoice": "Nouvelle facture d'achat",

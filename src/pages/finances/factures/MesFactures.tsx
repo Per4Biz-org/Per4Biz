@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
@@ -13,8 +13,10 @@ import { PageSection } from '../../../components/ui/page-section';
 import { DataTable, Column } from '../../../components/ui/data-table';
 import { Button } from '../../../components/ui/button';
 import { FilterSection } from '../../../components/filters/FilterSection';
-import { ToastContainer, ToastData } from '../../../components/ui/toast'; 
+import { ToastContainer, ToastData } from '../../../components/ui/toast';
 import EditFactureAchatModal from '../../../components/finances/factures/EditFactureAchatModal';
+import { InvoiceKPIDashboard } from '../../../components/finances/factures/InvoiceKPIDashboard';
+import { InvoiceEvolutionChart } from '../../../components/finances/factures/InvoiceEvolutionChart';
 import styles from '../styles.module.css';
 
 interface FactureAchat {
@@ -27,6 +29,9 @@ interface FactureAchat {
   lien_piece_jointe: string | null;
   commentaire: string | null;
   created_at: string;
+  status: 'pendente' | 'pago' | 'vencido';
+  data_vencimento: string | null;
+  data_pagamento: string | null;
   entite: {
     code: string;
     libelle: string;
@@ -73,6 +78,7 @@ const MesFactures: React.FC = () => {
         console.error("Erreur lors du parsing des filtres sauvegardés:", e);
         return {
           entite: '',
+          status: '',
           dateDebut: format(startOfMonth(subMonths(new Date(), 1)), 'yyyy-MM-dd'),
           dateFin: format(endOfMonth(new Date()), 'yyyy-MM-dd')
         };
@@ -80,6 +86,7 @@ const MesFactures: React.FC = () => {
     }
     return {
       entite: '',
+      status: '',
       dateDebut: format(startOfMonth(subMonths(new Date(), 1)), 'yyyy-MM-dd'),
       dateFin: format(endOfMonth(new Date()), 'yyyy-MM-dd')
     };
@@ -89,10 +96,13 @@ const MesFactures: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [toasts, setToasts] = useState<ToastData[]>([]);
   const [searchPerformed, setSearchPerformed] = useState(false);
-  
+
   // États pour la modale d'édition de facture
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedFactureId, setSelectedFactureId] = useState<string | undefined>(undefined);
+
+  // États pour seleção múltipla
+  const [selectedFactures, setSelectedFactures] = useState<Set<string>>(new Set());
 
   // État pour stocker le type de facture "exploitation"
   const [exploitationTypeFacture, setExploitationTypeFacture] = useState<{id: string, libelle: string} | null>(null);
@@ -128,19 +138,24 @@ const MesFactures: React.FC = () => {
       if (filters.entite) {
         // Trouver l'entité sélectionnée par son code ou son id
         const entiteSelectionnee = entites.find(e => e.code === filters.entite || e.id === filters.entite);
-        if (entiteSelectionnee) { 
+        if (entiteSelectionnee) {
           console.log(`Filtrage par entité: ${entiteSelectionnee.code} (ID: ${entiteSelectionnee.id})`);
-          query = query.eq('id_entite', entiteSelectionnee.id); 
+          query = query.eq('id_entite', entiteSelectionnee.id);
         } else {
           console.warn(`Entité sélectionnée non trouvée dans la liste: ${filters.entite}`);
         }
       }
-      
+
+      // Filtrer par status si sélectionné
+      if (filters.status) {
+        query = query.eq('status', filters.status);
+      }
+
       // Filtrer par date
       if (filters.dateDebut) {
         query = query.gte('date_facture', filters.dateDebut);
       }
-      
+
       if (filters.dateFin) {
         query = query.lte('date_facture', filters.dateFin);
       }
@@ -318,6 +333,92 @@ const MesFactures: React.FC = () => {
     }
   };
 
+  const handleMarkAsPaid = async (facture: FactureAchat) => {
+    if (window.confirm(t('invoices.actions.markAsPaidConfirm'))) {
+      try {
+        const { error } = await supabase
+          .from('fin_facture_achat')
+          .update({
+            status: 'pago',
+            data_pagamento: new Date().toISOString()
+          })
+          .eq('id', facture.id);
+
+        if (error) throw error;
+
+        await fetchFactures();
+        addToast({
+          label: t('invoices.actions.markAsPaidSuccess'),
+          icon: 'Check',
+          color: '#22c55e'
+        });
+      } catch (error) {
+        console.error('Erro ao marcar fatura como paga:', error);
+        addToast({
+          label: t('invoices.actions.markAsPaidError'),
+          icon: 'AlertTriangle',
+          color: '#ef4444'
+        });
+      }
+    }
+  };
+
+  const handleBulkMarkAsPaid = async () => {
+    const count = selectedFactures.size;
+    if (count === 0) return;
+
+    if (window.confirm(t('invoices.actions.bulkMarkAsPaidConfirm', { count }))) {
+      try {
+        const factureIds = Array.from(selectedFactures);
+
+        const { error } = await supabase
+          .from('fin_facture_achat')
+          .update({
+            status: 'pago',
+            data_pagamento: new Date().toISOString()
+          })
+          .in('id', factureIds);
+
+        if (error) throw error;
+
+        setSelectedFactures(new Set());
+        await fetchFactures();
+        addToast({
+          label: t('invoices.actions.bulkMarkAsPaidSuccess', { count }),
+          icon: 'Check',
+          color: '#22c55e'
+        });
+      } catch (error) {
+        console.error('Erro ao marcar faturas como pagas:', error);
+        addToast({
+          label: t('invoices.actions.markAsPaidError'),
+          icon: 'AlertTriangle',
+          color: '#ef4444'
+        });
+      }
+    }
+  };
+
+  const handleToggleSelectFacture = (factureId: string) => {
+    setSelectedFactures(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(factureId)) {
+        newSet.delete(factureId);
+      } else {
+        newSet.add(factureId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleToggleSelectAll = () => {
+    if (selectedFactures.size === filteredFactures.length) {
+      setSelectedFactures(new Set());
+    } else {
+      setSelectedFactures(new Set(filteredFactures.map(f => f.id)));
+    }
+  };
+
   const handleFilterChange = (updatedFilters: { [key: string]: any }) => {
     setFilters(updatedFilters);
     // Sauvegarder les filtres dans le localStorage
@@ -419,7 +520,7 @@ const MesFactures: React.FC = () => {
     });
   };
 
-  const filterConfigs = [
+  const filterConfigs = useMemo(() => [
     {
       name: 'entite',
       label: t('forms.entity', 'Entité'),
@@ -428,9 +529,20 @@ const MesFactures: React.FC = () => {
         id: entite.id,
         code: entite.code,
         libelle: entite.libelle
-      })), 
+      })),
       isEntityOption: true,
       requireSelection: true
+    },
+    {
+      name: 'status',
+      label: t('financial.status', 'Status'),
+      type: 'select' as const,
+      options: [
+        { id: 'pendente', code: 'pendente', libelle: String(t('invoices.status.pending', 'Pendente')) },
+        { id: 'pago', code: 'pago', libelle: String(t('invoices.status.paid', 'Pago')) },
+        { id: 'vencido', code: 'vencido', libelle: String(t('invoices.status.overdue', 'Vencido')) }
+      ],
+      width: '140px'
     },
     {
       name: 'dateDebut',
@@ -444,7 +556,7 @@ const MesFactures: React.FC = () => {
       type: 'date' as const,
       width: '160px'
     }
-  ];
+  ], [t, entites]);
 
   const columns: Column<FactureAchat>[] = [
     {
@@ -458,6 +570,34 @@ const MesFactures: React.FC = () => {
       accessor: 'date_facture',
       sortable: true,
       render: (value) => format(new Date(value), 'dd/MM/yyyy', { locale: fr })
+    },
+    {
+      label: t('financial.status', 'Status'),
+      accessor: 'status',
+      sortable: true,
+      width: '120px',
+      align: 'center',
+      render: (value) => {
+        const statusConfig = {
+          pendente: { color: '#f59e0b', bg: '#fef3c7', label: t('invoices.status.pending', 'Pendente') },
+          pago: { color: '#22c55e', bg: '#dcfce7', label: t('invoices.status.paid', 'Pago') },
+          vencido: { color: '#ef4444', bg: '#fee2e2', label: t('invoices.status.overdue', 'Vencido') }
+        };
+        const config = statusConfig[value] || statusConfig.pendente;
+        return (
+          <span style={{
+            backgroundColor: config.bg,
+            color: config.color,
+            padding: '4px 12px',
+            borderRadius: '12px',
+            fontSize: '12px',
+            fontWeight: '600',
+            display: 'inline-block'
+          }}>
+            {config.label}
+          </span>
+        );
+      }
     },
     {
       label: t('forms.entity', 'Entité'),
@@ -537,6 +677,13 @@ const MesFactures: React.FC = () => {
 
   const actions = [
     {
+      label: t('invoices.actions.markAsPaid'),
+      icon: 'check',
+      color: '#22c55e',
+      onClick: handleMarkAsPaid,
+      condition: (facture: FactureAchat) => facture.status !== 'pago'
+    },
+    {
       label: t('table.edit', 'Éditer'),
       icon: 'edit',
       color: 'var(--color-primary)',
@@ -562,6 +709,18 @@ const MesFactures: React.FC = () => {
             {t('pages.finances.invoicesSubtitle', 'Visualize e gira as suas facturas de compra')}
           </p>
         </div>
+
+        {/* Dashboard KPIs */}
+        {searchPerformed && factures.length > 0 && (
+          <>
+            <InvoiceKPIDashboard factures={factures} />
+
+            {/* Gráfico de evolução */}
+            <div className="mb-6">
+              <InvoiceEvolutionChart factures={factures} monthsToShow={6} />
+            </div>
+          </>
+        )}
 
         {/* Container principal */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -621,6 +780,21 @@ const MesFactures: React.FC = () => {
               </div>
             </div>
 
+            {/* Bulk actions bar */}
+            {searchPerformed && selectedFactures.size > 0 && (
+              <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                <span className="text-sm font-medium text-blue-900">
+                  {t('invoices.actions.selectedCount', { count: selectedFactures.size })}
+                </span>
+                <Button
+                  label={t('invoices.actions.bulkMarkAsPaid')}
+                  icon="Check"
+                  color="#22c55e"
+                  onClick={handleBulkMarkAsPaid}
+                />
+              </div>
+            )}
+
             {/* Status info */}
             <div className="mt-4 text-sm text-gray-600">
               {searchPerformed && factures.length > 0 ? (
@@ -653,6 +827,10 @@ const MesFactures: React.FC = () => {
               defaultRowsPerPage={10}
               emptyTitle={t('messages.noInvoices', 'Aucune facture')}
               emptyMessage={t('messages.noInvoicesCreated', 'Aucune facture d\'achat n\'a été créée pour le moment.')}
+              selectable={true}
+              selectedRows={selectedFactures}
+              onSelectRow={handleToggleSelectFacture}
+              onSelectAll={handleToggleSelectAll}
             />
           )}
         </div>

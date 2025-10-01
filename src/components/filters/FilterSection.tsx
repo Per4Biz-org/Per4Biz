@@ -51,24 +51,36 @@ export function FilterSection({
 
         let dropdownOptions: DropdownOption[];
         
-        if (filter.isEntityOption) {
-          // Para as opções de entidade (com código e rótulo)
+        // Verificar se as opções são objetos com estrutura { id, code, libelle }
+        const firstOption = options[0];
+        const isObjectOption = typeof firstOption === 'object' && firstOption !== null && 'libelle' in firstOption;
+
+        if (isObjectOption) {
+          // Para opções de entidade ou qualquer objeto com código e rótulo
           const entityOptions = options as { id?: string; code: string; libelle: string }[];
-          dropdownOptions = requireSelection ? [] : [
-            { value: '', label: `${t('common.all')} ${label.toLowerCase()}` }
-          ];
-          
-          dropdownOptions = requireSelection ? 
-            entityOptions.map(option => ({
-              value: option.code,
-              label: `${option.code} - ${option.libelle}`
-            })) : [
-            { value: '', label: `${t('common.all')} ${label.toLowerCase()}` },
-            ...entityOptions.map(option => ({
-              value: option.code,
-              label: `${option.code} - ${option.libelle}`
-            }))
-          ];
+
+          if (filter.isEntityOption) {
+            dropdownOptions = requireSelection ?
+              entityOptions.map(option => ({
+                value: option.code,
+                label: `${option.code} - ${option.libelle}`
+              })) : [
+              { value: '', label: `${t('common.all')} ${label.toLowerCase()}` },
+              ...entityOptions.map(option => ({
+                value: option.code,
+                label: `${option.code} - ${option.libelle}`
+              }))
+            ];
+          } else {
+            // Para outras opções de objeto (como status)
+            dropdownOptions = [
+              { value: '', label: `${t('common.all', 'Todos')} ${label.toLowerCase()}` },
+              ...entityOptions.map(option => ({
+                value: option.code,
+                label: option.libelle
+              }))
+            ];
+          }
         } else {
           // Para as opções simples (string ou number)
           dropdownOptions = [

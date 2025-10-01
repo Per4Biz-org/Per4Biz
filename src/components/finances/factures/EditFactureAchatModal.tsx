@@ -22,6 +22,9 @@ interface FactureAchat {
   montant_ttc: number;
   commentaire?: string | null;
   lien_piece_jointe?: string | null;
+  status?: 'pendente' | 'pago' | 'vencido';
+  data_vencimento?: string | null;
+  data_pagamento?: string | null;
 }
 
 interface FactureLigne {

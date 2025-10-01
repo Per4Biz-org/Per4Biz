@@ -395,6 +395,7 @@
         "errorFetchingNatureFlux": "Error fetching cash flow natures",
         "errorDeletingNatureFlux": "Error deleting cash flow nature",
         "employee": "Employee",
+        "status": "Status",
         "categorieFluxTitle": "Cash Flow Categories",
         "categorieFluxDescription": "Manage cash flow categories by entity",
         "addCategorieFlux": "Add a cash flow category",
@@ -562,6 +563,33 @@
     "invoices": {
         "attachment": "Attach.",
         "showInvoices": "Show Invoices",
+        "status": {
+            "pending": "Pending",
+            "paid": "Paid",
+            "overdue": "Overdue"
+        },
+        "dashboard": {
+            "totalPending": "Total Pending",
+            "overdueInvoices": "Overdue Invoices",
+            "paidThisMonth": "Paid this Month",
+            "kpiValue": "€",
+            "kpiCount": "invoices"
+        },
+        "actions": {
+            "markAsPaid": "Mark as Paid",
+            "markAsPaidConfirm": "Are you sure you want to mark this invoice as paid?",
+            "markAsPaidSuccess": "Invoice marked as paid successfully",
+            "markAsPaidError": "Error marking invoice as paid",
+            "bulkMarkAsPaid": "Mark Selected as Paid",
+            "bulkMarkAsPaidConfirm": "Are you sure you want to mark {{count}} invoices as paid?",
+            "bulkMarkAsPaidSuccess": "{{count}} invoices marked as paid successfully",
+            "selectInvoices": "Select invoices",
+            "selectedCount": "{{count}} selected"
+        },
+        "chart": {
+            "title": "Invoice Evolution",
+            "subtitle": "Distribution by status over the last 6 months"
+        },
         "modal": {
             "editInvoice": "Edit purchase invoice",
             "newInvoice": "New purchase invoice",
